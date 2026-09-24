@@ -5,8 +5,8 @@ import assert from 'node:assert/strict';
 
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const src = html.slice(html.indexOf('/* ENGINE START */'), html.indexOf('/* ENGINE END */'));
-const engine = new Function(`${src}; return { simulatePayoff, projectSavings, FREQUENCIES };`)();
-const { simulatePayoff } = engine;
+const engine = new Function(`${src}; return { simulatePayoff, projectPlan, projectSavings, normalize, baselineAt, FREQUENCIES };`)();
+const { simulatePayoff, projectPlan, normalize, baselineAt } = engine;
 
 // Three fake cards (sample data only).
 const cards = [
@@ -56,6 +56,143 @@ assert.equal(promo.totalInterest, 0);
 const tooLow = simulatePayoff(cards, { ...base, perPaycheck: 50, strategy: 'avalanche' });
 assert.equal(tooLow.ok, false);
 assert.ok(tooLow.warnings.length > 0);
+
+// ----- credit buffers: restore first, flagged urgent -----
+{
+  // Card P: limit $19,900, keep $1,000 open → buffer line $18,900. Balance $19,400 is $500 over.
+  const withBuffer = [
+    { id: 'p', name: 'Platinum', balance: 19400, apr: 12.99, minPayment: 400, creditLimit: 19900, keepOpen: 1000 },
+    { id: 'h', name: 'High APR', balance: 3000, apr: 29.99, minPayment: 90 }
+  ];
+  // Payday Sep 25 is in the same month as "today", so no interest is added before it and the numbers stay exact.
+  const sameMonth = { ...base, payAnchor: '2026-09-25' };
+  const r = simulatePayoff(withBuffer, { ...sameMonth, perPaycheck: 1200, strategy: 'avalanche' });
+  assert.ok(r.ok);
+  assert.deepEqual(r.overBuffer, [{ id: 'p', name: 'Platinum', over: 500 }]);
+  const first = r.paychecks[0];
+  const p = first.allocations.find((a) => a.id === 'p');
+  const h = first.allocations.find((a) => a.id === 'h');
+  // minimums: 400 + 90; then buffer restore 500 - (400 already paid) = 100 more to P; rest to High APR (avalanche target)
+  assert.equal(p.amount, 500, 'P gets min + whatever restores the buffer');
+  assert.equal(p.buffer, 100, 'buffer portion is tracked separately');
+  assert.equal(h.amount, 700, 'everything left goes to the avalanche target only after the buffer');
+  assert.equal(first.urgent, true, 'paycheck is flagged urgent');
+  assert.equal(r.bufferRestored.p, first.date);
+  // Without the buffer the same paycheck would send nothing extra to P.
+  const noBuf = simulatePayoff(withBuffer.map((d) => ({ ...d, creditLimit: null, keepOpen: 0 })), { ...sameMonth, perPaycheck: 1200, strategy: 'avalanche' });
+  assert.equal(noBuf.paychecks[0].allocations.find((a) => a.id === 'p').amount, 400);
+  assert.equal(noBuf.paychecks[0].urgent, false);
+
+  // Snowball would target the smaller High APR card, but the buffer still comes first.
+  const tight = simulatePayoff(withBuffer, { ...sameMonth, perPaycheck: 600, strategy: 'snowball' });
+  const tp = tight.paychecks[0].allocations;
+  assert.equal(tp.find((a) => a.id === 'p').amount, 500, 'buffer restored before snowball extra');
+  assert.equal(tp.find((a) => a.id === 'h').amount, 100, 'snowball target gets only what is left');
+
+  // Lump sum also restores buffers first.
+  const lump = simulatePayoff(withBuffer, { ...sameMonth, perPaycheck: 1200, strategy: 'avalanche', lumpSum: 800 });
+  assert.equal(lump.lump.allocations[0].id, 'p');
+  assert.equal(lump.lump.allocations[0].buffer, 500);
+  assert.equal(lump.lump.allocations.find((a) => a.id === 'h').amount, 300);
+  assert.equal(lump.lump.urgent, true);
+
+  // A card under its line is never urgent.
+  const under = simulatePayoff([{ ...withBuffer[0], balance: 10000 }], { ...sameMonth, perPaycheck: 800 });
+  assert.equal(under.paychecks.some((pc) => pc.urgent), false);
+  assert.ok(Math.abs(r.totalPaid - (19400 + 3000 + r.totalInterest)) < 0.02, 'conservation with buffers');
+}
+
+// ----- custom order -----
+{
+  const order = ['c', 'b', 'a'];   // not avalanche (a,c,b) and not snowball (b,c,a)
+  const r = simulatePayoff(cards, { ...base, strategy: 'custom', customOrder: order });
+  assert.deepEqual(r.payoffs.map((p) => p.id), order, 'debts are paid off in the custom order');
+  const extra = r.paychecks[0].allocations.find((a) => a.id === 'c');
+  assert.ok(extra.amount > 75, 'extra money goes to #1 in the custom order');
+  const lump = simulatePayoff(cards, { ...base, strategy: 'custom', customOrder: order, lumpSum: LUMP });
+  assert.equal(lump.lump.allocations[0].id, 'c');
+  // Debts missing from the saved order are appended (avalanche among themselves), not dropped.
+  const partial = simulatePayoff(cards, { ...base, strategy: 'custom', customOrder: ['b'] });
+  assert.deepEqual(partial.payoffs.map((p) => p.id), ['b', 'a', 'c']);
+  assert.equal(partial.payoffs.length, 3);
+}
+
+// ----- migration of data saved by the first version -----
+{
+  const v1 = {
+    version: 1,
+    debts: [
+      { id: 'x1', name: 'Old Card', type: 'card', balance: 1234.56, startBalance: 2000, apr: 22.9, minPayment: 40, promoEnd: '', paid: false, paidAt: null, createdAt: '2026-09-01T00:00:00Z' },
+      { id: 'x2', name: 'Old Loan', type: 'loan', balance: 0, startBalance: 500, apr: 6, minPayment: 50, promoEnd: '2026-12-31', paid: true, paidAt: '2026-09-20T00:00:00Z', createdAt: '2026-09-01T00:00:00Z' }
+    ],
+    budget: { takeHome: 2400, frequency: 'biweekly', payAnchor: '2026-09-25', debtPerPaycheck: 500, savingsPerPaycheck: 150, lumpSum: 1000 },
+    strategy: 'snowball',
+    activePlan: 'B',
+    savings: { balance: 3000, goal: 10000, apy: 4.1, monthlyContribution: null },
+    history: [{ id: 'h1', at: '2026-09-20T00:00:00Z', kind: 'paid', debtId: 'x2', debtName: 'Old Loan', amount: 500, before: 500, after: 0 }],
+    milestones: { 25: '2026-09-20T00:00:00Z' }
+  };
+  const before = JSON.parse(JSON.stringify(v1));
+  const m = normalize(v1, '2026-09-24');
+  assert.deepEqual(v1, before, 'normalize does not mutate its input');
+  // every old field keeps its name and value
+  for (const k of ['id', 'name', 'type', 'balance', 'startBalance', 'apr', 'minPayment', 'promoEnd', 'paid', 'paidAt', 'createdAt']) {
+    assert.deepEqual(m.debts[0][k], v1.debts[0][k], `debt.${k} preserved`);
+    assert.deepEqual(m.debts[1][k], v1.debts[1][k], `paid debt.${k} preserved`);
+  }
+  for (const k of Object.keys(v1.budget)) assert.equal(m.budget[k], v1.budget[k], `budget.${k} preserved`);
+  assert.deepEqual(m.savings, v1.savings);
+  assert.equal(m.strategy, 'snowball');
+  assert.equal(m.activePlan, 'B');
+  assert.deepEqual(m.history, v1.history);
+  assert.deepEqual(m.milestones, v1.milestones);
+  // new fields get safe defaults
+  assert.equal(m.debts[0].creditLimit, null);
+  assert.equal(m.debts[0].keepOpen, 0);
+  assert.equal(m.debts[0].dueDay, null);
+  assert.equal(m.budget.rentReserve, 0);
+  assert.equal(m.budget.spending, 0);
+  assert.deepEqual(m.budget.customItems, []);
+  assert.deepEqual(m.budget.freedLater, {});
+  assert.equal(m.budget.lumpFromSavings, false);
+  assert.deepEqual(m.customOrder, []);
+  assert.deepEqual(m.customMilestones, []);
+  assert.deepEqual(m.checkins, []);
+  assert.equal(m.baseline, null);
+  // idempotent, JSON-safe, and the migrated data simulates the same as before
+  assert.deepEqual(normalize(JSON.parse(JSON.stringify(m)), '2026-09-24'), m, 'normalize is idempotent');
+  const opts = { perPaycheck: 500, frequency: 'biweekly', payAnchor: '2026-09-25', today: '2026-09-24', strategy: 'snowball' };
+  assert.deepEqual(simulatePayoff(m.debts, opts).payoffs, simulatePayoff(v1.debts, opts).payoffs, 'same payoff result after migration');
+  // unknown fields (e.g. from a future version) survive
+  const future = normalize({ ...v1, futureThing: { a: 1 }, debts: [{ ...v1.debts[0], futureField: 'keep me' }] }, '2026-09-24');
+  assert.deepEqual(future.futureThing, { a: 1 });
+  assert.equal(future.debts[0].futureField, 'keep me');
+  // garbage in → usable defaults out
+  const empty = normalize(null, '2026-09-24');
+  assert.deepEqual(empty.debts, []);
+  assert.equal(empty.strategy, 'avalanche');
+  const bad = normalize({ debts: [null, 5, { name: 'X', balance: '-5', apr: 'abc', dueDay: 45 }], strategy: 'weird', customOrder: ['nope'] }, '2026-09-24');
+  assert.equal(bad.debts.length, 1);
+  assert.equal(bad.debts[0].balance, 0);
+  assert.equal(bad.debts[0].apr, 0);
+  assert.equal(bad.debts[0].dueDay, null);
+  assert.equal(bad.strategy, 'avalanche');
+  assert.deepEqual(bad.customOrder, [], 'custom order drops ids that no longer exist');
+  assert.equal(normalize({ ...v1, strategy: 'custom', customOrder: ['x1', 'x1', 'gone'] }, '2026-09-24').customOrder.join(), 'x1');
+}
+
+// ----- projection & baseline helpers -----
+{
+  const plan = simulatePayoff(cards, { ...base, strategy: 'avalanche' });
+  const proj = projectPlan(plan, { balance: 1000, apy: 0, monthlyContribution: 100, lumpFromSavings: false });
+  assert.equal(proj[0].debt, 7750);
+  assert.equal(proj[proj.length - 1].debt, 0);
+  assert.equal(proj[proj.length - 1].date, plan.debtFree);
+  assert.equal(proj[proj.length - 1].hysa, 1000 + 100 * plan.months + plan.paychecks[plan.paychecks.length - 1].leftover, 'HYSA grows by contributions + freed-up money');
+  const planB = simulatePayoff(cards, { ...base, strategy: 'avalanche', lumpSum: 500 });
+  assert.equal(projectPlan(planB, { balance: 1000, apy: 0, monthlyContribution: 0, lumpFromSavings: true })[0].hysa, 500, 'lump sum from HYSA is deducted');
+  assert.equal(baselineAt([{ date: '2026-01-01', debt: 100, hysa: 0 }, { date: '2026-01-31', debt: 40, hysa: 30 }], '2026-01-16', 'debt'), 70);
+}
 
 // ----- results table -----
 const fmt = (n) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
