@@ -5,9 +5,10 @@ A private debt payoff tracker. It's one `index.html` page hosted on GitHub Pages
 Live: https://wealthsheethq.github.io/debt-tracker/
 
 ## Setup
-1. In `index.html`, set `SUPABASE_ANON_KEY` to your project's anon (public) key. Until you do, the page shows "Setup needed".
-2. In Supabase → Authentication → URL Configuration, add `https://wealthsheethq.github.io/debt-tracker/` to the **Redirect URLs** (and make it the Site URL).
-3. Turn on GitHub Pages for this repo: Settings → Pages → deploy from branch `main`, folder `/ (root)`.
+The Supabase anon (public) key is in `index.html`. It's meant to be public: Row Level Security limits each signed-in user to their own row. Never put the service_role key in this repo.
+
+1. In Supabase → Authentication → URL Configuration, add `https://wealthsheethq.github.io/debt-tracker/` to the **Redirect URLs** (and make it the Site URL).
+2. Turn on GitHub Pages for this repo: Settings → Pages → deploy from branch `main`, folder `/ (root)`.
 
 All numbers are entered in the app. None are stored in this repo. The app data is saved as one JSON object in `public.tracker_state.data`, one row per user, protected by RLS.
 
