@@ -43,6 +43,8 @@
   --b-hysa: #3197CC;
   --b-spend: #5E9E2E;
   --b-custom: #9A6ADB;
+  --s-invest: #5E9E2E;
+  --s-total: #C08A1E;
   --radius: 16px;
   --tab-h: 68px;
   --font-head: 'Bebas Neue', Impact, 'Arial Narrow', sans-serif;
@@ -308,6 +310,36 @@ input[type=range] { width: 100%; height: 44px; background: transparent; accent-c
 .empty { text-align: center; padding: 28px 16px; }
 .empty h2 { margin-bottom: 8px; }
 
+/* payday checklist */
+.paynow { border-color: rgba(198,255,61,.55); background: linear-gradient(145deg, #1B1F14 0%, var(--surface) 60%); }
+.paynow.missed { border-color: rgba(255,181,71,.55); background: var(--surface); }
+.cl-row { display: grid; grid-template-columns: 48px minmax(0,1fr) minmax(0,118px); gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); }
+.cl-row.done .nm b { text-decoration: line-through; color: var(--muted); }
+.cl-row .nm { min-width: 0; }
+.cl-row .nm b { display: block; overflow-wrap: anywhere; }
+.cl-row .nm span { font-size: 12px; color: var(--muted); }
+.cl-check { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--accent); background: transparent; color: var(--accent-ink); font-size: 22px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.cl-row.done .cl-check { background: var(--accent); }
+.cl-row .input { min-height: 44px; font-size: 16px; }
+.cl-paid { text-align: right; font-family: var(--font-num); font-size: 15px; }
+.cl-paid button { background: none; border: 0; color: var(--muted); text-decoration: underline; font-size: 12px; cursor: pointer; padding: 6px 0 0; min-height: 28px; }
+
+/* recaps & tables */
+.recap-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 8px; }
+.recap-grid .stat .v { font-size: 16px; }
+details.recap { border-top: 1px solid var(--line); padding: 10px 0; }
+details.recap:first-of-type { border-top: 0; }
+details.recap summary { cursor: pointer; display: flex; justify-content: space-between; gap: 10px; font-weight: 700; list-style: none; min-height: 32px; align-items: center; }
+details.recap summary::-webkit-details-marker { display: none; }
+details.recap summary .num { font-weight: 400; font-size: 14px; }
+details.recap[open] summary { margin-bottom: 10px; }
+.mini-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 13px; margin-top: 10px; }
+.mini-table th { font-weight: 500; color: var(--faint); font-size: 11px; text-align: right; padding: 4px 0; }
+.mini-table th:first-child, .mini-table td:first-child { text-align: left; }
+.mini-table td { border-top: 1px solid var(--line); padding: 8px 0; text-align: right; font-family: var(--font-num); }
+.mini-table tr.hl td { color: var(--text); font-weight: 500; }
+.disclaimer { font-size: 12px; color: var(--faint); border-left: 3px solid var(--line); padding-left: 10px; margin: 12px 0 0; }
+
 /* check-in */
 .ci-row { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,150px); gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); }
 .ci-row .nm { min-width: 0; }
@@ -329,6 +361,7 @@ input[type=range] { width: 100%; height: 44px; background: transparent; accent-c
 .toast b { font-family: var(--font-head); font-size: 26px; font-weight: 400; display: block; line-height: 1; }
 .toast.info { background: var(--surface-2); color: var(--text); border: 1px solid var(--line); }
 .toast.info b { font-size: 20px; }
+.toast.warn { background: #3A1520; color: #FFD6DE; border: 1px solid rgba(255,77,109,.6); }
 @keyframes pop { from { transform: translateY(-20px) scale(.9); opacity: 0; } to { transform: none; opacity: 1; } }
 #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 60; width: 100%; height: 100%; }
 
@@ -465,7 +498,7 @@ function nextDueDate(day, from) {
 
 /** Effective APR for a debt during the month that starts on `monthStart`. */
 function effectiveApr(debt, monthStart) {
-  if (debt.promoEnd && monthStart <= debt.promoEnd) return 0;
+  if (debt.promoEnd && monthStart <= debt.promoEnd) return debt.promoApr || 0;
   return debt.apr;
 }
 /** The balance a card should stay under: limit minus the amount to keep open. Infinity = no limit set. */
@@ -492,7 +525,8 @@ function priorityOrder(debts, strategy, when) {
  *   3. every remaining dollar to the priority debt (avalanche / snowball / custom order),
  *      rolling over as debts close.
  *
- * opts: { perPaycheck, frequency, payAnchor (ISO), today (ISO), strategy, customOrder, lumpSum, maxMonths }
+ * opts: { perPaycheck, frequency, payAnchor (ISO), today (ISO), strategy, customOrder, lumpSum, maxMonths,
+ *         skipThrough (ISO, optional: paydays on/before this date are already handled, e.g. by a payday checklist) }
  */
 function simulatePayoff(debtsIn, opts) {
   const today = parseISO(opts.today) || new Date();
@@ -512,7 +546,7 @@ function simulatePayoff(debtsIn, opts) {
         bal: r2(toNum(d.balance)), startBal: r2(toNum(d.balance)),
         apr: Math.max(0, toNum(d.apr)), min: Math.max(0, toNum(d.minPayment)),
         line: bufferLine(d.creditLimit, d.keepOpen),
-        promoEnd: parseISO(d.promoEnd), paidOn: null, interest: 0, paidTotal: 0, minDue: 0
+        promoEnd: parseISO(d.promoEnd), promoApr: Math.max(0, toNum(d.promoApr)), paidOn: null, interest: 0, paidTotal: 0, minDue: 0
       };
     });
 
@@ -577,6 +611,7 @@ function simulatePayoff(debtsIn, opts) {
 
   let payday = firstPaycheckOnOrAfter(opts.payAnchor, freq, today);
   const anchorDay = (parseISO(opts.payAnchor) || payday).getDate();
+  if (opts.skipThrough) while (toISO(payday) <= opts.skipThrough) payday = nextPaycheck(payday, freq, anchorDay);
   const startKey = monthKey(today);
 
   while (debts.some((d) => d.bal > 0)) {
@@ -667,11 +702,11 @@ function monthsToGoal(balance, apy, monthlyContribution, goal) {
 /* ---------- saved-data shape & migration ---------- */
 function defaultData(todayISO) {
   return {
-    version: 2,
+    version: 3,
     debts: [],
     budget: {
       takeHome: 0, frequency: 'biweekly', payAnchor: todayISO || toISO(new Date()), debtPerPaycheck: 0, savingsPerPaycheck: 0, lumpSum: 0,
-      rentReserve: 0, spending: 0, customItems: [], freedLater: {}, lumpFromSavings: false
+      rentReserve: 0, spending: 0, customItems: [], freedLater: {}, lumpFromSavings: false, cardSpending: 0
     },
     strategy: 'avalanche',
     customOrder: [],
@@ -681,7 +716,13 @@ function defaultData(todayISO) {
     milestones: {},
     customMilestones: [],
     checkins: [],
-    baseline: null
+    baseline: null,
+    payChecklists: [],
+    checklistSince: null,
+    drift: [],
+    afterPlan: { monthly: null, rothPct: 100, rothLimit: 7000, annualReturn: 7 },
+    monthlySummaries: [],
+    monthMarks: {}
   };
 }
 const nonNeg = (v) => Math.max(0, toNum(v));
@@ -696,7 +737,7 @@ function normalize(raw, todayISO) {
   const src = isObj(raw) ? raw : {};
   const def = defaultData(todayISO);
   const d = Object.assign({}, src, def);
-  d.version = Math.max(2, toNum(src.version));
+  d.version = Math.max(3, toNum(src.version));
 
   d.debts = Array.isArray(src.debts) ? src.debts.filter(isObj).map((x) => {
     const due = Math.round(toNum(x.dueDay));
@@ -713,6 +754,7 @@ function normalize(raw, todayISO) {
       paidAt: x.paidAt || null,
       createdAt: x.createdAt || new Date().toISOString(),
       creditLimit: toNum(x.creditLimit) > 0 ? r2(toNum(x.creditLimit)) : null,
+      promoApr: nonNeg(x.promoApr),
       keepOpen: r2(nonNeg(x.keepOpen)),
       dueDay: due >= 1 && due <= 31 ? due : null
     });
@@ -721,7 +763,7 @@ function normalize(raw, todayISO) {
   const sb = isObj(src.budget) ? src.budget : {};
   d.budget = Object.assign({}, def.budget, sb);
   d.budget.frequency = FREQUENCIES[d.budget.frequency] ? d.budget.frequency : 'biweekly';
-  ['takeHome', 'debtPerPaycheck', 'savingsPerPaycheck', 'lumpSum', 'rentReserve', 'spending'].forEach((k) => { d.budget[k] = nonNeg(d.budget[k]); });
+  ['takeHome', 'debtPerPaycheck', 'savingsPerPaycheck', 'lumpSum', 'rentReserve', 'spending', 'cardSpending'].forEach((k) => { d.budget[k] = nonNeg(d.budget[k]); });
   if (!parseISO(d.budget.payAnchor)) d.budget.payAnchor = def.budget.payAnchor;
   d.budget.customItems = Array.isArray(sb.customItems) ? sb.customItems.filter(isObj).map((i) => Object.assign({}, i, {
     id: String(i.id || newId()), name: String(i.name || 'Item').slice(0, 40), amount: r2(nonNeg(i.amount)), freedLater: !!i.freedLater
@@ -750,6 +792,26 @@ function normalize(raw, todayISO) {
     id: String(c.id || newId()), date: String(c.date).slice(0, 10), balances: isObj(c.balances) ? c.balances : {}, totalDebt: r2(nonNeg(c.totalDebt)), hysa: r2(nonNeg(c.hysa))
   })).sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0)) : [];
   d.baseline = isObj(src.baseline) && Array.isArray(src.baseline.points) ? src.baseline : null;
+
+  d.payChecklists = Array.isArray(src.payChecklists) ? src.payChecklists.filter((c) => isObj(c) && parseISO(c.date) && Array.isArray(c.items)).map((c) => Object.assign({}, c, {
+    date: String(c.date).slice(0, 10), dismissed: !!c.dismissed, completedAt: c.completedAt || null,
+    items: c.items.filter(isObj).map((i) => Object.assign({}, i, {
+      key: String(i.key || ''), kind: ['debt', 'hysa', 'rent'].includes(i.kind) ? i.kind : 'rent', label: String(i.label || ''),
+      planned: r2(nonNeg(i.planned)), done: !!i.done, paid: i.paid == null ? null : r2(nonNeg(i.paid))
+    })).filter((i) => i.key)
+  })).sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0)).slice(0, 60) : [];
+  d.checklistSince = parseISO(src.checklistSince) ? String(src.checklistSince).slice(0, 10) : null;
+  d.drift = Array.isArray(src.drift) ? src.drift.filter((e) => isObj(e) && e.debtId && /^\d{4}-\d{2}$/.test(e.month)).map((e) => Object.assign({}, e, { rise: r2(nonNeg(e.rise)) })).slice(-500) : [];
+  const ap = isObj(src.afterPlan) ? src.afterPlan : {};
+  d.afterPlan = Object.assign({}, def.afterPlan, ap, {
+    monthly: ap.monthly === null || ap.monthly === undefined || ap.monthly === '' ? null : nonNeg(ap.monthly),
+    rothPct: Math.min(100, ap.rothPct === undefined ? 100 : nonNeg(ap.rothPct)),
+    rothLimit: ap.rothLimit === undefined || ap.rothLimit === null ? 7000 : nonNeg(ap.rothLimit),
+    annualReturn: ap.annualReturn === undefined || ap.annualReturn === null || ap.annualReturn === '' ? 7 : toNum(ap.annualReturn)
+  });
+  d.monthlySummaries = Array.isArray(src.monthlySummaries) ? src.monthlySummaries.filter((m) => isObj(m) && /^\d{4}-\d{2}$/.test(m.month))
+    .map((m) => Object.assign({}, m, { dismissed: !!m.dismissed })).sort((a, b) => (a.month < b.month ? 1 : -1)) : [];
+  d.monthMarks = isObj(src.monthMarks) ? Object.assign({}, src.monthMarks) : {};
   return d;
 }
 
@@ -763,6 +825,271 @@ function baselineAt(points, iso, key) {
     if (t <= ts[i]) { const f = (t - ts[i - 1]) / Math.max(1, ts[i] - ts[i - 1]); return r2(points[i - 1][key] + f * (points[i][key] - points[i - 1][key])); }
   }
   return points[points.length - 1][key];
+}
+/* ---------- history (shared by the app and the data helpers below) ---------- */
+function pushHistory(data, entry, nowISO) {
+  const e = Object.assign({ id: newId(), at: nowISO || new Date().toISOString() }, entry);
+  data.history.unshift(e);
+  if (data.history.length > 2000) data.history.length = 2000;
+  return e;
+}
+/** Local calendar month ('YYYY-MM') of an ISO timestamp or date. */
+function monthOf(iso) { const d = /T/.test(iso) ? new Date(iso) : parseISO(iso); return toISO(d).slice(0, 7); }
+function shiftMonth(month, n) { const [y, m] = month.split('-').map(Number); const d = new Date(y, m - 1 + n, 1, 12); return toISO(d).slice(0, 7); }
+function lastDayOfMonth(month) { const [y, m] = month.split('-').map(Number); return toISO(new Date(y, m, 0, 12)); }
+
+/** Most recent payday on or before `date` (a Date). */
+function lastPaydayOnOrBefore(anchorISO, freq, date) {
+  const anchorDay = (parseISO(anchorISO) || date).getDate();
+  let d = firstPaycheckOnOrAfter(anchorISO, freq, addDays(date, -40)), last = null;
+  while (d <= date) { last = d; d = nextPaycheck(d, freq, anchorDay); }
+  return last;
+}
+
+/* ---------- payday "pay now" checklist ---------- */
+/** Snapshot one paycheck's plan as checklist items: each debt payment, the HYSA transfer, the rent reserve. */
+function buildChecklist(paycheck, budget, dateISO, nowISO) {
+  const items = [];
+  (paycheck ? paycheck.allocations : []).forEach((a) => items.push({ key: 'debt:' + a.id, kind: 'debt', debtId: a.id, label: a.name, planned: r2(a.amount), urgent: a.buffer > 0, done: false, paid: null }));
+  const hysa = r2(toNum(budget.savingsPerPaycheck) + (paycheck ? paycheck.leftover : 0));
+  if (hysa > 0) items.push({ key: 'hysa', kind: 'hysa', label: 'HYSA transfer', planned: hysa, done: false, paid: null });
+  if (toNum(budget.rentReserve) > 0) items.push({ key: 'rent', kind: 'rent', label: 'Rent reserve', planned: r2(budget.rentReserve), done: false, paid: null });
+  return { date: dateISO, createdAt: nowISO || new Date().toISOString(), items, dismissed: false, completedAt: null };
+}
+/**
+ * Check off one item. Debt: subtracts `amount` from the balance and logs a payment
+ * (marks the debt paid if it hits 0). HYSA: adds to the savings balance. Rent: just marks it done.
+ * Returns { ok, item, paidOff (debt or null), complete (bool) }.
+ */
+function checkChecklistItem(data, date, key, amount, nowISO) {
+  const list = data.payChecklists.find((c) => c.date === date);
+  const item = list && list.items.find((i) => i.key === key);
+  if (!item || item.done) return { ok: false };
+  nowISO = nowISO || new Date().toISOString();
+  const amt = r2(Math.max(0, toNum(amount)));
+  let paidOff = null;
+  item.historyIds = [];
+  if (item.kind === 'debt') {
+    const debt = data.debts.find((d) => d.id === item.debtId);
+    if (debt && !debt.paid && amt > 0) {
+      const before = debt.balance, after = r2(Math.max(0, before - amt));
+      debt.balance = after;
+      item.historyIds.push(pushHistory(data, { kind: 'payment', debtId: debt.id, debtName: debt.name, amount: amt, before, after, source: 'payday', payday: date }, nowISO).id);
+      if (after <= 0) {
+        debt.paid = true; debt.paidAt = nowISO; paidOff = debt;
+        item.historyIds.push(pushHistory(data, { kind: 'paid', debtId: debt.id, debtName: debt.name, amount: 0, before: 0, after: 0 }, nowISO).id);
+      }
+    }
+  } else if (item.kind === 'hysa' && amt > 0) {
+    const before = data.savings.balance, after = r2(before + amt);
+    data.savings.balance = after;
+    item.historyIds.push(pushHistory(data, { kind: 'savings', amount: amt, before, after, source: 'payday', payday: date }, nowISO).id);
+  }
+  item.done = true; item.paid = amt; item.at = nowISO;
+  const complete = list.items.every((i) => i.done);
+  if (complete && !list.completedAt) list.completedAt = nowISO;
+  return { ok: true, item, paidOff, complete };
+}
+/** Undo a checked item: puts the balance / savings back and removes the history it logged. */
+function uncheckChecklistItem(data, date, key) {
+  const list = data.payChecklists.find((c) => c.date === date);
+  const item = list && list.items.find((i) => i.key === key);
+  if (!item || !item.done) return false;
+  const amt = toNum(item.paid);
+  if (item.kind === 'debt') {
+    const debt = data.debts.find((d) => d.id === item.debtId);
+    if (debt && amt > 0 && (item.historyIds || []).length) {
+      debt.balance = r2(debt.balance + amt);
+      if (debt.paid && debt.balance > 0) { debt.paid = false; debt.paidAt = null; }
+    }
+  } else if (item.kind === 'hysa' && (item.historyIds || []).length) {
+    data.savings.balance = r2(Math.max(0, data.savings.balance - amt));
+  }
+  const ids = new Set(item.historyIds || []);
+  data.history = data.history.filter((h) => !ids.has(h.id));
+  item.done = false; item.paid = null; item.at = null; item.historyIds = [];
+  list.completedAt = null;
+  return true;
+}
+
+/* ---------- balance drift (new card spending) ---------- */
+/** Rise beyond the interest the card would have charged since the last update. null if no real rise. */
+function detectDrift(before, after, apr, days) {
+  const interest = r2(Math.max(0, before) * Math.max(0, toNum(apr)) / 100 / 365 * Math.max(0, days));
+  const rise = r2(after - before - interest);
+  return rise > 0.5 ? { rise, interest } : null;
+}
+/**
+ * Set a debt's balance from a check-in / statement, logging history. If a card went UP by more
+ * than estimated interest, records a drift event. Returns the drift ({ rise, interest }) or null.
+ */
+function recordBalance(data, debt, newBalance, nowISO, source) {
+  nowISO = nowISO || new Date().toISOString();
+  const before = debt.balance, after = r2(Math.max(0, toNum(newBalance)));
+  if (Math.abs(after - before) <= 0.004) return null;
+  const last = data.history.find((h) => h.debtId === debt.id && h.at);
+  const since = last ? last.at : debt.createdAt;
+  const days = since ? Math.max(0, (Date.parse(nowISO) - Date.parse(since)) / 86400000) : 0;
+  const promo = debt.promoEnd && parseISO(debt.promoEnd) >= new Date(nowISO);
+  pushHistory(data, { kind: 'balance', debtId: debt.id, debtName: debt.name, before, after, source }, nowISO);
+  debt.balance = after;
+  if (after > debt.startBalance) debt.startBalance = after;
+  if (debt.type === 'loan' || after <= before) return null;
+  const drift = detectDrift(before, after, promo ? debt.promoApr : debt.apr, days);
+  if (drift) {
+    data.drift.push({ id: newId(), debtId: debt.id, debtName: debt.name, at: nowISO, month: monthOf(nowISO), before, after, rise: drift.rise, interest: drift.interest, source });
+    if (data.drift.length > 500) data.drift.splice(0, data.drift.length - 500);
+  }
+  return drift;
+}
+/**
+ * New card spending in `month` vs. the monthly allowance. The allowance is used up in the
+ * order the rises happened; anything past it is "excess" (the part worth warning about).
+ */
+function driftSummary(data, month) {
+  const allowance = Math.max(0, toNum(data.budget.cardSpending));
+  const events = data.drift.filter((e) => e.month === month).sort((a, b) => (a.at < b.at ? -1 : 1));
+  let used = 0;
+  const byCard = {};
+  for (const e of events) {
+    const room = Math.max(0, allowance - used);
+    const excess = r2(Math.max(0, e.rise - room));
+    used = r2(used + e.rise);
+    const c = byCard[e.debtId] || (byCard[e.debtId] = { debtId: e.debtId, name: e.debtName, rise: 0, excess: 0, events: 0 });
+    c.rise = r2(c.rise + e.rise); c.excess = r2(c.excess + excess); c.events++;
+  }
+  return { month, allowance, total: used, excess: r2(Math.max(0, used - allowance)), byCard: Object.values(byCard) };
+}
+/** Days the debt-free date moves out because of `extra` ({ debtId: amount }) added balance. */
+function driftDelayDays(debts, opts, extra) {
+  const withIt = simulatePayoff(debts, opts);
+  const without = simulatePayoff(debts.map((d) => (extra[d.id] ? Object.assign({}, d, { balance: Math.max(0, toNum(d.balance) - extra[d.id]) }) : d)), opts);
+  if (!withIt.ok || !without.ok) return null;
+  return Math.max(0, Math.round((parseISO(withIt.debtFree) - parseISO(without.debtFree)) / 86400000));
+}
+
+/* ---------- after debt-free: investing projection ---------- */
+/**
+ * Month-by-month after debt-free day. Each month: balances grow, then `monthly` is invested —
+ * rothPct% to the Roth IRA (capped at rothLimit per calendar year, 0 = no cap), the rest to brokerage.
+ * The HYSA keeps compounding at its APY with its own monthly contribution.
+ * o: { startISO, months, monthly, rothPct, rothLimit, annualReturn, hysaStart, hysaMonthly, hysaApy }
+ */
+function projectInvesting(o) {
+  const r = Math.pow(1 + toNum(o.annualReturn) / 100, 1 / 12) - 1;
+  const rh = Math.pow(1 + toNum(o.hysaApy) / 100, 1 / 12) - 1;
+  const start = parseISO(o.startISO);
+  const monthly = Math.max(0, toNum(o.monthly)), rothPct = Math.min(100, Math.max(0, toNum(o.rothPct))), limit = Math.max(0, toNum(o.rothLimit));
+  let roth = 0, brokerage = 0, hysa = toNum(o.hysaStart), contributed = 0, year = null, usedThisYear = 0;
+  const pts = [{ month: 0, date: o.startISO, roth: 0, brokerage: 0, invested: 0, hysa: r2(hysa), total: r2(hysa), contributed: 0 }];
+  for (let m = 1; m <= (o.months || 120); m++) {
+    const date = addMonthsKeepDay(start, m, start.getDate());
+    if (date.getFullYear() !== year) { year = date.getFullYear(); usedThisYear = 0; }
+    roth *= 1 + r; brokerage *= 1 + r;
+    hysa = hysa * (1 + rh) + toNum(o.hysaMonthly);
+    const want = monthly * rothPct / 100;
+    const toRoth = limit > 0 ? Math.min(want, Math.max(0, limit - usedThisYear)) : want;
+    usedThisYear += toRoth; roth += toRoth; brokerage += monthly - toRoth; contributed += monthly;
+    pts.push({ month: m, date: toISO(date), roth: r2(roth), brokerage: r2(brokerage), invested: r2(roth + brokerage), hysa: r2(hysa), total: r2(roth + brokerage + hysa), contributed: r2(contributed) });
+  }
+  return pts;
+}
+
+/* ---------- monthly summary ---------- */
+function totalUnpaid(data) { return r2(data.debts.reduce((s, d) => s + (d.paid ? 0 : toNum(d.balance)), 0)); }
+/** Record totals the first time the app is opened in a month (start-of-month snapshot). */
+function markMonth(data, nowISO) {
+  const m = monthOf(nowISO);
+  if (data.monthMarks[m]) return false;
+  const balances = {};
+  data.debts.forEach((d) => { if (!d.paid) balances[d.id] = d.balance; });
+  data.monthMarks[m] = { at: nowISO, debt: totalUnpaid(data), hysa: data.savings.balance, balances };
+  return true;
+}
+/** Days ahead (+) or behind (-) plan: when the plan expected to reach `actualDebt`, vs `iso`. */
+function daysAheadOfPlan(points, iso, actualDebt) {
+  if (!points || !points.length) return null;
+  const t = parseISO(iso).getTime();
+  let hit = null;
+  for (let i = 0; i < points.length; i++) {
+    const p = points[i];
+    if (p.debt <= actualDebt + 0.004) {
+      if (i === 0) { hit = parseISO(p.date).getTime(); break; }
+      const a = points[i - 1], ta = parseISO(a.date).getTime(), tb = parseISO(p.date).getTime();
+      const f = a.debt === p.debt ? 0 : (a.debt - actualDebt) / (a.debt - p.debt);
+      hit = ta + f * (tb - ta); break;
+    }
+  }
+  if (hit === null) hit = parseISO(points[points.length - 1].date).getTime();
+  return Math.round((hit - t) / 86400000);
+}
+function buildMonthlySummary(data, month, nowISO) {
+  const inMonth = data.history.filter((h) => h.at && monthOf(h.at) === month);
+  let paid = 0, change = 0;
+  for (const h of inMonth) {
+    if (h.kind === 'payment') { paid += toNum(h.amount); change += toNum(h.after) - toNum(h.before); }
+    else if (h.kind === 'balance') { paid += Math.max(0, toNum(h.before) - toNum(h.after)); change += toNum(h.after) - toNum(h.before); }
+    else if (h.kind === 'paid') { paid += toNum(h.amount); change -= toNum(h.amount); }
+  }
+  const start = data.monthMarks[month], end = data.monthMarks[shiftMonth(month, 1)];
+  const debtEnd = end ? end.debt : totalUnpaid(data);
+  const debtStart = start ? start.debt : r2(debtEnd - change);
+  const hysaEnd = end ? end.hysa : data.savings.balance;
+  const hysaStart = start ? start.hysa : null;
+  const [y, m] = month.split('-').map(Number), dim = daysInMonth(y, m - 1);
+  const fromDay = start ? new Date(start.at).getDate() : 1;
+  const frac = start && monthOf(start.at) === month ? (dim - fromDay + 1) / dim : 1;
+  const monthStart = new Date(y, m - 1, 1, 12);
+  let interest = 0;
+  for (const d of data.debts) {
+    const bal = start && start.balances ? toNum(start.balances[d.id]) : (d.paid ? 0 : toNum(d.balance));
+    const promo = d.promoEnd && parseISO(d.promoEnd) >= monthStart;
+    interest += bal * (promo ? toNum(d.promoApr) : toNum(d.apr)) / 1200 * frac;
+  }
+  const bl = data.baseline;
+  return {
+    month, createdAt: nowISO, trackedFrom: start ? start.at : null,
+    paidToDebt: r2(paid), interestEst: r2(interest),
+    debtStart: r2(debtStart), debtEnd: r2(debtEnd), debtChange: r2(debtEnd - debtStart),
+    hysaStart: hysaStart == null ? null : r2(hysaStart), hysaEnd: r2(hysaEnd), hysaChange: hysaStart == null ? null : r2(hysaEnd - hysaStart),
+    paidOff: inMonth.filter((h) => h.kind === 'paid').map((h) => h.debtName),
+    aheadDays: bl ? daysAheadOfPlan(bl.points, lastDayOfMonth(month), debtEnd) : null,
+    dismissed: false
+  };
+}
+/** On the first open of a month: summarize last month (once) and snapshot this month's start. */
+function ensureMonthlySummary(data, nowISO) {
+  const cur = monthOf(nowISO), prev = shiftMonth(cur, -1);
+  let changed = false;
+  const hadPrev = data.monthMarks[prev] || data.history.some((h) => h.at && monthOf(h.at) === prev);
+  if (markMonth(data, nowISO)) changed = true;
+  if (data.debts.length && hadPrev && !data.monthlySummaries.some((s) => s.month === prev)) {
+    data.monthlySummaries.unshift(buildMonthlySummary(data, prev, nowISO));
+    data.monthlySummaries.sort((a, b) => (a.month < b.month ? 1 : -1));
+    changed = true;
+  }
+  return changed;
+}
+
+/* ---------- balance transfer check ---------- */
+/** Compare the plan as-is vs. moving one card to a promo-rate transfer (fee added to the balance). */
+function balanceTransferCheck(debts, opts, debtId, t) {
+  const today = parseISO(opts.today);
+  const card = debts.find((d) => d.id === debtId && !d.paid);
+  if (!card) return null;
+  const fee = r2(toNum(card.balance) * Math.max(0, toNum(t.feePct)) / 100);
+  const promoEnd = toISO(addMonthsKeepDay(today, Math.max(0, Math.round(toNum(t.months))), today.getDate()));
+  const keep = simulatePayoff(debts, opts);
+  const moved = debts.map((d) => (d.id === debtId ? Object.assign({}, d, { balance: r2(toNum(d.balance) + fee), promoEnd, promoApr: Math.max(0, toNum(t.promoApr)), creditLimit: null, keepOpen: 0 }) : d));
+  const tr = simulatePayoff(moved, opts);
+  const po = tr.payoffs.find((p) => p.id === debtId);
+  const interestSaved = r2(keep.totalInterest - tr.totalInterest);
+  return {
+    fee, promoEnd, interestSaved, net: r2(interestSaved - fee),
+    keepInterest: keep.totalInterest, transferInterest: tr.totalInterest,
+    keepDebtFree: keep.ok ? keep.debtFree : null, transferDebtFree: tr.ok ? tr.debtFree : null,
+    payoffDate: po ? po.date : null, paidBeforePromoEnd: !!(po && po.date <= promoEnd), ok: keep.ok && tr.ok
+  };
 }
 /* ENGINE END */
 </script>
@@ -806,7 +1133,9 @@ const S = {
   pushTimer: null, pushing: false, pulling: false,
   showAllPaychecks: 24, showAllHistory: false,
   whatIf: 0,             // what-if slider value (never saved)
-  checkinDraft: null     // unsaved check-in inputs, survives re-renders
+  checkinDraft: null,    // unsaved check-in inputs, survives re-renders
+  clDraft: {},           // edited checklist amounts before they're checked off
+  bt: { debtId: null, feePct: 3, months: 18, promoApr: 0 }   // balance-transfer calculator (never saved)
 };
 
 /* ---------- local cache ---------- */
@@ -893,6 +1222,7 @@ async function pull() {
     } else {
       setSync('saved');
     }
+    setTimeout(housekeeping, 0);
   } catch (e) {
     console.warn('pull failed', e);
     setSync(navigator.onLine ? 'error' : 'offline');
@@ -935,12 +1265,13 @@ function planOpts(lump, extra = 0, strategy = S.data.strategy) {
   const b = S.data.budget;
   return {
     perPaycheck: Math.max(0, b.debtPerPaycheck + extra), frequency: b.frequency, payAnchor: b.payAnchor, today: todayISO(),
-    strategy, customOrder: effectiveCustomOrder(), lumpSum: lump
+    strategy, customOrder: effectiveCustomOrder(), lumpSum: lump,
+    skipThrough: S.data.payChecklists.some((c) => c.date === todayISO()) ? todayISO() : null
   };
 }
 let planCache = { key: '' };
 function plans() {
-  const key = JSON.stringify([S.data.debts, S.data.budget, S.data.strategy, S.data.customOrder, S.data.activePlan, S.data.savings, todayISO()]);
+  const key = JSON.stringify([S.data.debts, S.data.budget, S.data.strategy, S.data.customOrder, S.data.activePlan, S.data.savings, S.data.payChecklists.map((c) => c.date), todayISO()]);
   if (planCache.key !== key) {
     const A = simulatePayoff(S.data.debts, planOpts(0));
     const B = simulatePayoff(S.data.debts, planOpts(S.data.budget.lumpSum));
@@ -987,10 +1318,7 @@ function freedomStats() {
 function missingInfo() { return unpaid().filter((d) => !(d.apr > 0) || !(d.minPayment > 0)); }
 
 /* ---------- history & celebrations ---------- */
-function logHistory(entry) {
-  S.data.history.unshift(Object.assign({ id: uid(), at: new Date().toISOString() }, entry));
-  if (S.data.history.length > 2000) S.data.history.length = 2000;
-}
+function logHistory(entry) { return pushHistory(S.data, entry); }
 function customMilestoneMet(m) {
   const t = totals();
   if (m.type === 'debtPaid') { const d = S.data.debts.find((x) => x.id === m.debtId); return !!(d && d.paid); }
@@ -1150,6 +1478,207 @@ function emptyState() {
     </div></div>`;
 }
 
+/* ---------- housekeeping: runs only after a successful sync, so it never races a newer cloud copy ---------- */
+function housekeeping() {
+  if (!S.user) return;
+  const now = new Date().toISOString();
+  let changed = ensureMonthlySummary(S.data, now);
+  if (ensurePaydayChecklist(now)) changed = true;
+  if (!changed) return;
+  const editing = isEditing();
+  commit({ noRender: editing });
+  if (editing) S.pendingRender = true;
+}
+/** Create the checklist for the most recent payday (today or past) once, from the plan as of that payday. */
+function ensurePaydayChecklist(now) {
+  const b = S.data.budget, today = todayISO();
+  let changed = false;
+  if (!S.data.checklistSince) { S.data.checklistSince = today; changed = true; }   // no back-filled checklists from before this feature existed
+  if (!(b.debtPerPaycheck > 0 || b.savingsPerPaycheck > 0 || b.rentReserve > 0)) return changed;
+  const pd = lastPaydayOnOrBefore(b.payAnchor, b.frequency, parseISO(today));
+  if (!pd) return changed;
+  const iso = toISO(pd);
+  if (iso < S.data.checklistSince || S.data.payChecklists.some((c) => c.date === iso)) return changed;
+  const sim = simulatePayoff(S.data.debts, Object.assign(planOpts(0), { today: iso, payAnchor: b.frequency === 'semimonthly' ? b.payAnchor : iso, skipThrough: null }));
+  const pc = sim.paychecks.find((x) => x.date === iso) || null;
+  const list = buildChecklist(pc, b, iso, now);
+  if (!list.items.length) return changed;
+  S.data.payChecklists.unshift(list);
+  S.data.payChecklists.sort((a, c) => (a.date < c.date ? 1 : -1));
+  if (S.data.payChecklists.length > 60) S.data.payChecklists.length = 60;
+  return true;
+}
+
+function payNowHTML() {
+  const today = todayISO();
+  const lists = S.data.payChecklists.filter((c) => !c.dismissed && c.items.length && (!c.completedAt || c.date === today));
+  return lists.map((c) => {
+    const done = c.items.filter((i) => i.done).length, n = c.items.length, isToday = c.date === today;
+    const rows = c.items.map((i) => {
+      const k = `${c.date}|${i.key}`;
+      const hint = i.kind === 'debt' ? (i.urgent ? '⚠ includes buffer restore' : 'card payment') : i.kind === 'hysa' ? 'adds to savings balance' : 'set aside for rent';
+      if (i.done) {
+        return `<div class="cl-row done"><button class="cl-check" data-act="cl-undo" data-date="${esc(c.date)}" data-key="${esc(i.key)}" aria-label="Undo ${esc(i.label)}">✓</button>
+          <div class="nm"><b>${esc(i.label)}</b><span>${Math.abs(toNum(i.paid) - i.planned) > 0.004 ? `planned ${money(i.planned)}` : 'done'}</span></div>
+          <div class="cl-paid">${money(i.paid)}<div><button data-act="cl-undo" data-date="${esc(c.date)}" data-key="${esc(i.key)}">undo</button></div></div></div>`;
+      }
+      const v = S.clDraft[k] != null ? S.clDraft[k] : i.planned;
+      return `<div class="cl-row"><button class="cl-check" data-act="cl-check" data-date="${esc(c.date)}" data-key="${esc(i.key)}" aria-label="Mark ${esc(i.label)} done"></button>
+        <div class="nm"><b>${esc(i.label)}</b><span>${hint}</span></div>
+        <div class="prefix"><b>$</b><input class="input num" type="number" inputmode="decimal" min="0" step="0.01" data-cl-amt="${esc(k)}" value="${esc(v)}" aria-label="${esc(i.label)} amount"></div></div>`;
+    }).join('');
+    return `<div class="card paynow ${isToday ? '' : 'missed'}">
+      <div class="card-head"><h3>${isToday ? '💵 PAYDAY · PAY NOW' : `⏰ MISSED · ${esc(fmtDate(c.date, { weekday: 'short', month: 'short', day: 'numeric' })).toUpperCase()}`}</h3><b class="num" style="color:${done === n ? 'var(--accent)' : 'var(--text)'}">${done} of ${n} done</b></div>
+      <div class="progress" style="height:8px;margin-bottom:6px"><div style="width:${(done / n) * 100}%"></div></div>
+      ${rows}
+      <div class="row between wrap" style="margin-top:10px">
+        <span class="small faint" style="flex:1;min-width:160px">${done === n ? 'Paycheck complete. 🎉' : 'Paid a different amount? Edit it before checking it off.'}</span>
+        <button class="btn sm ghost" data-act="cl-dismiss" data-date="${esc(c.date)}">${done === n ? 'Hide' : 'Dismiss'}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function monthLabel(month, opts = { month: 'long', year: 'numeric' }) { const [y, m] = month.split('-').map(Number); return new Date(y, m - 1, 1, 12).toLocaleDateString('en-US', opts); }
+function signedMoney(v) { return `${v > 0 ? '+' : v < 0 ? '−' : ''}${money0(Math.abs(v))}`; }
+function recapGrid(sm) {
+  const ahead = sm.aheadDays == null ? '<span class="faint small">Do a check-in to set a plan baseline</span>'
+    : `<span style="color:${sm.aheadDays >= 0 ? 'var(--accent)' : 'var(--debt)'}">${sm.aheadDays === 0 ? 'On plan' : `${plural(Math.abs(sm.aheadDays), 'day')} ${sm.aheadDays > 0 ? 'ahead' : 'behind'}`}</span>`;
+  const partial = sm.trackedFrom && monthOf(sm.trackedFrom) === sm.month && new Date(sm.trackedFrom).getDate() > 1;
+  return `<div class="recap-grid">
+    <div class="stat"><div class="k">Paid to debt</div><div class="v" style="color:var(--accent)">${money0(sm.paidToDebt)}</div></div>
+    <div class="stat"><div class="k">Est. interest charged</div><div class="v">${money0(sm.interestEst)}</div></div>
+    <div class="stat"><div class="k">Debt change</div><div class="v" style="color:${sm.debtChange <= 0 ? 'var(--accent)' : 'var(--debt)'}">${signedMoney(sm.debtChange)}</div></div>
+    <div class="stat"><div class="k">HYSA change</div><div class="v" style="color:${sm.hysaChange == null ? 'var(--muted)' : sm.hysaChange >= 0 ? 'var(--save)' : 'var(--debt)'}">${sm.hysaChange == null ? '—' : signedMoney(sm.hysaChange)}</div></div>
+    <div class="stat"><div class="k">Paid off</div><div class="v" style="font-size:14px">${sm.paidOff.length ? sm.paidOff.map(esc).join(', ') + ' 🎉' : '—'}</div></div>
+    <div class="stat"><div class="k">vs. plan</div><div class="v" style="font-size:14px">${ahead}</div></div>
+  </div>
+  <p class="small faint" style="margin:8px 0 0">${partial ? `Tracked from ${esc(fmtDate(toISO(new Date(sm.trackedFrom)), { month: 'short', day: 'numeric' }))}. ` : ''}Interest is an estimate from your APRs.</p>`;
+}
+function recapCardHTML() {
+  const sm = S.data.monthlySummaries.find((x) => !x.dismissed && x.month === shiftMonth(monthOf(new Date().toISOString()), -1));
+  if (!sm) return '';
+  return `<div class="card">
+    <div class="card-head"><h3>${esc(monthLabel(sm.month, { month: 'long' })).toUpperCase()} RECAP</h3><button class="btn sm ghost" data-act="dismiss-summary" data-month="${esc(sm.month)}" aria-label="Dismiss recap">✕</button></div>
+    ${recapGrid(sm)}
+  </div>`;
+}
+function recapListHTML() {
+  if (!S.data.monthlySummaries.length) return '';
+  return `<div class="card"><div class="card-head"><h3>Monthly recaps</h3></div>
+    ${S.data.monthlySummaries.map((sm) => `<details class="recap"><summary><span>${esc(monthLabel(sm.month))}</span><span class="num" style="color:${sm.debtChange <= 0 ? 'var(--accent)' : 'var(--debt)'}">${signedMoney(sm.debtChange)} debt</span></summary>${recapGrid(sm)}</details>`).join('')}
+  </div>`;
+}
+
+let driftCache = { key: '' };
+/** This month's new card spending vs. allowance, with the days each overage pushes the debt-free date. */
+function driftInfo() {
+  const month = monthOf(new Date().toISOString());
+  const key = JSON.stringify([S.data.drift.filter((e) => e.month === month), S.data.debts, S.data.budget, S.data.strategy, S.data.customOrder, S.data.activePlan, S.data.payChecklists.map((c) => c.date), todayISO()]);
+  if (driftCache.key === key) return driftCache.v;
+  const sum = driftSummary(S.data, month);
+  const opts = planOpts(S.data.activePlan === 'B' ? S.data.budget.lumpSum : 0);
+  const all = {};
+  sum.byCard.forEach((c) => { if (c.excess > 0) all[c.debtId] = c.excess; c.days = c.excess > 0 ? driftDelayDays(S.data.debts, opts, { [c.debtId]: c.excess }) : 0; });
+  sum.days = sum.excess > 0 ? driftDelayDays(S.data.debts, opts, all) : 0;
+  driftCache = { key, v: sum };
+  return sum;
+}
+function driftAlertHTML() {
+  const dr = driftInfo();
+  if (!(dr.excess > 0)) return '';
+  return `<div class="alert bad"><b>⚠ New card spending: ${money0(dr.total)} this month</b> vs. your ${money0(dr.allowance)} allowance, so ${money0(dr.excess)} over.
+    ${dr.days ? `That pushes your debt-free date back about <b>${plural(dr.days, 'day')}</b>.` : ''}
+    <div class="small" style="margin-top:6px">${dr.byCard.filter((c) => c.excess > 0).map((c) => `${esc(c.name)} +${money0(c.rise)}${c.days ? ` (+${plural(c.days, 'day')})` : ''}`).join(' · ')}</div></div>`;
+}
+function driftTallyHTML() {
+  const dr = driftInfo();
+  const cards = unpaid().filter((d) => d.type !== 'loan');
+  if (!cards.length || (!dr.byCard.length && !(dr.allowance > 0))) return '';
+  const byId = Object.fromEntries(dr.byCard.map((c) => [c.debtId, c]));
+  const pctUsed = dr.allowance > 0 ? Math.min(100, (dr.total / dr.allowance) * 100) : (dr.total > 0 ? 100 : 0);
+  return `<div class="card">
+    <div class="card-head"><h3>Card spending · ${esc(monthLabel(dr.month, { month: 'short' }))}</h3><span class="small muted num">${money0(dr.total)} / ${money0(dr.allowance)}</span></div>
+    <div class="progress util ${dr.excess > 0 ? 'hot' : ''}" style="height:8px"><div style="width:${pctUsed}%"></div></div>
+    <table class="mini-table"><colgroup><col style="width:52%"><col><col></colgroup>
+      <thead><tr><th>Card</th><th>New spending</th><th>Over</th></tr></thead>
+      <tbody>${cards.map((d) => { const c = byId[d.id]; return `<tr><td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(d.name)}</td><td>${c ? money0(c.rise) : '$0'}</td><td style="color:${c && c.excess > 0 ? 'var(--debt)' : 'inherit'}">${c && c.excess > 0 ? money0(c.excess) : '—'}</td></tr>`; }).join('')}</tbody>
+    </table>
+    <p class="small faint" style="margin:8px 0 0">A balance that rises by more than its estimated interest counts as new spending. Set your allowance in Paychecks → Budget.</p>
+  </div>`;
+}
+/** Toast after balance updates that recorded new spending. */
+function driftToast(names) {
+  if (!names.length) return;
+  const dr = driftInfo();
+  if (dr.excess > 0) toast('⚠ NEW SPENDING', `${names.join(', ')} went up. ${money0(dr.excess)} over your monthly allowance${dr.days ? `, about ${plural(dr.days, 'day')} added to your plan` : ''}.`, 'warn');
+  else toast('NEW SPENDING NOTED', `${names.join(', ')} went up. Still within your ${money0(dr.allowance)} monthly allowance.`, 'info');
+}
+
+function btHTML() {
+  const cards = unpaid().filter((d) => d.type !== 'loan');
+  if (!cards.length) return '';
+  if (!cards.some((c) => c.id === S.bt.debtId)) S.bt.debtId = cards.slice().sort((a, b) => b.apr - a.apr)[0].id;
+  return `<div class="card">
+    <div class="card-head"><h3>Balance transfer check</h3><span class="small muted">estimate only</span></div>
+    <label class="field"><span>Card to transfer</span><select class="input" data-bt="debtId">${cards.map((c) => `<option value="${esc(c.id)}" ${c.id === S.bt.debtId ? 'selected' : ''}>${esc(c.name)} · ${money0(c.balance)} @ ${toNum(c.apr).toFixed(2)}%</option>`).join('')}</select></label>
+    <div class="grid-2">
+      <label class="field"><span>Transfer fee</span><div class="suffix"><input class="input num" type="number" inputmode="decimal" min="0" step="0.1" data-bt="feePct" value="${esc(S.bt.feePct)}"><b>%</b></div></label>
+      <label class="field"><span>Promo length</span><div class="suffix"><input class="input num" type="number" inputmode="numeric" min="0" step="1" data-bt="months" value="${esc(S.bt.months)}" style="padding-right:44px"><b>mo</b></div></label>
+    </div>
+    <label class="field"><span>Promo APR</span><div class="suffix"><input class="input num" type="number" inputmode="decimal" min="0" step="0.01" data-bt="promoApr" value="${esc(S.bt.promoApr)}"><b>%</b></div></label>
+    <div id="btOut"></div>
+    <p class="disclaimer">Estimate only. It assumes the fee is added to the balance, the rate goes back to the card's current APR when the promo ends, and your plan keeps running as it's set now. Check the offer's actual terms.</p>
+  </div>`;
+}
+function updateBT() {
+  const out = $('#btOut'); if (!out) return;
+  const res = balanceTransferCheck(S.data.debts, planOpts(S.data.activePlan === 'B' ? S.data.budget.lumpSum : 0), S.bt.debtId, S.bt);
+  if (!res) { out.innerHTML = ''; return; }
+  const good = res.net > 0.5;
+  out.innerHTML = `<div class="grid-2">
+      <div class="stat"><div class="k">Interest saved</div><div class="v" style="color:${res.interestSaved > 0 ? 'var(--accent)' : 'var(--debt)'}">${res.interestSaved < 0 ? '−' : ''}${money0(Math.abs(res.interestSaved))}</div></div>
+      <div class="stat"><div class="k">Fee cost</div><div class="v">${money0(res.fee)}</div></div>
+      <div class="stat" style="grid-column:1/-1"><div class="k">Net savings</div><div class="v" style="font-size:24px;color:${good ? 'var(--accent)' : 'var(--debt)'}">${res.net < 0 ? '−' : ''}${money0(Math.abs(res.net))}</div>
+        <div class="small muted">${good ? 'Could be worth it.' : 'Not worth it on these terms.'}</div></div>
+    </div>
+    <div class="alert ${res.paidBeforePromoEnd ? '' : 'bad'}" style="margin:10px 0 0;${res.paidBeforePromoEnd ? 'border-color:rgba(198,255,61,.4);background:rgba(198,255,61,.08);color:var(--accent)' : ''}">
+      ${res.paidBeforePromoEnd ? `✅ Your plan pays it off by <b>${esc(fmtMonth(res.payoffDate))}</b>, before the promo ends (${esc(fmtMonth(res.promoEnd))}).`
+        : `⚠ Your plan ${res.payoffDate ? `pays it off in <b>${esc(fmtMonth(res.payoffDate))}</b>, after` : 'doesn\'t pay it off before'} the promo ends (${esc(fmtMonth(res.promoEnd))}). Whatever is left goes back to the full APR.`}
+    </div>`;
+}
+
+function afterPlanHTML() {
+  const a = S.data.afterPlan, act = activePlan(), proj = plans().proj, f = freedomStats();
+  const monthly = a.monthly === null ? f.monthly : a.monthly;
+  const hasDebt = unpaid().length > 0;
+  const start = hasDebt && act.ok ? act.debtFree : todayISO();
+  const hysaStart = hasDebt && act.ok ? proj[proj.length - 1].hysa : S.data.savings.balance;
+  const pts = projectInvesting({ startISO: start, months: 120, monthly, rothPct: a.rothPct, rothLimit: a.rothLimit, annualReturn: a.annualReturn, hysaStart, hysaMonthly: monthlySavingsContribution(), hysaApy: S.data.savings.apy });
+  const k = (v) => (Math.abs(v) >= 1e6 ? '$' + (v / 1e6).toFixed(2) + 'M' : Math.abs(v) >= 1e4 ? '$' + (v / 1000).toFixed(0) + 'k' : money0(v));
+  const rows = [12, 36, 60, 120].map((m, i) => { const p = pts[m]; return `<tr class="${i === 3 ? 'hl' : ''}"><td>${m / 12} yr</td><td>${k(p.roth)}</td><td>${k(p.brokerage)}</td><td>${k(p.hysa)}</td><td>${k(p.total)}</td></tr>`; }).join('');
+  const chart = lineChart('invest', [
+    { label: 'Invested', color: 'var(--s-invest)', points: pts.map((p) => ({ date: p.date, v: p.invested })) },
+    { label: 'HYSA', color: 'var(--s-hysa)', points: pts.map((p) => ({ date: p.date, v: p.hysa })) },
+    { label: 'Total', color: 'var(--s-total)', points: pts.map((p) => ({ date: p.date, v: p.total })) }
+  ], { height: 170, endLabels: true, aria: 'Projected invested balance, HYSA and total for 10 years after debt-free day' });
+  return `<div class="card">
+    <div class="card-head"><h3>After debt-free plan</h3><span class="small muted">from ${esc(fmtMonth(start))}</span></div>
+    <label class="field"><span>Invest per month</span><div class="prefix"><b>$</b><input class="input num" type="number" inputmode="decimal" min="0" step="1" data-bind="afterPlan.monthly" value="${a.monthly === null ? '' : a.monthly}" placeholder="${r2(f.monthly)}"></div></label>
+    <p class="hint">Leave blank to use the money you free up: ${f.parts.map((x) => esc(x.name)).join(' + ')} (${money0(f.monthly)}/mo).</p>
+    <div class="grid-2">
+      <label class="field"><span>Share to Roth IRA</span><div class="suffix"><input class="input num" type="number" inputmode="numeric" min="0" max="100" step="5" data-bind="afterPlan.rothPct" value="${a.rothPct}"><b>%</b></div></label>
+      <label class="field"><span>Expected return</span><div class="suffix"><input class="input num" type="number" inputmode="decimal" step="0.1" data-bind="afterPlan.annualReturn" value="${a.annualReturn}"><b>%</b></div></label>
+    </div>
+    <label class="field"><span>Roth annual limit</span><div class="prefix"><b>$</b><input class="input num" type="number" inputmode="decimal" min="0" step="100" data-bind="afterPlan.rothLimit" value="${a.rothLimit || ''}" placeholder="No limit"></div></label>
+    <p class="hint">${a.rothPct}% of each month goes to the Roth IRA until the yearly limit is reached. Everything else goes to brokerage.</p>
+    ${chart}
+    <table class="mini-table"><colgroup><col style="width:15%"><col><col><col><col></colgroup>
+      <thead><tr><th>After</th><th>Roth</th><th>Brokerage</th><th>HYSA</th><th>Total</th></tr></thead><tbody>${rows}</tbody></table>
+    <p class="disclaimer">Estimate, not financial advice. Assumes a steady ${toNum(a.annualReturn)}% yearly return compounded monthly (real returns vary and can be negative), no taxes or fees, and the HYSA growing at ${toNum(S.data.savings.apy)}% APY with ${money0(monthlySavingsContribution())}/mo.</p>
+  </div>`;
+}
+
 function nudgesHTML() {
   let html = '';
   const miss = missingInfo();
@@ -1164,6 +1693,7 @@ function nudgesHTML() {
   if (over.length) {
     html += `<div class="alert bad"><b>⚠ Over your buffer:</b> ${over.map(([d, u]) => `${esc(d.name)} by <b class="num">${money(u.over)}</b>`).join(', ')}. The plan pays this first, before any other extra payments.</div>`;
   }
+  html += driftAlertHTML();
   return html;
 }
 
@@ -1359,11 +1889,12 @@ function historyHTML(limit) {
   if (!h.length) return '<p class="muted small">No activity yet. Log a payment, update a balance, or do a check-in.</p>';
   const items = (limit ? h.slice(0, limit) : h).map((e) => {
     let what = '', amt = '', sub = '';
-    if (e.kind === 'payment') { what = `Payment · ${esc(e.debtName)}`; amt = `<span class="amt pos">−${money(e.amount)}</span>`; }
+    if (e.kind === 'payment') { what = `Payment · ${esc(e.debtName)}${e.source === 'payday' ? ' · payday' : ''}`; amt = `<span class="amt pos">−${money(e.amount)}</span>`; }
     else if (e.kind === 'balance') { const diff = r2(e.after - e.before); what = `Balance update · ${esc(e.debtName)}`; amt = `<span class="amt ${diff <= 0 ? 'pos' : 'neg'}">${diff <= 0 ? '−' : '+'}${money(Math.abs(diff))}</span>`; }
     else if (e.kind === 'paid') { what = `🎉 PAID OFF · ${esc(e.debtName)}`; amt = `<span class="amt pos">${money(e.amount || 0)}</span>`; }
     else if (e.kind === 'added') { what = `Added · ${esc(e.debtName)}`; amt = `<span class="amt">${money(e.after)}</span>`; }
     else if (e.kind === 'removed') { what = `Removed · ${esc(e.debtName)}`; }
+    else if (e.kind === 'savings') { what = `💰 HYSA deposit${e.source === 'payday' ? ' · payday' : ''}`; amt = `<span class="amt" style="color:var(--save)">+${money(e.amount)}</span>`; sub = `<div class="when num">now ${money(e.after)}</div>`; }
     else if (e.kind === 'checkin') { what = '✅ Monthly check-in'; amt = `<span class="amt">${money(e.after)}</span>`; sub = `<div class="when num">HYSA ${money(e.hysa)}</div>`; }
     else { what = esc(e.kind); }
     if (!sub && e.after != null && e.kind !== 'added') sub = `<div class="when num">now ${money(e.after)}</div>`;
@@ -1397,6 +1928,8 @@ function renderOverview() {
     custom: 'Your order. Extra money goes to the top of your list first.'
   }[S.data.strategy];
   el.innerHTML = `
+    ${payNowHTML()}
+    ${recapCardHTML()}
     <div class="card hero">
       ${isFree ? `<div class="label">Status</div><div class="big">DEBT FREE 🎉</div>`
         : `<div class="label">Total debt remaining</div><div class="big">${money0(t.current)}</div>`}
@@ -1455,6 +1988,13 @@ function renderOverview() {
   wireOrderDrag();
 }
 
+function driftChip(d) {
+  if (d.paid || d.type === 'loan') return '';
+  const c = driftInfo().byCard.find((x) => x.debtId === d.id);
+  if (!c) return '';
+  return c.excess > 0 ? `<span class="chip bad">↑ ${money0(c.rise)} new spending this month${c.days ? ` · +${plural(c.days, 'day')}` : ''}</span>`
+    : `<span class="chip">↑ ${money0(c.rise)} new spending (within allowance)</span>`;
+}
 function renderDebts() {
   const el = $('#view-debts');
   const active = unpaid();
@@ -1480,6 +2020,7 @@ function renderDebts() {
         ${d.promoEnd ? `<span class="chip ${promoActive ? 'hot' : ''}">0% ${promoActive ? 'until' : 'ended'} ${esc(fmtDate(d.promoEnd))}</span>` : ''}
         ${!d.paid && po ? `<span class="chip ok">#${po.order} · done ${esc(fmtMonth(po.date))}</span>` : ''}
         ${d.paid && d.paidAt ? `<span class="chip ok">paid ${esc(fmtDate(d.paidAt.slice(0, 10)))}</span>` : ''}
+        ${driftChip(d)}
         ${urgent ? `<span class="chip bad">⚠ URGENT · ${money(u.over)} over buffer${restoredOn ? ` · fixed by ${esc(fmtDate(restoredOn, { month: 'short', day: 'numeric' }))}` : ''}</span>` : ''}
       </div>
       ${u ? `<div class="util-line"><span>${u.pct.toFixed(1)}% of ${money0(u.limit)} used</span><span>${d.keepOpen > 0 ? `keep ${money0(d.keepOpen)} open` : `${money0(u.available)} available`}</span></div>
@@ -1506,7 +2047,10 @@ function renderDebts() {
     </div>` : emptyState()}
     ${nudgesHTML()}
     ${active.map(card).join('')}
+    ${driftTallyHTML()}
+    ${btHTML()}
     ${paid.length ? `<h3 style="margin:22px 0 12px;color:var(--accent)">Crushed 🏆</h3>${paid.map(card).join('')}` : ''}`;
+  updateBT();
 }
 
 function checkinDraft() {
@@ -1568,6 +2112,7 @@ function renderCheckin() {
     ${status}
     ${chart}
     ${cis.length ? `<div class="card"><div class="card-head"><h3>Past check-ins</h3></div><ul class="hist">${cis.slice().reverse().slice(0, 24).map((c) => `<li><div><div>${esc(fmtDate(c.date))}</div><div class="when">${plural(Object.keys(c.balances).length, 'balance')}</div></div><div class="amt">${money0(c.totalDebt)}<div class="when">HYSA ${money0(c.hysa)}</div></div></li>`).join('')}</ul></div>` : ''}
+    ${recapListHTML()}
     <div class="card">
       <div class="card-head"><h3>Progress history</h3>${S.data.history.length > 8 ? `<button class="btn sm ghost" data-act="toggle-history">${S.showAllHistory ? 'Show less' : 'Show all'}</button>` : ''}</div>
       ${historyHTML(S.showAllHistory ? 0 : 8)}
@@ -1584,16 +2129,12 @@ function saveCheckin() {
   const date = parseISO(dr.date) ? dr.date : todayISO();
   if (!S.data.baseline) snapshotBaseline();   // first check-in: compare against the plan as it stood before it
   const balances = {};
-  const newlyPaid = [];
+  const newlyPaid = [], drifted = [];
   for (const d of unpaid()) {
     const raw = dr.balances[d.id];
     const v = r2(Math.max(0, toNum(raw != null && raw !== '' ? raw : d.balance)));
     balances[d.id] = v;
-    if (Math.abs(v - d.balance) > 0.004) {
-      logHistory({ kind: 'balance', debtId: d.id, debtName: d.name, before: d.balance, after: v });
-      d.balance = v;
-      if (v > d.startBalance) d.startBalance = v;
-    }
+    if (recordBalance(S.data, d, v, undefined, 'checkin')) drifted.push(d.name);
     if (v <= 0) newlyPaid.push(d);
   }
   const hysa = r2(Math.max(0, toNum(dr.hysa != null && dr.hysa !== '' ? dr.hysa : S.data.savings.balance)));
@@ -1608,6 +2149,7 @@ function saveCheckin() {
   commit();
   window.scrollTo(0, 0);
   if (newlyPaid.length) { confetti(260); toast(`${newlyPaid.map((d) => d.name.toUpperCase()).join(' & ')} PAID!`, 'Rolling that payment forward. 🔥'); }
+  else if (drifted.length) driftToast(drifted);
   else toast('CHECK-IN SAVED', `Total debt ${money0(totalDebt)} · HYSA ${money0(hysa)}`, 'info');
   setTimeout(checkMilestones, 900);
 }
@@ -1681,6 +2223,8 @@ function renderPaychecks() {
       ${moneyField('<span class="sw" style="background:var(--b-hysa)"></span>HYSA', 'budget.savingsPerPaycheck', b.savingsPerPaycheck)}
       ${moneyField('<span class="sw" style="background:var(--b-spend)"></span>Spending money', 'budget.spending', b.spending)}
       ${freeable('spending')}
+      ${moneyField('Monthly card spending allowance', 'budget.cardSpending', b.cardSpending)}
+      <p class="hint">Per <b>month</b>, not per paycheck, and not counted in the split above. Card balances rising by more than this (after estimated interest) get flagged.</p>
       ${b.customItems.map((c) => `<div class="item-row">
           <input class="input" data-item="${esc(c.id)}" data-field="name" value="${esc(c.name)}" maxlength="40" aria-label="Item name">
           <div class="prefix"><b>$</b><input class="input num" type="number" inputmode="decimal" min="0" step="0.01" data-item="${esc(c.id)}" data-field="amount" value="${c.amount || ''}" placeholder="0" aria-label="${esc(c.name)} amount"></div>
@@ -1731,7 +2275,8 @@ function renderSavings() {
         <div class="stat"><div class="k">In 12 months</div><div class="v">${money0(yearOut)}</div></div>
         <div class="stat"><div class="k">Interest earned (12 mo)</div><div class="v" style="color:var(--save)">${money0(Math.max(0, yearOut - s.balance - contrib * 12))}</div></div>
       </div>
-    </div>`;
+    </div>
+    ${afterPlanHTML()}`;
 }
 
 function renderSettings() {
@@ -1858,7 +2403,10 @@ function debtForm(d) {
         <label class="field"><span>Minimum payment</span><div class="prefix"><b>$</b><input class="input num" name="minPayment" type="number" inputmode="decimal" min="0" step="0.01" value="${v(d.minPayment)}"></div></label>
         <label class="field"><span>Due day (1–31)</span><input class="input num" name="dueDay" type="number" inputmode="numeric" min="1" max="31" step="1" value="${v(d.dueDay)}" placeholder="e.g. 15"></label>
       </div>
-      <label class="field"><span>0% promo ends <span class="faint">(optional)</span></span><input class="input num" name="promoEnd" type="date" value="${esc(d.promoEnd || '')}"></label>
+      <div class="grid-2">
+        <label class="field"><span>Promo ends <span class="faint">(optional)</span></span><input class="input num" name="promoEnd" type="date" value="${esc(d.promoEnd || '')}"></label>
+        <label class="field"><span>Promo APR</span><div class="suffix"><input class="input num" name="promoApr" type="number" inputmode="decimal" min="0" step="0.01" value="${v(d.promoApr)}" placeholder="0"><b>%</b></div></label>
+      </div>
       <div id="limitFields" class="${d.type === 'loan' ? 'hidden' : ''}">
         <div class="grid-2">
           <label class="field"><span>Credit limit <span class="faint">(optional)</span></span><div class="prefix"><b>$</b><input class="input num" name="creditLimit" type="number" inputmode="decimal" min="0" step="0.01" value="${v(d.creditLimit)}"></div></label>
@@ -1886,7 +2434,7 @@ function debtForm(d) {
       const vals = {
         name: f.name.value.trim().slice(0, 60) || 'Debt', type: f.type.value,
         balance: r2(Math.max(0, toNum(f.balance.value))), apr: Math.max(0, toNum(f.apr.value)),
-        minPayment: r2(Math.max(0, toNum(f.minPayment.value))), promoEnd: f.promoEnd.value || '',
+        minPayment: r2(Math.max(0, toNum(f.minPayment.value))), promoEnd: f.promoEnd.value || '', promoApr: Math.max(0, toNum(f.promoApr.value)),
         creditLimit: !isLoan && toNum(f.creditLimit.value) > 0 ? r2(toNum(f.creditLimit.value)) : null,
         keepOpen: isLoan ? 0 : r2(Math.max(0, toNum(f.keepOpen.value))),
         dueDay: due >= 1 && due <= 31 ? due : null
@@ -1898,10 +2446,11 @@ function debtForm(d) {
       } else {
         d = S.data.debts.find((x) => x.id === d.id);  // data may have been refreshed from the cloud meanwhile
         if (!d) { closeSheet(); return; }
-        const before = d.balance;
+        const drift = recordBalance(S.data, d, vals.balance, undefined, 'edit');
+        const start = d.startBalance;
         Object.assign(d, vals);
-        d.startBalance = r2(Math.max(0, toNum(f.startBalance.value || vals.balance)));
-        if (Math.abs(before - vals.balance) > 0.004) logHistory({ kind: 'balance', debtId: d.id, debtName: d.name, before, after: vals.balance });
+        d.startBalance = r2(Math.max(0, toNum(f.startBalance.value || start)));
+        if (drift) setTimeout(() => driftToast([d.name]), 50);
       }
       S.checkinDraft = null;
       closeSheet();
@@ -1929,18 +2478,18 @@ function amountSheet(d, mode) {
       if (!d) { closeSheet(); return; }
       const v = r2(Math.max(0, toNum(f.amt.value)));
       const before = d.balance;
+      let drifted = false;
       if (mode === 'payment') {
         if (v <= 0) return;
         d.balance = r2(Math.max(0, d.balance - v));
         logHistory({ kind: 'payment', debtId: d.id, debtName: d.name, amount: v, before, after: d.balance });
-      } else {
-        d.balance = v;
-        if (v > d.startBalance) d.startBalance = v;
-        logHistory({ kind: 'balance', debtId: d.id, debtName: d.name, before, after: v });
+      } else if (recordBalance(S.data, d, v, undefined, 'update')) {
+        drifted = true;
       }
       S.checkinDraft = null;
       closeSheet();
       if (d.balance <= 0) { markPaid(d); return; }
+      if (drifted) { commit(); driftToast([d.name]); checkMilestones(); return; }
       toast(mode === 'payment' ? 'PAYMENT LOGGED' : 'BALANCE UPDATED', `${d.name}: ${money(d.balance)} left`, 'info');
       commit();
       checkMilestones();
@@ -2015,7 +2564,9 @@ function setPath(path, raw) {
   const target = S.data[obj];
   if (key === 'frequency') target[key] = FREQUENCIES[raw] ? raw : 'biweekly';
   else if (key === 'payAnchor') target[key] = parseISO(raw) ? raw : todayISO();
-  else if (key === 'monthlyContribution') target[key] = raw === '' ? null : Math.max(0, toNum(raw));
+  else if (key === 'monthlyContribution' || (obj === 'afterPlan' && key === 'monthly')) target[key] = raw === '' ? null : Math.max(0, toNum(raw));
+  else if (obj === 'afterPlan' && key === 'rothPct') target[key] = Math.min(100, Math.max(0, toNum(raw)));
+  else if (obj === 'afterPlan' && key === 'annualReturn') target[key] = raw === '' ? 7 : Math.min(30, Math.max(-20, toNum(raw)));
   else target[key] = Math.max(0, key === 'apy' ? toNum(raw) : r2(toNum(raw)));
 }
 
@@ -2039,6 +2590,8 @@ document.addEventListener('change', (e) => {
 document.addEventListener('input', (e) => {
   const t = e.target;
   if (t.id === 'wiRange') { S.whatIf = toNum(t.value); updateWhatIf(); return; }
+  if (t.matches('[data-cl-amt]')) { S.clDraft[t.dataset.clAmt] = t.value; return; }
+  if (t.matches('[data-bt]')) { S.bt[t.dataset.bt] = t.dataset.bt === 'debtId' ? t.value : toNum(t.value); updateBT(); return; }
   if (t.matches('[data-ci]')) {
     const dr = checkinDraft();
     if (t.dataset.ci === 'debt') dr.balances[t.dataset.id] = t.value;
@@ -2113,9 +2666,36 @@ document.addEventListener('click', (e) => {
     case 'sign-out': signOut(); break;
     case 'export': exportData(); break;
     case 'import': $('#importFile').click(); break;
+    case 'cl-check': payChecklistItem(b.dataset.date, b.dataset.key); break;
+    case 'cl-undo':
+      if (uncheckChecklistItem(S.data, b.dataset.date, b.dataset.key)) { S.checkinDraft = null; commit(); toast('UNDONE', 'Balance put back.', 'info'); }
+      break;
+    case 'cl-dismiss': { const c = S.data.payChecklists.find((x) => x.date === b.dataset.date); if (c) { c.dismissed = true; commit(); } break; }
+    case 'dismiss-summary': { const sm = S.data.monthlySummaries.find((x) => x.month === b.dataset.month); if (sm) { sm.dismissed = true; commit(); } break; }
   }
 });
 $('#sync').addEventListener('click', () => pull());
+
+function payChecklistItem(date, key) {
+  const list = S.data.payChecklists.find((c) => c.date === date);
+  const item = list && list.items.find((i) => i.key === key);
+  if (!item) return;
+  const draft = S.clDraft[`${date}|${key}`];
+  const amount = draft != null && draft !== '' ? toNum(draft) : item.planned;
+  const res = checkChecklistItem(S.data, date, key, amount);
+  if (!res.ok) return;
+  delete S.clDraft[`${date}|${key}`];
+  S.checkinDraft = null;
+  commit();
+  if (res.paidOff) { confetti(260); toast(`${res.paidOff.name.toUpperCase()} IS PAID!`, 'Rolling that payment forward. 🔥'); }
+  if (res.complete) { setTimeout(() => { confetti(320); toast('PAYCHECK DONE ✅', `All ${plural(list.items.length, 'payment')} made. Nice work.`); }, res.paidOff ? 900 : 0); }
+  else if (!res.paidOff) {
+    const debt = item.kind === 'debt' ? S.data.debts.find((d) => d.id === item.debtId) : null;
+    toast(item.kind === 'hysa' ? `+${money0(res.item.paid)} TO HYSA` : `${money0(res.item.paid)} → ${item.label.toUpperCase()}`,
+      debt ? `Balance now ${money(debt.balance)}` : item.kind === 'hysa' ? `Savings now ${money(S.data.savings.balance)}` : 'Marked done', 'info');
+  }
+  setTimeout(checkMilestones, 1200);
+}
 
 /** Starting point for a new custom order: the current order of another strategy. */
 function priorityOrderIds(strategy) {

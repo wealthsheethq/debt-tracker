@@ -1,6 +1,6 @@
 // Offline shell for Debt Tracker. Network-first for the page so updates show up
 // immediately; cached copies are used only when offline. Supabase API calls are never cached.
-const CACHE = 'debt-tracker-v2';
+const CACHE = 'debt-tracker-v3';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
