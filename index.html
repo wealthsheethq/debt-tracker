@@ -499,6 +499,72 @@ details.recap[open] summary { margin-bottom: 10px; }
 .cal .day .dots { position: absolute; left: 0; right: 0; bottom: 5px; display: flex; justify-content: center; gap: 2px; }
 .cal .day .dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--save); }
 
+
+/* ---------- credit ---------- */
+:root { --band-excellent: #C6FF3D; --band-good: #3DD6FF; --band-fair: #FFB547; --band-high: #FF5C7A; }
+.band { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-xs); font-weight: 700; padding: 3px 9px; border-radius: var(--r-pill); background: var(--surface-2); color: var(--muted); white-space: nowrap; font-family: var(--font-body); }
+.band i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.band.excellent { color: var(--band-excellent); background: var(--accent-soft); }
+.band.good { color: var(--band-good); background: rgba(61,214,255,.12); }
+.band.fair { color: var(--band-fair); background: var(--warn-soft); }
+.band.high { color: var(--band-high); background: var(--debt-soft); }
+.bandscale { position: relative; display: grid; grid-template-columns: 10fr 20fr 20fr 50fr; gap: 2px; height: 8px; margin-top: var(--sp-4); }
+.bandscale i { display: block; border-radius: 2px; opacity: .55; }
+.bandscale i.excellent { background: var(--band-excellent); } .bandscale i.good { background: var(--band-good); } .bandscale i.fair { background: var(--band-fair); } .bandscale i.high { background: var(--band-high); }
+.bandscale b { position: absolute; top: -4px; width: 4px; height: 16px; border-radius: 2px; background: var(--text); transform: translateX(-50%); box-shadow: 0 0 0 2px var(--surface); }
+.bandscale-ticks { position: relative; height: 16px; font-size: 10px; color: var(--faint); font-family: var(--font-num); margin-top: 3px; }
+.bandscale-ticks span { position: absolute; transform: translateX(-50%); }
+.util-meter { position: relative; height: 12px; border-radius: var(--r-pill); background: var(--bg); border: 1px solid var(--line); overflow: hidden; margin-top: 8px; }
+.util-meter > div { height: 100%; border-radius: var(--r-pill); transition: width .7s var(--ease); }
+.util-meter .tick { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line-strong); }
+.util-meter .proj { position: absolute; top: -1px; bottom: -1px; width: 3px; border-radius: 2px; background: var(--text); transform: translateX(-50%); }
+.ur { padding: var(--sp-3) 0; border-top: 1px solid var(--line); }
+.ur:first-child { border-top: 0; padding-top: 0; }
+.ur-name { min-width: 0; overflow-wrap: anywhere; }
+.bands-key { display: grid; gap: 6px; margin-top: var(--sp-3); }
+.bands-key div { display: grid; grid-template-columns: 92px minmax(0,1fr); gap: var(--sp-3); align-items: start; font-size: var(--fs-sm); color: var(--muted); }
+.rp { padding: var(--sp-3) 0; border-top: 1px solid var(--line); }
+.rp:first-of-type { border-top: 0; }
+.rp-head { display: flex; justify-content: space-between; align-items: baseline; gap: 4px var(--sp-2); flex-wrap: wrap; }
+.rp-name { font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
+.rp-when { font-family: var(--font-num); font-size: var(--fs-xs); color: var(--muted); white-space: nowrap; }
+.rp-act { font-family: var(--font-head); font-size: 26px; line-height: 1.05; margin: 6px 0 6px; letter-spacing: .4px; }
+.rp-act b { color: var(--accent); font-weight: 400; }
+.rp-act.quiet { font-family: var(--font-body); font-size: 15px; color: var(--muted); letter-spacing: 0; }
+.rp-flow { display: flex; align-items: center; gap: 6px 8px; flex-wrap: wrap; font-size: var(--fs-sm); }
+.rp-src { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--sp-2); }
+.rp-note { font-size: var(--fs-xs); color: var(--muted); margin-top: 6px; }
+.timing { background: var(--surface-2); border-radius: var(--r-md); padding: var(--sp-3); margin-top: var(--sp-2); }
+.timing .pc-line { font-size: 14px; }
+.pc-line.timing { color: var(--save); font-size: 14px; }
+.factors { display: grid; grid-template-columns: minmax(0,1fr); gap: var(--sp-3); margin-bottom: var(--sp-3); }
+@media (min-width: 640px) { .factors { grid-template-columns: minmax(0,1fr) minmax(0,1fr); } }
+.factor { margin: 0; display: flex; flex-direction: column; }
+.factor .f-top { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-2); }
+.factor .f-top b { font-size: var(--fs-sm); color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-size: var(--fs-xs); }
+.factor .f-val { font-family: var(--font-head); font-size: 28px; line-height: 1; margin: 10px 0 6px; overflow-wrap: anywhere; }
+.factor p { margin: 0; font-size: var(--fs-sm); color: var(--muted); }
+.pill { font-size: 11px; font-weight: 700; letter-spacing: .3px; padding: 3px 9px; border-radius: var(--r-pill); white-space: nowrap; background: var(--surface-2); color: var(--muted); }
+.pill.helps { background: var(--accent-soft); color: var(--accent); }
+.pill.watch { background: var(--warn-soft); color: var(--warn); }
+.pill.hurts { background: var(--debt-soft); color: var(--debt); }
+.score-big { font-family: var(--font-head); font-size: 64px; line-height: .9; letter-spacing: .5px; }
+.warn-list { list-style: none; margin: 0; padding: 0; }
+.warn-list li { display: grid; grid-template-columns: 24px minmax(0,1fr); gap: var(--sp-2); padding: 10px 0; border-top: 1px solid var(--line); font-size: 14px; }
+.warn-list li:first-child { border-top: 0; }
+.warn-list li .ic { margin-top: 2px; }
+.warn-list li.hurts .ic { color: var(--debt); } .warn-list li.warn .ic { color: var(--warn); } .warn-list li.info .ic { color: var(--muted); }
+.tile.wide { grid-column: 1 / -1; min-height: 0; }
+.tile .t-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); flex-wrap: wrap; }
+.up.report .d b { color: var(--accent); }
+.link-row { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: var(--sp-2); background: none; border: 0; color: inherit; padding: 0; margin-top: 12px; cursor: pointer; font: inherit; font-size: var(--fs-sm); text-align: left; min-height: 32px; }
+.tier-table td { vertical-align: middle; }
+.tier-table .input { min-height: 40px; font-size: 14px; padding: 0 20px 0 6px; text-align: right; }
+.tier-table td:nth-child(2) { padding-right: 6px; }
+.tier-table .suffix > b { right: 8px; font-size: 13px; }
+.tier-table tr.me td { color: var(--accent); }
+.tier-table tr.me td:first-child { font-weight: 700; }
+
 /* ---------- sheet (modal) ---------- */
 .sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.62); z-index: 50; display: flex; align-items: flex-end; justify-content: center; animation: fadeIn var(--dur-1) ease-out; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -613,6 +679,7 @@ details.recap[open] summary { margin-bottom: 10px; }
   <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></symbol>
   <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></symbol>
+  <symbol id="i-gauge" viewBox="0 0 24 24"><path d="M4 17a8 8 0 1116 0"/><path d="M12 17l4-5"/><path d="M12 17h.01"/></symbol>
   <symbol id="i-rocket" viewBox="0 0 24 24"><path d="M5 15c-1 1-2 4-2 6 2 0 5-1 6-2M9 13l2 2"/><path d="M14 4c3-1 6-1 6-1s0 3-1 6l-7 7-5-5z"/><circle cx="15" cy="9" r="1.5"/></symbol>
 </svg>
 
@@ -653,12 +720,14 @@ details.recap[open] summary { margin-bottom: 10px; }
       <nav class="subnav" id="subnav" aria-label="Debt sections">
         <button type="button" data-sub="overview">Overview</button>
         <button type="button" data-sub="debts">Debts</button>
+        <button type="button" data-sub="credit">Credit</button>
         <button type="button" data-sub="checkin">Check-in</button>
         <button type="button" data-sub="paychecks">Paychecks</button>
         <button type="button" data-sub="savings">Savings</button>
       </nav>
       <section class="subview" id="view-overview"></section>
       <section class="subview" id="view-debts"></section>
+      <section class="subview" id="view-credit"></section>
       <section class="subview" id="view-checkin"></section>
       <section class="subview" id="view-paychecks"></section>
       <section class="subview" id="view-savings"></section>
@@ -810,7 +879,8 @@ function simulatePayoff(debtsIn, opts) {
     monthlyBudget: r2(perPaycheck * FREQUENCIES[freq].perMonth),
     perPaycheck, debtFree: null, months: 0, payoffs: [], lump: null, paychecks: [], series: [], warnings: [],
     overBuffer: debts.filter((d) => d.bal > d.line + 0.004).map((d) => ({ id: d.id, name: d.name, over: r2(d.bal - d.line) })),
-    bufferRestored: {}
+    bufferRestored: {},
+    trace: []   // each debt's balance after every event (day 1, month-start interest, each paycheck)
   };
   if (!debts.length) { res.debtFree = res.today; return res; }
 
@@ -853,6 +923,7 @@ function simulatePayoff(debtsIn, opts) {
   };
 
   res.series.push({ date: res.today, total: total() });
+  const snap = (date) => { const bals = {}; debts.forEach((d) => { bals[d.id] = d.bal; }); res.trace.push({ date, bals }); };
 
   // Day 1 lump sum: restore buffers first, then priority order
   if (lumpSum > 0) {
@@ -861,6 +932,7 @@ function simulatePayoff(debtsIn, opts) {
     avail = payExtra(today, avail, allocs);
     res.lump = { date: res.today, amount: lumpSum, allocations: allocs, leftover: r2(avail), urgent: allocs.some((a) => a.buffer > 0) };
   }
+  snap(res.today);
 
   let payday = firstPaycheckOnOrAfter(opts.payAnchor, freq, today);
   const anchorDay = (parseISO(opts.payAnchor) || payday).getDate();
@@ -881,6 +953,7 @@ function simulatePayoff(debtsIn, opts) {
         d.minDue = Math.min(d.min, d.bal);
       }
       res.series.push({ date: toISO(monthStart), total: total() });
+      snap(toISO(monthStart));
     }
     if (curMonth - startKey > maxMonths) {
       res.ok = false;
@@ -897,6 +970,7 @@ function simulatePayoff(debtsIn, opts) {
     avail = restoreBuffers(payday, avail, allocs);                // 2) urgent: get back under buffer lines
     avail = payExtra(payday, avail, allocs);                      // 3) everything else, rolling over
     res.paychecks.push({ date: toISO(payday), allocations: allocs, toDebt: r2(perPaycheck - avail), leftover: r2(avail), remaining: total(), urgent: allocs.some((a) => a.buffer > 0) });
+    snap(toISO(payday));
     payday = nextPaycheck(payday, freq, anchorDay);
   }
 
@@ -1275,6 +1349,10 @@ function normalizeWalletCard(c) {
     annualFee: r2(nonNeg(c.annualFee)), earnType: c.earnType === 'points' ? 'points' : 'cash', cpp: c.cpp == null || c.cpp === '' ? 1 : nonNeg(c.cpp),
     debtId: c.debtId ? String(c.debtId) : null, presetId: c.presetId || null, archived: !!c.archived, notes: String(c.notes || '').slice(0, 200),
     createdAt: c.createdAt || new Date().toISOString(),
+    // v6: credit details (used when the card isn't linked to a debt)
+    creditLimit: toNum(c.creditLimit) > 0 ? r2(toNum(c.creditLimit)) : null, keepOpen: r2(nonNeg(c.keepOpen)), currentBalance: r2(nonNeg(c.currentBalance)),
+    closingDay: dayOrNull(c.closingDay), dueDay: dayOrNull(c.dueDay), cardKind: c.cardKind === 'charge' ? 'charge' : 'revolving',
+    openDate: isoOrEmpty(c.openDate), utilInclude: c.utilInclude !== false, monthlySpend: c.monthlySpend == null || c.monthlySpend === '' ? null : r2(nonNeg(c.monthlySpend)),
     rules: arr(c.rules).filter(isObj).map((r) => Object.assign({}, r, {
       id: String(r.id || newId()), category: SPEND_CATEGORIES[r.category] ? r.category : 'everything',
       merchants: arr(r.merchants).map((m) => String(m).trim()).filter(Boolean), rate: nonNeg(r.rate),
@@ -1300,7 +1378,8 @@ function defaultHome() {
   return {
     priceMin: null, priceMax: null, downPct: 5, closingPct: 3, ratePct: null, termYears: 30, taxRatePct: null, insuranceYr: null, pmiRatePct: 0.5, hoaMonthly: 0,
     grossIncomeYr: null, emergencyMonths: 3, monthlyExpenses: null, creditScore: null, creditTarget: 640, dtiTarget: 36, preapproved: false,
-    programs: NC_PROGRAMS.map((p) => Object.assign({ id: newId(), verify: true }, p))
+    programs: NC_PROGRAMS.map((p) => Object.assign({ id: newId(), verify: true }, p)),
+    rateTiers: defaultRateTiers()
   };
 }
 function monthlyPI(principal, ratePct, years) {
@@ -1363,13 +1442,589 @@ function defaultMonthlyExpenses(data) {
 function homeChecklist(data, ctx) {
   const h = data.home;
   const items = [
-    { key: 'credit', label: `Credit score ${h.creditTarget}+`, done: toNum(h.creditScore) >= toNum(h.creditTarget) && toNum(h.creditScore) > 0, detail: h.creditScore ? `Now ${h.creditScore}` : 'Add your score' },
+    (() => { const ls = latestScore(data); return { key: 'credit', label: `Credit score ${h.creditTarget}+`, done: !!ls && ls.score >= toNum(h.creditTarget), detail: ls ? `Now ${ls.score}${ls.logged ? ` · logged ${fmtMD(ls.date)}` : ''}` : 'Add your score' }; })(),
     { key: 'dti', label: `Debt-to-income under ${h.dtiTarget}%`, done: ctx.dti != null && ctx.dti <= toNum(h.dtiTarget), detail: ctx.dti == null ? 'Add income and a target price' : `Now ${ctx.dti.toFixed(1)}%` },
     { key: 'down', label: 'Down payment + closing saved', done: ctx.need != null && data.savings.balance >= ctx.need.down + ctx.need.closing, detail: ctx.need ? `${Math.min(100, (data.savings.balance / Math.max(1, ctx.need.down + ctx.need.closing)) * 100).toFixed(0)}% there` : 'Set a target price' },
     { key: 'emergency', label: `${h.emergencyMonths}-month emergency fund on top`, done: ctx.need != null && data.savings.balance >= ctx.need.total, detail: ctx.need ? `${Math.min(100, (data.savings.balance / Math.max(1, ctx.need.total)) * 100).toFixed(0)}% of the full cash goal` : 'Set a target price' },
     { key: 'preapproval', label: 'Mortgage pre-approval', done: !!h.preapproved, detail: h.preapproved ? 'Done' : 'Tap to mark done', manual: true }
   ];
   return { items, done: items.filter((i) => i.done).length, total: items.length };
+}
+
+/* ---------- credit: statements, utilization, "pay before it reports" ---------- */
+const DATA_VERSION = 6;
+const CARD_KINDS = { revolving: 'Credit card', charge: 'Charge card' };
+const SCORE_MODELS = ['FICO 8', 'FICO 9', 'FICO 10T', 'FICO 2/4/5 (mortgage)', 'VantageScore 3.0', 'VantageScore 4.0', 'Other'];
+const INQUIRY_TYPES = { card: 'Credit card', mortgage: 'Mortgage', auto: 'Auto loan', loan: 'Personal loan', other: 'Other' };
+const UTIL_BANDS = [
+  { key: 'excellent', below: 10, label: 'Excellent', range: 'Under 10%', meaning: 'Where the strongest scores usually sit. Lenders see a light, well-managed balance.' },
+  { key: 'good', below: 30, label: 'Good', range: '10–29%', meaning: 'Healthy. Usually helps your score; dropping under 10% can help a little more.' },
+  { key: 'fair', below: 50, label: 'Fair', range: '30–49%', meaning: 'Starting to weigh on your score. Getting under 30% usually helps.' },
+  { key: 'high', below: Infinity, label: 'High', range: '50% and up', meaning: 'Likely pulling your score down now. Lowering it is one of the fastest ways to recover.' }
+];
+function utilBand(pct) { const p = toNum(pct); return UTIL_BANDS.find((b) => p < b.below) || UTIL_BANDS[3]; }
+const bandIndex = (pct) => UTIL_BANDS.indexOf(utilBand(pct));
+function defaultCredit() {
+  return { targetCard: 29, targetOverall: 9, goal: 'card', leadDays: 2, mode: 'next', preMonth: null, mortgageMonth: null, azeKeepId: null, azeAmount: null, scores: [], inquiries: [] };
+}
+const RATE_TIER_BOUNDS = [[760, null], [740, 759], [720, 739], [700, 719], [680, 699], [660, 679], [640, 659]];
+function defaultRateTiers() { return RATE_TIER_BOUNDS.map(([min, max]) => ({ min, max, rate: null })); }
+const tierLabel = (t) => (t.max == null ? `${t.min}+` : `${t.min}–${t.max}`);
+
+const daysBetween = (a, b) => Math.round((parseISO(b) - parseISO(a)) / 86400000);
+const addDaysISO = (iso, n) => toISO(addDays(parseISO(iso), n));
+function addMonthsISO(iso, n) { const d = parseISO(iso); return toISO(addMonthsKeepDay(d, n, d.getDate())); }
+/** Whole months from a to b (ISO dates). */
+function monthsBetween(a, b) { const x = parseISO(a), y = parseISO(b); return (y.getFullYear() - x.getFullYear()) * 12 + (y.getMonth() - x.getMonth()) - (y.getDate() < x.getDate() ? 1 : 0); }
+const fmtMD = (iso) => parseISO(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+const fmtMY = (iso) => parseISO(iso).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+/** Statement closing date in `month` ('YYYY-MM') for closing day `day`; days past the month's end land on its last day. */
+function closingIn(day, month) { const [y, m] = month.split('-').map(Number); return toISO(new Date(y, m - 1, Math.min(day, daysInMonth(y, m - 1)), 12)); }
+/** Next closing date on/after `fromISO`. */
+function nextClosing(day, fromISO) { return toISO(nextDueDate(day, parseISO(fromISO))); }
+function prevClosing(day, closingISO) { return closingIn(day, shiftMonth(closingISO.slice(0, 7), -1)); }
+function closingsFrom(day, fromISO, n) {
+  const out = [];
+  let c = nextClosing(day, fromISO);
+  for (let i = 0; i < n; i++) { out.push(c); c = closingIn(day, shiftMonth(c.slice(0, 7), 1)); }
+  return out;
+}
+/** Due date for the statement that closes on `closingISO`: the card's due day at least 21 days later (the legal minimum grace period), or closing + 21 days as an estimate. */
+function statementDue(acct, closingISO) {
+  if (acct.dueDay) return { date: toISO(nextDueDate(acct.dueDay, parseISO(addDaysISO(closingISO, 21)))), estimated: false };
+  return { date: addDaysISO(closingISO, 21), estimated: true };
+}
+/** Pay-by date so a payment posts before the statement closes (never before today). */
+function payByDate(closingISO, leadDays, today) { const d = addDaysISO(closingISO, -Math.max(0, Math.round(toNum(leadDays)))); return d < today ? today : d; }
+
+/**
+ * Every credit account Money HQ knows about: debts (cards and loans) and wallet cards that aren't
+ * linked to a debt (those are assumed paid in full each month). A wallet card linked to a debt uses the debt's details.
+ */
+function creditAccounts(data) {
+  const out = [];
+  const debtIds = new Set(data.debts.map((d) => d.id));
+  data.debts.forEach((d) => {
+    const w = data.wallet.find((c) => c.debtId === d.id && !c.archived);
+    out.push(acctFrom({ id: d.id, source: 'debt', debtId: d.id, walletId: w ? w.id : null, name: d.name,
+      kind: d.type === 'loan' ? 'loan' : d.cardKind === 'charge' ? 'charge' : 'revolving',
+      balance: d.paid ? 0 : r2(toNum(d.balance)), limit: toNum(d.creditLimit) > 0 ? r2(toNum(d.creditLimit)) : null,
+      closingDay: d.closingDay || null, dueDay: d.dueDay || null, openDate: d.openDate || '', keepOpen: toNum(d.keepOpen), utilInclude: d.utilInclude !== false,
+      minPayment: toNum(d.minPayment), apr: toNum(d.apr), monthlySpend: d.monthlySpend == null ? null : toNum(d.monthlySpend), paid: !!d.paid }));
+  });
+  data.wallet.filter((c) => !c.archived && !(c.debtId && debtIds.has(c.debtId))).forEach((c) => out.push(acctFrom({
+    id: 'w:' + c.id, source: 'wallet', debtId: null, walletId: c.id, name: c.name, kind: c.cardKind === 'charge' ? 'charge' : 'revolving',
+    balance: r2(toNum(c.currentBalance)), limit: toNum(c.creditLimit) > 0 ? r2(toNum(c.creditLimit)) : null,
+    closingDay: c.closingDay || null, dueDay: c.dueDay || null, openDate: c.openDate || '', keepOpen: toNum(c.keepOpen), utilInclude: c.utilInclude !== false,
+    minPayment: null, apr: 0, monthlySpend: c.monthlySpend == null ? null : toNum(c.monthlySpend), paid: false })));
+  return out;
+}
+function acctFrom(a) {
+  // No closing day but a due day: statements usually close about 25 days before the due date.
+  const est = !a.closingDay && a.kind !== 'loan' && a.dueDay ? ((a.dueDay + 4) % 31) + 1 : null;
+  return Object.assign(a, { include: a.kind === 'revolving' || (a.kind === 'charge' && a.utilInclude), closeDay: a.closingDay || est, closeEst: !a.closingDay && !!est });
+}
+const countsInUtil = (a) => a.kind !== 'loan' && a.include && a.limit > 0;
+/**
+ * New card spending per account per month. Amounts you set per card win; otherwise the monthly card
+ * spending allowance is split evenly across cards you aren't paying down (or all cards if you're paying down every one).
+ */
+function monthlySpendByAccount(data, accts) {
+  const cards = accts.filter((a) => a.kind !== 'loan'), out = {};
+  cards.forEach((a) => { out[a.id] = 0; });
+  if (cards.some((a) => a.monthlySpend != null)) { cards.forEach((a) => { out[a.id] = r2(nonNeg(a.monthlySpend)); }); return out; }
+  const allowance = nonNeg(data.budget.cardSpending);
+  if (!(allowance > 0) || !cards.length) return out;
+  const free = cards.filter((a) => !(a.source === 'debt' && a.balance > 0.004));
+  const pool = free.length ? free : cards;
+  pool.forEach((a) => { out[a.id] = r2(allowance / pool.length); });
+  return out;
+}
+/** Utilization as of today: per card and overall (revolving cards, plus charge cards you include). */
+function utilizationNow(data) {
+  const rows = creditAccounts(data).filter((a) => a.kind !== 'loan').map((a) => {
+    const pct = a.limit ? (a.balance / a.limit) * 100 : null;
+    const line = a.limit ? bufferLine(a.limit, a.keepOpen) : Infinity;
+    return Object.assign({}, a, { pct, band: pct == null ? null : utilBand(pct), over30: pct != null && pct >= 30,
+      overLimit: !!a.limit && a.balance > a.limit + 0.004,
+      nearLimit: !!a.limit && a.balance <= a.limit + 0.004 && (a.balance >= a.limit * 0.9 || a.balance > line + 0.004) });
+  });
+  const used = rows.filter(countsInUtil);
+  const limit = used.reduce((t, r) => t + r.limit, 0), bal = used.reduce((t, r) => t + r.balance, 0);
+  return {
+    rows, overall: limit > 0 ? { bal: r2(bal), limit: r2(limit), pct: (bal / limit) * 100, band: utilBand((bal / limit) * 100), count: used.length } : null,
+    excluded: rows.filter((r) => r.kind === 'charge' && !r.include), noLimit: rows.filter((r) => r.include && !r.limit)
+  };
+}
+
+/** A debt's balance on the payoff plan as of `iso` (after that day's events). null when the plan doesn't include it. */
+function planBalAt(plan, id, iso) {
+  let v = null;
+  for (const t of plan.trace || []) { if (t.date > iso) break; if (id in t.bals) v = t.bals[id]; }
+  return v;
+}
+/** Plan payments to one debt (day-1 lump sum and paychecks) dated from..to inclusive. */
+function plannedPayments(plan, id, fromISO, toISO_) {
+  const out = [];
+  if (plan.lump && plan.lump.date >= fromISO && plan.lump.date <= toISO_) { const a = plan.lump.allocations.find((x) => x.id === id); if (a) out.push({ date: plan.lump.date, amount: a.amount }); }
+  for (const p of plan.paychecks) {
+    if (p.date > toISO_) break;
+    if (p.date < fromISO) continue;
+    const a = p.allocations.find((x) => x.id === id);
+    if (a) out.push({ date: p.date, amount: a.amount });
+  }
+  return out;
+}
+/** New spending that lands on the statement closing `closingISO`: the rest of the current cycle, or a full month for later statements. */
+function cycleSpend(monthly, closeDay, closingISO, today) {
+  if (!(monthly > 0)) return 0;
+  const prev = prevClosing(closeDay, closingISO);
+  if (today <= prev) return r2(monthly);
+  const len = Math.max(1, daysBetween(prev, closingISO));
+  return r2((monthly * Math.max(0, daysBetween(today, closingISO))) / len);
+}
+/**
+ * Balance the card should report on `closingISO` on the current plan: the plan's balance when payments
+ * stop counting (the pay-by date) plus that statement's new spending. Wallet-only cards are paid in full
+ * each month, so only their first statement carries today's balance.
+ */
+function reportedBalance(plan, acct, closingISO, today, lead, monthly) {
+  const cut = payByDate(closingISO, lead, today);
+  let base;
+  if (acct.source === 'wallet') base = closingISO <= nextClosing(acct.closeDay, today) ? acct.balance : 0;
+  else { const b = planBalAt(plan, acct.id, cut); base = b == null ? acct.balance : b; }
+  return r2(base + cycleSpend(monthly, acct.closeDay, closingISO, today));
+}
+/** Was any payment logged for this debt after `iso` (history or a checked payday item)? */
+function paymentLoggedSince(data, debtId, iso) {
+  const day = (at) => (at ? toISO(new Date(at)) : '');
+  if (data.history.some((h) => h.debtId === debtId && day(h.at) > iso && (h.kind === 'payment' || h.kind === 'paid' || (h.kind === 'balance' && toNum(h.after) < toNum(h.before))))) return true;
+  return data.payChecklists.some((c) => c.items.some((i) => i.debtId === debtId && i.done && i.paid > 0 && day(i.at) > iso));
+}
+/** Unchecked payday-checklist debt payments: money that's still going out today. */
+function pendingChecklistMoney(data, today) {
+  const alloc = {};
+  data.payChecklists.filter((c) => !c.dismissed && !c.completedAt && c.date <= today).forEach((c) => c.items.forEach((i) => {
+    const d = i.kind === 'debt' && !i.done && !i.credit && i.debtId && data.debts.find((x) => x.id === i.debtId && !x.paid);
+    if (d && i.planned > 0) alloc[i.debtId] = r2((alloc[i.debtId] || 0) + i.planned);
+  }));
+  return Object.keys(alloc).length ? [{ date: today, label: 'checklist', allocations: alloc }] : [];
+}
+function creditPlan(data, today) { return simulatePayoff(data.debts, planOptionsFrom(data, today)); }
+
+/**
+ * "Pay before it reports". For each card's target statement (the next one, or the one in `month`),
+ * how much must be paid before it closes so the reported balance hits the goal:
+ *   goal 'card'    → every card at or under targetCard% of its limit,
+ *        'overall' → that, plus overall at or under targetOverall% (highest cards brought down first, evenly),
+ *        'aze'     → every card reports $0 except one small balance.
+ * Money comes from the payoff plan first. Planned paycheck payments are re-timed (earliest deadline first)
+ * so they land before closing dates; each card still gets the same total over the window, and every
+ * minimum is still paid by its due date. Whatever that can't cover is extra cash.
+ * o: { plan, mode, month, goal, targetCard, targetOverall, leadDays, azeKeepId, azeAmount, pending, fixPending (keep today's checklist amounts as they are) }
+ */
+function planStatements(data, today, o = {}) {
+  const c = data.credit;
+  const plan = o.plan || creditPlan(data, today);
+  const mode = (o.mode || c.mode) === 'month' ? 'month' : 'next';
+  const goal = ['card', 'overall', 'aze'].includes(o.goal) ? o.goal : c.goal;
+  const lead = o.leadDays != null ? o.leadDays : c.leadDays;
+  const tCard = toNum(o.targetCard != null ? o.targetCard : c.targetCard), tAll = toNum(o.targetOverall != null ? o.targetOverall : c.targetOverall);
+  const month = mode === 'month' ? (o.month || c.preMonth || shiftMonth(today.slice(0, 7), 1)) : null;
+  const all = creditAccounts(data), spend = monthlySpendByAccount(data, all);
+  const out = { mode, month, goal, targetCard: tCard, targetOverall: tAll, rows: [], pays: [], keepId: null, overallShort: 0,
+    totals: { need: 0, moved: 0, extra: 0, extraPre: 0, extraMin: 0 }, overall: null, skipped: [] };
+  const rows = out.rows;
+  for (const a of all) {
+    if (a.kind === 'loan') continue;
+    if (!a.closeDay) { out.skipped.push({ id: a.id, name: a.name, why: 'closing' }); continue; }
+    const closing = month ? closingIn(a.closeDay, month) : nextClosing(a.closeDay, today);
+    if (closing < today) { out.skipped.push({ id: a.id, name: a.name, why: 'closed', closing }); continue; }
+    const raw = addDaysISO(closing, -Math.max(0, Math.round(toNum(lead))));
+    rows.push({ acct: a, id: a.id, name: a.name, kind: a.kind, closing, prev: prevClosing(a.closeDay, closing), payBy: raw < today ? today : raw, tight: raw < today,
+      due: statementDue(a, closing), prevDue: statementDue(a, prevClosing(a.closeDay, closing)), spend: spend[a.id] || 0, limit: a.limit, closeEst: a.closeEst, util: countsInUtil(a) });
+  }
+  if (!rows.length) return out;
+  const ws = mode === 'month' ? [today, addDaysISO(rows.reduce((m, r) => (r.prev < m ? r.prev : m), rows[0].prev), 1)].sort()[1] : today;
+  const pending = mode === 'next' ? (o.pending || []) : [];
+  const pendingFor = (id) => pending.reduce((t, p) => t + toNum(p.allocations[id]), 0);
+
+  // 1) what each card would report if nothing were paid in the window, and what the plan already pays before it closes
+  rows.forEach((r) => {
+    const planPaid = plannedPayments(plan, r.id, ws, r.payBy).reduce((t, p) => t + p.amount, 0);
+    const onPlan = reportedBalance(plan, r.acct, r.closing, today, lead, r.spend);
+    r.R0 = r2(onPlan + (r.acct.source === 'debt' ? planPaid : 0));
+    r.planBefore = r2(planPaid + pendingFor(r.id));
+    r.reportedPlan = r2(Math.max(0, r.R0 - r.planBefore));
+  });
+  // 2) targets
+  rows.forEach((r) => { r.target = goal === 'aze' ? 0 : r.util ? Math.floor(r.limit * tCard) / 100 : Infinity; });
+  if (goal === 'aze') {
+    const cands = rows.filter((r) => r.util);
+    const keep = cands.find((r) => r.id === c.azeKeepId || r.id === o.azeKeepId) || cands.slice().sort((a, b) => b.limit - a.limit)[0] || null;
+    if (keep) {
+      const amt = o.azeAmount != null ? toNum(o.azeAmount) : c.azeAmount != null ? c.azeAmount : Math.max(5, Math.ceil(keep.limit * 0.01));
+      keep.target = r2(Math.max(0, amt)); out.keepId = keep.id; out.keepAmount = keep.target;
+    }
+  }
+  rows.forEach((r) => { r.need = r.target === Infinity ? 0 : goal === 'aze' ? r2(Math.max(0, r.R0 - r.target)) : Math.min(r.R0, Math.max(0, Math.ceil(r.R0 - r.target - 0.004))); });
+  // 3) overall target: bring the highest-% cards down to one level until overall fits
+  const utilAll = all.filter(countsInUtil);
+  const L = utilAll.reduce((t, a) => t + a.limit, 0);
+  const other = utilAll.filter((a) => !rows.some((r) => r.id === a.id)).reduce((t, a) => t + a.balance, 0);
+  if (goal === 'overall' && L > 0) {
+    const U = rows.filter((r) => r.util);
+    const cap = (L * tAll) / 100;
+    let excess = U.reduce((t, r) => t + (r.R0 - r.need), 0) + other - cap;
+    if (excess > 0.004) {
+      const v = (r) => r.R0 - r.need;
+      const room = U.reduce((t, r) => t + v(r), 0);
+      if (excess > room) { out.overallShort = r2(excess - room); excess = room; }
+      let lo = 0, hi = Math.max(0, ...U.map((r) => v(r) / r.limit));
+      for (let i = 0; i < 60; i++) { const mid = (lo + hi) / 2; const cut = U.reduce((t, r) => t + Math.max(0, v(r) - mid * r.limit), 0); if (cut > excess) lo = mid; else hi = mid; }
+      U.forEach((r) => { const take = Math.max(0, v(r) - lo * r.limit); if (take > 0.004) r.need = Math.min(r.R0, Math.ceil(r.need + take - 0.004)); });
+    }
+  }
+  // 4) money in the window: unchecked checklist items today, the day-1 lump sum, then paychecks up to the last due date
+  const horizon = rows.reduce((m, r) => (r.due.date > m ? r.due.date : m), ws);
+  const pays = [];
+  const addPay = (date, label, alloc) => {
+    let p = pays.find((x) => x.date === date && x.label === label);
+    if (!p) { p = { date, label, plan: {} }; pays.push(p); }
+    Object.entries(alloc).forEach(([id, amt]) => { if (amt > 0) p.plan[id] = r2((p.plan[id] || 0) + amt); });
+  };
+  pending.forEach((p) => addPay(p.date, 'checklist', p.allocations));
+  const toMap = (allocs) => Object.fromEntries(allocs.map((a) => [a.id, a.amount]));
+  if (plan.lump && plan.lump.date >= ws && plan.lump.date <= horizon) addPay(plan.lump.date, 'lump', toMap(plan.lump.allocations));
+  plan.paychecks.filter((p) => p.date >= ws && p.date <= horizon).forEach((p) => addPay(p.date, 'paycheck', toMap(p.allocations)));
+  const budget = {};
+  pays.forEach((p) => Object.entries(p.plan).forEach(([id, amt]) => { budget[id] = r2((budget[id] || 0) + amt); }));
+  // 5) requirements: (amount, first day it can be paid, deadline)
+  const reqs = [];
+  const isRow = new Set(rows.map((r) => r.id));
+  rows.forEach((r) => {
+    const a = r.acct;
+    const m0 = mode === 'next' && a.source === 'debt' && a.minPayment > 0 && a.balance > 0.004 && r.prevDue.date >= ws && r.prevDue.date <= r.closing && !paymentLoggedSince(data, a.id, r.prev)
+      ? r2(Math.min(a.minPayment, a.balance)) : 0;
+    r.min0 = m0 > 0 ? { amount: m0, due: r.prevDue.date, extra: 0 } : null;
+    if (m0 > 0 && r.prevDue.date <= r.payBy) {
+      reqs.push({ id: r.id, kind: 'min0', left: m0, rel: ws, dl: r.prevDue.date });
+      reqs.push({ id: r.id, kind: 'pre', left: r2(Math.max(0, r.need - m0)), rel: ws, dl: r.payBy });
+    } else {
+      reqs.push({ id: r.id, kind: 'pre', left: r.need, rel: ws, dl: r.payBy });
+      if (m0 > 0) reqs.push({ id: r.id, kind: 'min0', left: r2(Math.max(0, m0 - r.need)), rel: ws, dl: r.prevDue.date });
+    }
+    const after = r2(Math.max(0, r.R0 - r.need));
+    const m1 = a.minPayment != null && a.minPayment > 0 && after > 0.004 ? r2(Math.min(a.minPayment, after)) : 0;
+    r.min1 = m1 > 0 ? { amount: m1, due: r.due.date, estimated: r.due.estimated, extra: 0 } : null;
+    if (m1 > 0) reqs.push({ id: r.id, kind: 'min1', left: m1, rel: addDaysISO(r.closing, 1), dl: r.due.date });
+  });
+  // debts without statement dates (loans, cards missing a closing day) keep their planned payments on the planned day
+  // (and with fixPending, today's checklist stays exactly as it is)
+  pays.forEach((p) => Object.entries(p.plan).forEach(([id, amt]) => { if (!isRow.has(id) || (o.fixPending && p.label === 'checklist')) reqs.push({ id, kind: 'keep', left: amt, rel: p.date, dl: p.date }); }));
+  const rank = { keep: 0, min0: 1, pre: 2, min1: 3 };
+  // 6) schedule, earliest deadline first; cash not needed yet waits for the card it was planned for
+  const rem = Object.assign({}, budget), gotCum = {}, planCum = {};
+  let pool = 0;
+  const give = (p, id, amt) => { amt = r2(amt); if (amt <= 0) return 0; p.now[id] = r2((p.now[id] || 0) + amt); rem[id] = r2(rem[id] - amt); gotCum[id] = r2((gotCum[id] || 0) + amt); pool = r2(pool - amt); return amt; };
+  const order = [...new Set(pays.flatMap((p) => Object.keys(p.plan)))];
+  pays.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : (a.label === 'checklist' ? -1 : 1)));
+  for (const p of pays) {
+    p.now = {};
+    pool = r2(pool + Object.values(p.plan).reduce((t, v) => t + v, 0));
+    Object.entries(p.plan).forEach(([id, amt]) => { planCum[id] = r2((planCum[id] || 0) + amt); });
+    const open = reqs.filter((q) => q.left > 0.004 && q.rel <= p.date && q.dl >= p.date)
+      .sort((a, b) => (a.dl < b.dl ? -1 : a.dl > b.dl ? 1 : rank[a.kind] - rank[b.kind]));
+    for (const q of open) {
+      if (q.left <= 0.004) continue;
+      const g = give(p, q.id, Math.min(q.left, pool, rem[q.id] || 0));
+      q.left = r2(q.left - g);
+      // a payment kept on its planned day still counts toward that card's own minimums and targets
+      if (q.kind === 'keep') { let x = g; for (const o of open) if (o !== q && o.id === q.id && o.kind !== 'keep' && x > 0.004) { const t = Math.min(o.left, x); o.left = r2(o.left - t); x = r2(x - t); } }
+    }
+    // catch up any card that's behind its plan (its money was used earlier for another card)
+    for (const id of order) { const behind = r2((planCum[id] || 0) - (gotCum[id] || 0)); if (behind > 0.004 && pool > 0.004) give(p, id, Math.min(behind, pool, rem[id] || 0)); }
+  }
+  if (pays.length && pool > 0.004) { const last = pays[pays.length - 1]; for (const id of order) if (pool > 0.004 && rem[id] > 0.004) give(last, id, Math.min(pool, rem[id])); }
+  // 7) results per card
+  const paidBy = (id, to) => r2(pays.filter((p) => p.date <= to).reduce((t, p) => t + toNum(p.now[id]), 0));
+  rows.forEach((r) => {
+    const left = (kind) => r2(reqs.filter((q) => q.id === r.id && q.kind === kind).reduce((t, q) => t + q.left, 0));
+    r.extraPre = r2(left('pre') + (r.min0 && r.min0.due <= r.payBy ? left('min0') : 0));
+    if (r.min0) r.min0.extra = left('min0');
+    if (r.min1) r.min1.extra = left('min1');
+    r.paidBefore = paidBy(r.id, r.payBy);
+    r.moved = r2(Math.max(0, r.paidBefore - r.planBefore));
+    r.reportedNew = r2(Math.max(0, r.R0 - r.paidBefore - r.extraPre));
+    r.pctPlan = r.limit ? (r.reportedPlan / r.limit) * 100 : null;
+    r.pctNew = r.limit ? (r.reportedNew / r.limit) * 100 : null;
+    r.act = r.need > 0.004;
+    r.extraMin = r2((r.min0 && r.min0.due > r.payBy ? r.min0.extra : 0) + (r.min1 ? r.min1.extra : 0));
+    out.totals.need = r2(out.totals.need + r.need);
+    out.totals.moved = r2(out.totals.moved + r.moved);
+    out.totals.extraPre = r2(out.totals.extraPre + r.extraPre);
+    out.totals.extraMin = r2(out.totals.extraMin + r.extraMin);
+  });
+  out.totals.extra = r2(out.totals.extraPre + out.totals.extraMin);
+  out.pays = pays.map((p) => {
+    const ids = [...new Set([...Object.keys(p.plan), ...Object.keys(p.now)])];
+    const lines = ids.map((id) => ({ id, name: (all.find((a) => a.id === id) || { name: 'Debt' }).name, plan: r2(toNum(p.plan[id])), now: r2(toNum(p.now[id])) }));
+    return { date: p.date, label: p.label, lines, total: r2(lines.reduce((t, l) => t + l.plan, 0)), changed: lines.some((l) => Math.abs(l.now - l.plan) >= 0.5) };
+  });
+  if (L > 0) {
+    const U = rows.filter((r) => r.util);
+    const planBal = U.reduce((t, r) => t + r.reportedPlan, 0) + other, newBal = U.reduce((t, r) => t + r.reportedNew, 0) + other;
+    out.overall = { limit: r2(L), planBal: r2(planBal), newBal: r2(newBal), planPct: (planBal / L) * 100, newPct: (newBal / L) * 100 };
+  }
+  out.allZero = goal === 'aze' && rows.every((r) => r.reportedNew <= 0.004);
+  return out;
+}
+/** Payday-checklist items for extra payments due before the next paycheck arrives. */
+function creditChecklistItems(sp, fromISO, beforeISO) {
+  const items = [];
+  sp.rows.forEach((r) => {
+    const base = { kind: 'debt', debtId: r.acct.debtId, walletId: r.acct.source === 'wallet' ? r.acct.walletId : null, done: false, paid: null };
+    if (r.extraPre > 0.004 && r.payBy >= fromISO && r.payBy < beforeISO) items.push(Object.assign({}, base, { key: `credit:${r.id}:${r.closing}`, label: r.name, planned: r2(r.extraPre), credit: { type: 'pre', closing: r.closing, payBy: r.payBy, pct: r.pctNew == null ? null : r2(r.pctNew) } }));
+    const m1 = r.min1 && r.min1.extra > 0.004 && r.min1.due >= fromISO && r.min1.due < beforeISO;
+    if (m1) items.push(Object.assign({}, base, { key: `credit-min:${r.id}:${r.closing}`, label: r.name, planned: r2(r.min1.extra), credit: { type: 'min', closing: r.closing, payBy: r.min1.due } }));
+  });
+  return items;
+}
+/** Swap a checklist's not-yet-done credit items for the current recommendation (done ones stay). Returns true if anything changed. */
+function mergeCreditItems(list, items) {
+  const before = JSON.stringify(list.items);
+  const keep = list.items.filter((i) => !i.credit || i.done);
+  items.forEach((n) => { if (!keep.some((i) => i.key === n.key)) keep.push(n); });
+  list.items = keep;
+  const changed = JSON.stringify(list.items) !== before;
+  if (changed && list.items.some((i) => !i.done)) list.completedAt = null;
+  return changed;
+}
+/** Re-time a checklist's unchecked plan payments to the planner's suggestion (same total). */
+function applyChecklistTiming(data, list, sp) {
+  const ev = sp.pays.find((p) => p.label === 'checklist');
+  if (!ev || !ev.changed) return false;
+  const now = Object.fromEntries(ev.lines.map((l) => [l.id, l.now]));
+  list.items = list.items.filter((i) => !(i.kind === 'debt' && !i.done && !i.credit && i.debtId && !(now[i.debtId] > 0.004)));
+  list.items.forEach((i) => { if (i.kind === 'debt' && !i.done && !i.credit && i.debtId) { i.planned = r2(now[i.debtId]); delete now[i.debtId]; } });
+  Object.entries(now).forEach(([id, amt]) => {
+    const d = data.debts.find((x) => x.id === id);
+    if (d && amt > 0.004 && !list.items.some((i) => i.key === 'debt:' + id && !i.done)) list.items.splice(list.items.findIndex((i) => i.kind !== 'debt') < 0 ? list.items.length : list.items.findIndex((i) => i.kind !== 'debt'), 0, { key: 'debt:' + id, kind: 'debt', debtId: id, label: d.name, planned: r2(amt), urgent: false, done: false, paid: null });
+  });
+  list.timing = { appliedAt: new Date().toISOString(), total: ev.total };
+  return true;
+}
+
+/**
+ * Reported utilization for the next `n` statements of every card (on the payoff plan, with spending).
+ * Overall point k = once every card's k-th statement has closed. Crossings: first statement under 50/30/10%.
+ */
+function projectUtilization(data, today, plan, n = 12) {
+  const all = creditAccounts(data), spend = monthlySpendByAccount(data, all), lead = data.credit.leadDays;
+  const accts = all.filter(countsInUtil);
+  const L = accts.reduce((t, a) => t + a.limit, 0);
+  const now = utilizationNow(data).overall;
+  if (!(L > 0)) return null;
+  const cards = accts.map((a) => ({ id: a.id, name: a.name, limit: a.limit, closeEst: a.closeEst, balance: a.balance,
+    points: a.closeDay ? closingsFrom(a.closeDay, today, n).map((cl) => { const bal = reportedBalance(plan, a, cl, today, lead, spend[a.id]); return { date: cl, bal, pct: (bal / a.limit) * 100 }; }) : null }));
+  const overall = [];
+  for (let k = 0; k < n; k++) {
+    const dated = cards.filter((c) => c.points);
+    const date = dated.length ? dated.reduce((m, c) => (c.points[k].date > m ? c.points[k].date : m), '') : addMonthsISO(today, k + 1);
+    const bal = cards.reduce((t, c) => t + (c.points ? c.points[k].bal : c.balance), 0);
+    overall.push({ date, bal: r2(bal), pct: (bal / L) * 100 });
+  }
+  const start = now ? now.pct : 0;
+  const crossings = [50, 30, 10].map((t) => {
+    if (start < t) return { t, already: true, date: null };
+    const hit = overall.find((p) => p.pct < t);
+    return { t, already: false, date: hit ? hit.date : null };
+  });
+  cards.forEach((c) => { c.under30 = c.points ? (c.points.find((p) => p.pct < 30) || {}).date || null : null; });
+  return { today, start, limit: r2(L), cards, overall, crossings, undated: cards.filter((c) => !c.points).map((c) => c.name) };
+}
+
+/* ---------- credit: score factors ---------- */
+/** On-time record from due days and logged payments: each due date in the tracked period needs a payment in the month before it. */
+function onTimeRecord(data, today) {
+  const day = (at) => toISO(new Date(at));
+  const starts = [data.checklistSince, ...data.history.filter((h) => h.at).map((h) => day(h.at))].filter(Boolean).sort();
+  const events = [];
+  if (!starts.length) return { tracked: false, streak: 0, since: null, events, missed: [] };
+  const from = starts[0];
+  const pays = {};
+  data.history.forEach((h) => { if (h.debtId && h.at && (h.kind === 'payment' || h.kind === 'paid' || (h.kind === 'balance' && toNum(h.after) < toNum(h.before)))) (pays[h.debtId] = pays[h.debtId] || []).push(day(h.at)); });
+  data.payChecklists.forEach((c) => c.items.forEach((i) => { if (i.debtId && i.done && i.paid > 0 && i.at) (pays[i.debtId] = pays[i.debtId] || []).push(day(i.at)); }));
+  data.debts.filter((d) => d.dueDay).forEach((d) => {
+    const created = d.createdAt ? day(d.createdAt) : from;
+    const start = created > from ? created : from;
+    let due = toISO(nextDueDate(d.dueDay, parseISO(addDaysISO(start, 1))));
+    while (due <= today) {
+      const prev = closingIn(d.dueDay, shiftMonth(due.slice(0, 7), -1));
+      const paidOffBefore = d.paid && d.paidAt && day(d.paidAt) <= prev;
+      if (prev >= start && !paidOffBefore) events.push({ debtId: d.id, name: d.name, due, onTime: (pays[d.id] || []).some((x) => x > prev && x <= due) });
+      due = closingIn(d.dueDay, shiftMonth(due.slice(0, 7), 1));
+    }
+  });
+  events.sort((a, b) => (a.due < b.due ? -1 : a.due > b.due ? 1 : 0));
+  let streak = 0, since = null;
+  for (let i = events.length - 1; i >= 0 && events[i].onTime; i--) { streak++; since = events[i].due; }
+  return { tracked: true, from, streak, since, events, missed: events.filter((e) => !e.onTime) };
+}
+/** Where one hard inquiry is: 'active' (can affect scores, about 12 months), 'fading' (still on the report), 'gone' (off after about 24 months). */
+function inquiryStatus(inq, today) {
+  const until = addMonthsISO(inq.date, 12), off = addMonthsISO(inq.date, 24);
+  return { affectsUntil: until, fallsOff: off, phase: today < until ? 'active' : today < off ? 'fading' : 'gone', monthsOld: Math.max(0, monthsBetween(inq.date, today)) };
+}
+function accountAges(data, today) {
+  const accts = creditAccounts(data);
+  const dated = accts.filter((a) => parseISO(a.openDate) && a.openDate <= today).map((a) => ({ id: a.id, name: a.name, kind: a.kind, openDate: a.openDate, months: monthsBetween(a.openDate, today), limit: a.limit, balance: a.balance }));
+  const oldest = dated.slice().sort((a, b) => (a.openDate < b.openDate ? -1 : 1))[0] || null;
+  const avgMonths = dated.length ? dated.reduce((t, a) => t + a.months, 0) / dated.length : null;
+  const opened = (m) => dated.filter((a) => a.openDate > addMonthsISO(today, -m));
+  return { count: accts.length, dated, missing: accts.filter((a) => !parseISO(a.openDate)).map((a) => a.name), oldest, avgMonths, new6: opened(6), new12: opened(12), new24: opened(24) };
+}
+/** Once a card is paid off: utilization with it kept open vs. closed (its limit gone). */
+function closeImpact(data, acctId) {
+  const u = utilizationNow(data), rows = u.rows.filter(countsInUtil);
+  const me = rows.find((r) => r.id === acctId);
+  if (!me || !u.overall) return null;
+  const L = u.overall.limit - me.limit, B = u.overall.bal - me.balance;
+  return { before: (B / u.overall.limit) * 100, after: L > 0 ? (B / L) * 100 : null, limitLost: me.limit };
+}
+function latestScore(data) {
+  const s = data.credit.scores[data.credit.scores.length - 1];
+  if (s) return { score: s.score, date: s.date, model: s.model, source: s.source, logged: true };
+  return data.home.creditScore ? { score: data.home.creditScore, date: null, model: null, source: null, logged: false } : null;
+}
+/** Warnings for the 6 months before a planned mortgage application. */
+function mortgageWarnings(data, today) {
+  const m = data.credit.mortgageMonth;
+  if (!m) return { set: false, list: [] };
+  const app = m + '-01', start = addMonthsISO(app, -6), end = lastDayOfMonth(m);
+  const monthsAway = monthsBetween(today.slice(0, 7) + '-01', app);
+  const inWindow = today >= start && today <= end;
+  const list = [];
+  const ages = accountAges(data, today);
+  data.credit.inquiries.filter((i) => i.date >= start && i.date <= end && i.type !== 'mortgage').forEach((i) => list.push({ level: 'hurts', text: `The ${i.lender || 'hard'} inquiry on ${fmtMD(i.date)} is within 6 months of your application. Lenders will see it, and it likely hurts a little until ${fmtMY(inquiryStatus(i, today).affectsUntil)}.` }));
+  ages.dated.filter((a) => a.openDate >= start && a.openDate <= end).forEach((a) => list.push({ level: 'hurts', text: `${a.name} was opened ${fmtMD(a.openDate)}, within 6 months of your application. New accounts likely hurt: they lower your average age and lenders ask about them.` }));
+  if (today <= end) {
+    list.push({ level: inWindow ? 'warn' : 'info', text: `Don't apply for new cards or loans before ${fmtMY(app)}. Each application adds a hard inquiry that likely hurts a little, right when lenders look.` });
+    const oldestCard = ages.dated.filter((a) => a.kind !== 'loan').sort((a, b) => (a.openDate < b.openDate ? -1 : 1))[0];
+    if (oldestCard) {
+      const ci = closeImpact(data, oldestCard.id);
+      list.push({ level: inWindow ? 'warn' : 'info', text: `Keep ${oldestCard.name} open (${plural_(Math.floor(oldestCard.months / 12), 'year')} old).${ci && ci.after != null ? ` Closing it would likely hurt: even once it's paid off, utilization would be ${ci.after.toFixed(1)}% closed vs. ${ci.before.toFixed(1)}% open` : ' Closing it would likely hurt: you lose its limit'}, and your history gets shorter over time.` });
+    } else list.push({ level: 'info', text: 'Don\'t close cards before you apply. Closing one lowers your total limit, which likely raises utilization.' });
+    if (data.credit.inquiries.some((i) => i.type === 'mortgage')) list.push({ level: 'info', text: 'Mortgage rate shopping: several mortgage inquiries within a short window (14–45 days, depending on the scoring model) usually count as one.' });
+  }
+  return { set: true, month: m, app, start, inWindow, monthsAway, past: today > end, list };
+}
+/** Directional factor cards. status: 'helps' | 'watch' | 'hurts' | 'unknown'. Never a predicted score. */
+function creditFactors(data, today, proj) {
+  const out = [];
+  const pay = onTimeRecord(data, today);
+  const recentMiss = pay.missed.filter((e) => e.due > addMonthsISO(today, -12));
+  out.push({ key: 'payments', title: 'Payment history', status: !pay.events.length ? 'unknown' : recentMiss.length ? 'watch' : 'helps',
+    value: pay.events.length ? plural_(pay.streak, 'on-time payment') + ' in a row' : 'Not tracked yet',
+    text: !pay.events.length ? 'The biggest factor in most scores. Add due days to your cards and log payments (the payday checklist does it for you) to track your on-time streak.'
+      : recentMiss.length ? `No payment logged for ${recentMiss.slice(-2).map((e) => `${e.name} (due ${fmtMD(e.due)})`).join(' and ')}. If you paid on time, log the payment so your record is right. A payment 30+ days late likely hurts a lot, so autopay at least the minimum.`
+      : `Every tracked due date${pay.since ? ` since ${fmtMD(pay.since)}` : ''} had a payment. That likely helps: payment history is the biggest factor. Autopay at least the minimum to keep it perfect.` });
+  const u = utilizationNow(data);
+  const hot = u.rows.filter((r) => r.include && r.over30);
+  out.push({ key: 'utilization', title: 'Utilization', status: !u.overall ? 'unknown' : u.overall.pct < 30 && !hot.length ? 'helps' : u.overall.pct >= 50 ? 'hurts' : 'watch',
+    value: u.overall ? `${u.overall.pct.toFixed(1)}% overall` : 'Add credit limits',
+    text: !u.overall ? 'Add credit limits to your cards to see utilization, the second-biggest factor.'
+      : `${u.overall.band.label} (${u.overall.band.range}). ${u.overall.band.meaning}${hot.length ? ` ${hot.map((r) => r.name).join(' and ')} ${hot.length === 1 ? 'is' : 'are'} at 30% or more on its own, which likely hurts even when overall is fine.` : ''}${proj && proj.crossings.find((c) => c.t === 10 && c.date) ? ` On your plan it drops under 10% around ${fmtMY(proj.crossings.find((c) => c.t === 10).date)}.` : ''}` });
+  const ages = accountAges(data, today);
+  const avgY = ages.avgMonths == null ? null : ages.avgMonths / 12;
+  out.push({ key: 'age', title: 'Account age', status: avgY == null ? 'unknown' : avgY >= 5 ? 'helps' : avgY < 2 ? 'hurts' : 'watch',
+    value: avgY == null ? 'Add open dates' : `${avgY.toFixed(1)} yr average`,
+    text: avgY == null ? 'Add the month each account was opened to see your average and oldest account age.'
+      : `Oldest: ${ages.oldest.name}, ${plural_(Math.floor(ages.oldest.months / 12), 'year')}. ${avgY >= 5 ? 'A long history likely helps.' : avgY < 2 ? 'A young history likely holds scores back; it improves on its own as accounts age.' : 'Older is better, and it grows on its own. New accounts pull the average down.'}${ages.missing.length ? ` Missing open dates: ${ages.missing.join(', ')}.` : ''}` });
+  const inq = data.credit.inquiries.map((i) => Object.assign({}, i, inquiryStatus(i, today)));
+  const active = inq.filter((i) => i.phase === 'active'), onReport = inq.filter((i) => i.phase !== 'gone');
+  out.push({ key: 'inquiries', title: 'Hard inquiries', status: active.length === 0 ? 'helps' : active.length <= 2 ? 'watch' : 'hurts',
+    value: `${active.length} in the last 12 months`,
+    text: active.length ? `Each one likely hurts a little for about 12 months, then stays on your report until about 24 months. Next to stop counting: ${fmtMY(active.slice().sort((a, b) => (a.affectsUntil < b.affectsUntil ? -1 : 1))[0].affectsUntil)}.${onReport.length > active.length ? ` ${onReport.length - active.length} older ${onReport.length - active.length === 1 ? 'one is' : 'ones are'} still listed but likely no longer counts.` : ''}`
+      : `None counting now${onReport.length ? ` (${onReport.length} older still listed)` : ''}. That likely helps. Log any application for credit here to see when it stops mattering.` });
+  out.push({ key: 'new', title: 'New accounts', status: !ages.dated.length ? 'unknown' : ages.new12.length === 0 ? 'helps' : ages.new12.length === 1 ? 'watch' : 'hurts',
+    value: `${ages.new12.length} in 12 mo · ${ages.new24.length} in 24 mo`,
+    text: !ages.dated.length ? 'Add open dates to your cards and loans to see recent accounts.'
+      : ages.new12.length ? `${ages.new12.map((a) => a.name).join(', ')}. Recent accounts likely hurt a little: they lower your average age, and lenders ask about new debt.` : 'No accounts opened in the last year. That likely helps, especially before a mortgage.' });
+  return out;
+}
+/** Best month to get pre-approved in the projection window: the earliest month in the lowest utilization band, then fewest recent inquiries and new accounts. */
+function bestPreapprovalMonth(data, today, proj) {
+  if (!proj) return null;
+  const inq = data.credit.inquiries, ages = accountAges(data, today);
+  let cands = proj.overall.map((p) => {
+    const start = p.date;
+    return { month: p.date.slice(0, 7), after: p.date, pct: p.pct, band: utilBand(p.pct),
+      inq12: inq.filter((i) => i.type !== 'mortgage' && i.date > addMonthsISO(start, -12) && i.date <= start).length,
+      new6: ages.dated.filter((a) => a.openDate > addMonthsISO(start, -6) && a.openDate <= start).length };
+  });
+  const m = data.credit.mortgageMonth;
+  if (m && cands.some((x) => x.month <= m)) cands = cands.filter((x) => x.month <= m);
+  const best = cands.slice().sort((a, b) => bandIndex(a.pct) - bandIndex(b.pct) || a.inq12 - b.inq12 || a.new6 - b.new6 || (a.month < b.month ? -1 : 1))[0];
+  return best || null;
+}
+/** Monthly P&I and total interest at each rate tier you've filled in, for the target home price. */
+function rateTierTable(home, price) {
+  price = toNum(price);
+  const loan = r2(price * (1 - toNum(home.downPct) / 100)), n = Math.max(1, Math.round(toNum(home.termYears) * 12));
+  return (home.rateTiers || []).map((t) => {
+    if (t.rate == null || !(price > 0)) return Object.assign({}, t, { label: tierLabel(t), loan, pi: null, totalInterest: null });
+    const pi = monthlyPI(loan, t.rate, home.termYears);
+    return Object.assign({}, t, { label: tierLabel(t), loan, pi, totalInterest: r2(pi * n - loan) });
+  });
+}
+function tierFor(score, tiers) { score = toNum(score); return tiers.find((t) => score >= t.min && (t.max == null || score <= t.max)) || null; }
+/** What moving up one tier from `score` changes: monthly P&I and total interest (negative = you pay less). */
+function tierJump(home, price, score) {
+  const rows = rateTierTable(home, price).slice().sort((a, b) => a.min - b.min);
+  if (!score || !rows.length) return null;
+  const cur = tierFor(score, rows);
+  const up = cur ? rows.find((t) => t.min === (cur.max == null ? Infinity : cur.max + 1)) : rows.find((t) => t.min > toNum(score));
+  if (!up) return { from: cur, to: null };
+  const ok = cur && cur.pi != null && up.pi != null;
+  return { from: cur, to: up, pointsToGo: up.min - toNum(score), piDiff: ok ? r2(up.pi - cur.pi) : null, interestDiff: ok ? r2(up.totalInterest - cur.totalInterest) : null };
+}
+/** Credit insights for the insights engine. */
+function creditInsights(data, today, fmt, plan) {
+  const out = [];
+  const accts = creditAccounts(data);
+  if (!accts.length) return out;
+  plan = plan || creditPlan(data, today);
+  const sp = planStatements(data, today, { plan, mode: 'next', pending: pendingChecklistMoney(data, today) });
+  const soon = addDaysISO(today, 14);
+  const goalText = (r) => (sp.goal === 'aze' ? (r.id === sp.keepId ? `so it reports a small ${fmt(r.target)} balance` : 'so it reports $0')
+    : sp.goal === 'overall' ? `to get overall utilization under ${Math.floor(sp.targetOverall) + 1}%` : `to report under ${Math.floor(sp.targetCard) + 1}%`);
+  sp.rows.filter((r) => r.act && r.payBy <= soon && (r.reportedPlan > r.target + 0.5 || r.extraPre > 0.004)).sort((a, b) => (a.payBy < b.payBy ? -1 : 1)).slice(0, 2).forEach((r, i) => out.push({
+    id: `credit-pay:${r.id}:${r.closing}`, type: 'credit', priority: 86 - i,
+    text: `Pay **${fmt(r.need)}** to ${r.name} by **${fmtMD(r.payBy)}** ${goalText(r)}.${r.extraPre > 0.5 ? ` ${fmt(r.extraPre)} of it is beyond your plan.` : ''}`,
+    action: { tab: 'credit' }, sig: sigOf(r.need, r.extraPre)
+  }));
+  const proj = projectUtilization(data, today, plan);
+  if (proj) {
+    const c10 = proj.crossings.find((c) => c.t === 10), c30 = proj.crossings.find((c) => c.t === 30);
+    const c = c10.date ? c10 : c30.date ? c30 : null;
+    if (c) out.push({ id: `util-cross:${c.t}`, type: 'credit', priority: 48, text: `Utilization drops below **${c.t}%** in **${fmtMY(c.date)}** on your current plan.`, action: { tab: 'credit' }, sig: sigOf(c.date.slice(0, 7)) });
+  }
+  const ages = accountAges(data, today);
+  if (ages.oldest && ages.oldest.months >= 24) {
+    const y = Math.floor(ages.oldest.months / 12);
+    out.push({ id: 'oldest-account', type: 'credit', priority: 28, text: `Your oldest account, ${ages.oldest.name}, is **${plural_(y, 'year')}** old. Keep it open: it anchors your credit age.`, action: { tab: 'credit' }, sig: sigOf(y) });
+  }
+  const mw = mortgageWarnings(data, today);
+  if (mw.set && mw.inWindow) {
+    const bad = mw.list.filter((w) => w.level === 'hurts').length;
+    out.push({ id: `mortgage-window:${mw.month}`, type: 'creditwarn', priority: bad ? 88 : 62,
+      text: bad ? `**${plural_(bad, 'recent credit event')}** fall within 6 months of your ${fmtMY(mw.app)} mortgage application. See what to avoid now.`
+        : `Your mortgage application is ${mw.monthsAway <= 0 ? '**this month**' : `**${plural_(mw.monthsAway, 'month')} away**`}. Hold off on new credit and keep old cards open.`,
+      action: { tab: 'credit' }, sig: sigOf(bad, mw.monthsAway) });
+  }
+  return out;
 }
 
 /* ---------- insights engine ---------- */
@@ -1455,11 +2110,13 @@ function computeInsights(data, today, fmt) {
     if (s.captured < s.fee && parseISO(today).getMonth() >= 5) add({ id: `fee:${c.id}:${today.slice(0, 4)}`, type: 'credits', priority: 45, text: `You've used **${fmt(s.captured)}** of credits on ${c.name} this year, against a ${fmt(s.fee)} fee.`, action: { tab: 'cards' }, sig: sigOf(s.captured) });
   });
   // utilization
-  const lim = data.debts.filter((d) => toNum(d.creditLimit) > 0);
-  if (lim.length) {
-    const pct = lim.reduce((t, d) => t + (d.paid ? 0 : d.balance), 0) / lim.reduce((t, d) => t + d.creditLimit, 0) * 100;
-    if (pct > 30) add({ id: 'utilization', type: 'debt', priority: 35, text: `Card utilization is **${pct.toFixed(0)}%**. Getting under 30% usually helps your credit score.`, action: { tab: 'debts' }, sig: sigOf(Math.round(pct / 5) * 5) });
+  const un = utilizationNow(data).overall;
+  if (un) {
+    const pct = un.pct;
+    if (pct > 30) add({ id: 'utilization', type: 'debt', priority: 35, text: `Card utilization is **${pct.toFixed(0)}%**. Getting under 30% usually helps your credit score.`, action: { tab: 'credit' }, sig: sigOf(Math.round(pct / 5) * 5) });
   }
+  // credit: pay before it reports, when utilization crosses a band, oldest account, mortgage timing
+  creditInsights(data, today, fmt, plan).forEach(add);
   // freedom money
   if (plan && plan.ok && data.budget.debtPerPaycheck > 0) {
     const f = freedMonthlyFrom(data);
@@ -1475,7 +2132,7 @@ function dismissInsight(data, insight, nowISO) { data.insightDismissals[insight.
 /* ---------- saved-data shape & migration ---------- */
 function defaultData(todayISO) {
   return {
-    version: 5,
+    version: DATA_VERSION,
     debts: [],
     budget: {
       takeHome: 0, frequency: 'biweekly', payAnchor: todayISO || toISO(new Date()), debtPerPaycheck: 0, savingsPerPaycheck: 0, lumpSum: 0,
@@ -1508,11 +2165,14 @@ function defaultData(todayISO) {
     spendProfile: {},
     home: defaultHome(),
     insightDismissals: {},
-    settings: { currency: 'USD', locale: 'en-US', weekStart: 0, reduceMotion: false }
+    settings: { currency: 'USD', locale: 'en-US', weekStart: 0, reduceMotion: false },
+    credit: defaultCredit()
   };
 }
 const nonNeg = (v) => Math.max(0, toNum(v));
 const isObj = (v) => !!v && typeof v === 'object' && !Array.isArray(v);
+const dayOrNull = (v) => { const n = Math.round(toNum(v)); return n >= 1 && n <= 31 ? n : null; };
+const isoOrEmpty = (v) => (parseISO(v) ? String(v).slice(0, 10) : '');
 
 /**
  * Accepts data saved by any version and returns a complete, current-shape object.
@@ -1523,7 +2183,7 @@ function normalize(raw, todayISO) {
   const src = isObj(raw) ? raw : {};
   const def = defaultData(todayISO);
   const d = Object.assign({}, src, def);
-  d.version = Math.max(5, toNum(src.version));
+  d.version = Math.max(DATA_VERSION, toNum(src.version));
 
   d.debts = Array.isArray(src.debts) ? src.debts.filter(isObj).map((x) => {
     const due = Math.round(toNum(x.dueDay));
@@ -1542,7 +2202,13 @@ function normalize(raw, todayISO) {
       creditLimit: toNum(x.creditLimit) > 0 ? r2(toNum(x.creditLimit)) : null,
       promoApr: nonNeg(x.promoApr),
       keepOpen: r2(nonNeg(x.keepOpen)),
-      dueDay: due >= 1 && due <= 31 ? due : null
+      dueDay: due >= 1 && due <= 31 ? due : null,
+      // v6: credit details
+      closingDay: dayOrNull(x.closingDay),
+      cardKind: x.cardKind === 'charge' ? 'charge' : 'revolving',
+      openDate: isoOrEmpty(x.openDate),
+      utilInclude: x.utilInclude !== false,
+      monthlySpend: x.monthlySpend == null || x.monthlySpend === '' ? null : r2(nonNeg(x.monthlySpend))
     });
   }) : [];
 
@@ -1647,13 +2313,33 @@ function normalize(raw, todayISO) {
     monthlyExpenses: numOrNull(sh.monthlyExpenses), creditScore: numOrNull(sh.creditScore), creditTarget: sh.creditTarget === undefined ? 640 : nonNeg(sh.creditTarget),
     dtiTarget: sh.dtiTarget === undefined ? 36 : nonNeg(sh.dtiTarget), preapproved: !!sh.preapproved,
     programs: Array.isArray(sh.programs) ? sh.programs.filter(isObj).map((x) => Object.assign({}, x, { id: String(x.id || newId()), name: String(x.name || 'Program').slice(0, 80),
-      amount: String(x.amount || '').slice(0, 120), terms: String(x.terms || '').slice(0, 600), link: String(x.link || '').slice(0, 300), verify: x.verify !== false })) : hd.programs
+      amount: String(x.amount || '').slice(0, 120), terms: String(x.terms || '').slice(0, 600), link: String(x.link || '').slice(0, 300), verify: x.verify !== false })) : hd.programs,
+    rateTiers: Array.isArray(sh.rateTiers) ? sh.rateTiers.filter((t) => isObj(t) && toNum(t.min) > 0).map((t) => Object.assign({}, t, {
+      min: Math.round(toNum(t.min)), max: t.max == null || t.max === '' ? null : Math.round(toNum(t.max)), rate: t.rate == null || t.rate === '' ? null : nonNeg(t.rate)
+    })) : hd.rateTiers
   });
   d.insightDismissals = isObj(src.insightDismissals) ? Object.assign({}, src.insightDismissals) : {};
   const st = isObj(src.settings) ? src.settings : {};
   d.settings = Object.assign({}, def.settings, st, {
     currency: /^[A-Z]{3}$/.test(st.currency || '') ? st.currency : 'USD', locale: typeof st.locale === 'string' && st.locale.length <= 12 && st.locale ? st.locale : 'en-US',
     weekStart: st.weekStart === 1 ? 1 : 0, reduceMotion: !!st.reduceMotion
+  });
+  // v6: credit (score log, inquiries, pay-before-it-reports settings)
+  const cr = isObj(src.credit) ? src.credit : {};
+  const pctOr = (v, def) => (v === undefined || v === null || v === '' ? def : Math.min(100, nonNeg(v)));
+  const monthOrNull = (v) => (/^\d{4}-\d{2}$/.test(v || '') ? v : null);
+  d.credit = Object.assign({}, defaultCredit(), cr, {
+    targetCard: pctOr(cr.targetCard, 29), targetOverall: pctOr(cr.targetOverall, 9),
+    goal: ['card', 'overall', 'aze'].includes(cr.goal) ? cr.goal : 'card',
+    leadDays: cr.leadDays == null || cr.leadDays === '' ? 2 : Math.min(10, Math.round(nonNeg(cr.leadDays))),
+    mode: cr.mode === 'month' ? 'month' : 'next', preMonth: monthOrNull(cr.preMonth), mortgageMonth: monthOrNull(cr.mortgageMonth),
+    azeKeepId: cr.azeKeepId ? String(cr.azeKeepId) : null, azeAmount: cr.azeAmount == null || cr.azeAmount === '' ? null : r2(nonNeg(cr.azeAmount)),
+    scores: Array.isArray(cr.scores) ? cr.scores.filter((x) => isObj(x) && parseISO(x.date) && toNum(x.score) >= 250 && toNum(x.score) <= 900).map((x) => Object.assign({}, x, {
+      id: String(x.id || newId()), date: String(x.date).slice(0, 10), score: Math.round(toNum(x.score)), model: String(x.model || 'Other').slice(0, 40), source: String(x.source || '').slice(0, 60)
+    })).sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0)) : [],
+    inquiries: Array.isArray(cr.inquiries) ? cr.inquiries.filter((x) => isObj(x) && parseISO(x.date)).map((x) => Object.assign({}, x, {
+      id: String(x.id || newId()), date: String(x.date).slice(0, 10), lender: String(x.lender || '').slice(0, 60), type: INQUIRY_TYPES[x.type] ? x.type : 'other', note: String(x.note || '').slice(0, 120)
+    })).sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0)) : []
   });
   return d;
 }
@@ -1712,7 +2398,13 @@ function checkChecklistItem(data, date, key, amount, nowISO) {
   const amt = r2(Math.max(0, toNum(amount)));
   let paidOff = null;
   item.historyIds = [];
-  if (item.kind === 'debt') {
+  const wcard = item.kind === 'debt' && item.walletId ? data.wallet.find((c) => c.id === item.walletId) : null;
+  if (wcard && amt > 0) {
+    // a card that isn't in Debt (paid in full each month): lower its current balance
+    const before = wcard.currentBalance || 0, after = r2(Math.max(0, before - amt));
+    wcard.currentBalance = after;
+    item.historyIds.push(pushHistory(data, { kind: 'cardpay', walletId: wcard.id, name: wcard.name, amount: amt, before, after, source: 'payday', payday: date }, nowISO).id);
+  } else if (item.kind === 'debt') {
     const debt = data.debts.find((d) => d.id === item.debtId);
     if (debt && !debt.paid && amt > 0) {
       const before = debt.balance, after = r2(Math.max(0, before - amt));
@@ -1739,7 +2431,10 @@ function uncheckChecklistItem(data, date, key) {
   const item = list && list.items.find((i) => i.key === key);
   if (!item || !item.done) return false;
   const amt = toNum(item.paid);
-  if (item.kind === 'debt') {
+  const wcard = item.kind === 'debt' && item.walletId ? data.wallet.find((c) => c.id === item.walletId) : null;
+  if (wcard) {
+    if (amt > 0 && (item.historyIds || []).length) wcard.currentBalance = r2((wcard.currentBalance || 0) + amt);
+  } else if (item.kind === 'debt') {
     const debt = data.debts.find((d) => d.id === item.debtId);
     if (debt && amt > 0 && (item.historyIds || []).length) {
       debt.balance = r2(debt.balance + amt);
@@ -2015,6 +2710,7 @@ function setSync(state) {
 
 /** Call after every change to S.data. */
 function commit(opts = {}) {
+  if (S.user) try { syncCreditChecklist(); } catch (e) { console.warn('credit checklist', e); }
   S.meta.updatedAt = new Date().toISOString();
   S.meta.dirty = true;
   saveCache();
@@ -2102,12 +2798,7 @@ function utilization(d) {
   const line = bufferLine(limit, d.keepOpen);
   return { limit, bal, pct: (bal / limit) * 100, line, linePct: (line / limit) * 100, over: r2(Math.max(0, bal - line)), available: r2(limit - bal) };
 }
-function overallUtilization() {
-  const cards = S.data.debts.map(utilization).filter(Boolean);
-  if (!cards.length) return null;
-  const limit = cards.reduce((s, c) => s + c.limit, 0), bal = cards.reduce((s, c) => s + c.bal, 0);
-  return { limit, bal, pct: (bal / limit) * 100, count: cards.length };
-}
+function overallUtilization() { return utilizationNow(S.data).overall; }
 /** Saved custom order, plus any unpaid debts not in it yet (appended at the end). */
 function effectiveCustomOrder() { return effectiveOrderFrom(S.data); }
 function planOpts(lump, extra = 0, strategy = S.data.strategy) { return planOptionsFrom(S.data, todayISO(), extra, strategy, lump); }
@@ -2248,13 +2939,13 @@ function lineChart(id, series, opts = {}) {
   const t0 = Math.min(...ts);
   let t1 = Math.max(...ts);
   if (t1 - t0 < 86400000 * 20) t1 = t0 + 86400000 * 30;
-  const lo = Math.min(0, ...all.map((p) => p.v));
-  const top = Math.max(lo + 1, 1, ...all.map((p) => p.v));
+  const lo = opts.yMin != null ? opts.yMin : Math.min(0, ...all.map((p) => p.v));
+  const top = opts.yMax != null ? opts.yMax : Math.max(lo + 1, 1, ...all.map((p) => p.v));
   const W = 340, H = opts.height || 180, L = 44, R = 10, T = 16, B = 22;
   const x = (iso) => L + ((parseISO(iso).getTime() - t0) / (t1 - t0)) * (W - L - R);
   const y = (v) => T + ((top - v) / (top - lo)) * (H - T - B);
-  const fmtY = (v) => (Math.abs(v) >= 1000 ? moneyK(v) : money0(v));
-  const gridVals = lo < 0 ? [lo, 0, top] : [0, top / 2, top];
+  const fmtY = opts.fmt || ((v) => (Math.abs(v) >= 1000 ? moneyK(v) : money0(v)));
+  const gridVals = lo < 0 ? [lo, 0, top] : [lo, (lo + top) / 2, top];
   const grid = gridVals.map((g) => `<line x1="${L}" x2="${W - R}" y1="${y(g).toFixed(1)}" y2="${y(g).toFixed(1)}" stroke="${g === 0 && lo < 0 ? 'var(--line-strong)' : 'var(--line)'}" stroke-width="1"/><text x="${L - 6}" y="${(y(g) + 4).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--faint)" font-family="DM Mono, monospace">${fmtY(g)}</text>`).join('');
   const paths = series.map((s) => {
     const d = s.points.map((p, i) => `${i ? 'L' : 'M'}${x(p.date).toFixed(1)},${y(p.v).toFixed(1)}`).join('');
@@ -2265,7 +2956,7 @@ function lineChart(id, series, opts = {}) {
     const p = s.points[s.points.length - 1];
     return `<text x="${(W - R).toFixed(1)}" y="${Math.max(10, y(p.v) - 8).toFixed(1)}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="DM Mono, monospace">${esc(s.label)} ${fmtY(p.v)}</text>`;
   }).join('');
-  CHARTS[id] = { series, x, t0, t1, W, L, R };
+  CHARTS[id] = { series, x, t0, t1, W, L, R, fmt: opts.fmt };
   const legend = `<div class="legend">${series.map((s) => `<span><i class="${s.dash ? 'dash' : ''}" style="border-color:${s.color}"></i>${esc(s.label)}</span>`).join('')}</div>`;
   return `${legend}<div class="chart-wrap" data-chart="${id}"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.aria || 'Chart')}">
     ${grid}
@@ -2308,7 +2999,7 @@ function wireCharts(root) {
         for (const p of s.points) { const dd = Math.abs(parseISO(p.date).getTime() - t); if (dd < bd) { bd = dd; best = p; } }
         if (!best) continue;
         if (!snap || bd < Math.abs(parseISO(snap).getTime() - t)) snap = best.date;
-        rows += `<div><span style="color:${s.color}">■</span> ${esc(s.label)} <span class="num">${money0(best.v)}</span> <span class="faint">${esc(fmtDate(best.date, { month: 'short', year: '2-digit' }))}</span></div>`;
+        rows += `<div><span style="color:${s.color}">■</span> ${esc(s.label)} <span class="num">${(c.fmt || money0)(best.v)}</span> <span class="faint">${esc(fmtDate(best.date, { month: 'short', year: '2-digit' }))}</span></div>`;
       }
       const X = c.x(snap);
       cx.setAttribute('x1', X); cx.setAttribute('x2', X); cx.classList.remove('hidden');
@@ -2379,7 +3070,7 @@ function emptyCard(ic, title, text, actions) {
 
 const TABS = ['home', 'debt', 'cards', 'networth', 'spending', 'more'];
 const MORE_PAGES = ['homebuy', 'insights', 'settings'];
-const DEBT_SUBS = ['overview', 'debts', 'checkin', 'paychecks', 'savings'];
+const DEBT_SUBS = ['overview', 'debts', 'credit', 'checkin', 'paychecks', 'savings'];
 function switchTab(tab, sub) {
   if (DEBT_SUBS.includes(tab)) { sub = tab; tab = 'debt'; }
   if (MORE_PAGES.includes(tab)) { sub = tab; tab = 'more'; }
@@ -2409,7 +3100,7 @@ function render(animate) {
   countUps(root);
 }
 function renderDebtSection() {
-  const fns = { overview: renderOverview, debts: renderDebts, checkin: renderCheckin, paychecks: renderPaychecks, savings: renderSavings };
+  const fns = { overview: renderOverview, debts: renderDebts, credit: renderCredit, checkin: renderCheckin, paychecks: renderPaychecks, savings: renderSavings };
   if (!fns[S.debtTab]) S.debtTab = 'overview';
   document.querySelectorAll('#view-debt .subview').forEach((v) => { const on = v.id === 'view-' + S.debtTab; v.classList.toggle('hidden', !on); if (!on) v.innerHTML = ''; });
   if (loading()) $('#view-' + S.debtTab).innerHTML = skeletonHTML(); else fns[S.debtTab]();
@@ -2439,7 +3130,7 @@ function renewalItems(days) {
 function upcomingRows(items) {
   const today = parseISO(todayISO());
   const rel = (iso) => { const n = Math.round((parseISO(iso) - today) / 86400000); return n === 0 ? 'Today' : n === 1 ? 'Tomorrow' : `In ${n} days`; };
-  const ic = { pay: 'cash', due: 'cal', sub: 'repeat', credit: 'gift' };
+  const ic = { pay: 'cash', due: 'cal', sub: 'repeat', credit: 'gift', report: 'gauge' };
   return items.map((it) => `<div class="up ${it.kind}">
       <div class="d"><b>${parseISO(it.date).getDate()}</b><span>${esc(fmtDate(it.date, { month: 'short' }))}</span></div>
       <div class="w"><div>${icon(ic[it.kind], 'sm')}${esc(it.title)}</div><div>${esc(rel(it.date))}${it.detail ? ' · ' + esc(it.detail) : ''}</div></div>
@@ -2455,9 +3146,10 @@ function renderHome() {
   const hasAnything = S.data.debts.length || S.data.accounts.length || S.data.subscriptions.length || s.balance > 0;
   // next payday tile
   const open = S.data.payChecklists.find((c) => !c.dismissed && !c.completedAt && c.items.length);
-  const nextPay = firstPaycheckOnOrAfter(b.payAnchor, b.frequency, parseISO(today));
-  const npISO = toISO(nextPay);
-  const week = [...upcomingItems(7, false), ...renewalItems(7), ...creditItems(7)].sort((a, c) => (a.date < c.date ? -1 : a.date > c.date ? 1 : 0));
+  const npISO = toISO(firstPaycheckOnOrAfter(b.payAnchor, b.frequency, parseISO(today)));
+  const week = [...upcomingItems(7, false), ...renewalItems(7), ...creditItems(7), ...reportItems(7)].sort((a, c) => (a.date < c.date ? -1 : a.date > c.date ? 1 : 0));
+  const cx = creditCtx(), uo = cx.util.overall, ls = latestScore(S.data);
+  const nextPay = cx.next.rows.filter((r) => r.act).sort((a, c) => (a.payBy < c.payBy ? -1 : 1))[0];
   const dueSoon = week.filter((x) => x.kind === 'due').length;
   const pc = act.paychecks.find((p) => p.date === npISO);
   let payVal, paySub;
@@ -2514,6 +3206,11 @@ function renderHome() {
         <div class="t-val">${credits.length ? countSpan('home-credits', unusedNow) : S.data.wallet.length || 'ADD'}</div>
         <div class="t-sub">${credits.length ? 'in credits left this period' : S.data.wallet.length ? 'cards in your wallet' : 'Find the best card per store'}</div>
       </button>
+      <button class="tile wide" data-act="goto" data-tab="credit">
+        <div class="t-head"><span class="t-ico" style="color:${uo ? bandColor(uo.pct) : 'var(--muted)'}">${icon('gauge')}</span>Credit</div>
+        <div class="t-row"><div class="t-val" style="color:${uo ? bandColor(uo.pct) : 'var(--text)'}">${uo ? pctTxt(uo.pct) : 'SET UP'}</div>${uo ? bandChip(uo.pct) : ''}</div>
+        <div class="t-sub">${nextPay ? `Pay ${money0(nextPay.need)} to ${esc(nextPay.name)} by ${esc(shortDate(nextPay.payBy))} · statement closes ${esc(shortDate(nextPay.closing))}` : uo ? `utilization today${ls ? ` · latest score ${ls.score}` : ' · log a score'}` : 'Add card limits and closing days to plan your utilization'}</div>
+      </button>
     </div>
     ${ins.length ? `<div class="group-label"><span>Insights</span><button class="link-btn small" data-act="goto" data-tab="insights">See all</button></div><div class="insights" role="list">${ins.map((i) => insightHTML(i)).join('')}</div>` : ''}
     <div class="card">
@@ -2547,8 +3244,8 @@ function numFmt(kind, dp) {
 function cur() { const p = numFmt('money', 0).formatToParts(0).find((x) => x.type === 'currency'); return p ? p.value : '$'; }
 const moneyK = (v) => numFmt('compact', 0).format(toNum(v));
 
-const INSIGHT_ICONS = { credits: 'gift', spending: 'alert', cards: 'card', subscriptions: 'repeat', debt: 'rocket', home: 'house', networth: 'trend' };
-const INSIGHT_KIND = { credits: 'warn', spending: 'bad', subscriptions: 'warn' };
+const INSIGHT_ICONS = { credits: 'gift', spending: 'alert', cards: 'card', subscriptions: 'repeat', debt: 'rocket', home: 'house', networth: 'trend', credit: 'gauge', creditwarn: 'alert' };
+const INSIGHT_KIND = { credits: 'warn', spending: 'bad', subscriptions: 'warn', creditwarn: 'warn' };
 let insightCache = { key: '' };
 function allInsights() {
   const key = JSON.stringify([S.data, todayISO()]).length + ':' + S.meta.updatedAt + ':' + todayISO();
@@ -2567,7 +3264,7 @@ function insightHTML(i, wide) {
 
 /* ---------- global search ---------- */
 const SCREENS = [
-  ['Home', 'home', 'home'], ['Debt overview', 'overview', 'card'], ['Debts', 'debts', 'card'], ['Monthly check-in', 'checkin', 'sync'], ['Paychecks & budget', 'paychecks', 'cash'],
+  ['Home', 'home', 'home'], ['Debt overview', 'overview', 'card'], ['Debts', 'debts', 'card'], ['Credit score & utilization', 'credit', 'gauge'], ['Monthly check-in', 'checkin', 'sync'], ['Paychecks & budget', 'paychecks', 'cash'],
   ['Savings', 'savings', 'piggy'], ['Cards · Which card?', 'cards', 'card'], ['Card credits', 'cards', 'gift'], ['Merchants', 'cards', 'list'], ['Net worth', 'networth', 'trend'],
   ['Accounts', 'networth', 'bank'], ['Subscriptions', 'spending', 'repeat'], ['Home buying', 'homebuy', 'house'], ['Insights', 'insights', 'spark'], ['Settings', 'settings', 'more']
 ];
@@ -2689,6 +3386,7 @@ function walletCardHTML(c) {
     <div class="chips">${c.rules.map((r) => `<span class="chip ${r.category === 'everything' && !r.merchants.length ? '' : 'ok'}">${esc(ruleLabel(c, r))}</span>`).join('')}</div>
     ${pd ? `<div class="alert bad" style="margin:0 0 8px">${icon('alert', 'sm')} You're paying this off (${money0(debt.balance)} left). Use a card with no balance, or pay it in full.</div>` : debt ? `<p class="small faint" style="margin:0 0 8px">Linked to ${esc(debt.name)} in Debt${debt.paid ? ' · paid off' : ''}.</p>` : ''}
     ${c.credits.length ? `<p class="small muted" style="margin:0">${icon('gift', 'sm')} ${money0(s.captured)} of credits used this year · ${money0(s.potential)}/yr available${c.annualFee ? ` vs ${money0(c.annualFee)} fee` : ''}</p>` : ''}
+    ${!debt && (c.creditLimit || c.closingDay) ? `<div class="chips" style="margin:8px 0 0">${c.creditLimit ? `<span class="chip">${money0(c.currentBalance || 0)} of ${money0(c.creditLimit)} · ${pctTxt(((c.currentBalance || 0) / c.creditLimit) * 100)}</span>` : ''}${c.closingDay ? `<span class="chip">closes on the ${ordinal(c.closingDay)}</span>` : ''}${c.cardKind === 'charge' ? `<span class="chip">charge card${c.utilInclude === false ? ' · not in utilization' : ''}</span>` : ''}</div>` : ''}
     ${c.presetId ? '<p class="small faint" style="margin:6px 0 0">From a preset: verify with your card terms.</p>' : ''}
     ${c.notes ? `<p class="small faint" style="margin:6px 0 0">${esc(c.notes)}</p>` : ''}
   </div>`;
@@ -2740,7 +3438,16 @@ function cardPresetPicker() {
 function cardForm(card, isNew) {
   S.cardDraft = JSON.parse(JSON.stringify(card));
   S.cardDraftNew = !!isNew;
+  loadCardCredit();
   renderCardForm();
+}
+const CD_KEYS = ['creditLimit', 'keepOpen', 'closingDay', 'dueDay', 'cardKind', 'openDate', 'utilInclude', 'monthlySpend', 'currentBalance'];
+/** Credit details being edited: from the linked debt when there is one (saved there), otherwise from the wallet card. */
+function loadCardCredit() {
+  const d = S.cardDraft, debt = d.debtId && S.data.debts.find((x) => x.id === d.debtId);
+  const src = debt || d;
+  S.cardDraft._cd = Object.fromEntries(CD_KEYS.map((k) => [k, src[k] === undefined ? null : src[k]]));
+  S.cardDraft._cdFrom = debt ? debt.id : null;
 }
 function readCardForm() {
   const f = $('#cardForm'); if (!f) return;
@@ -2748,6 +3455,30 @@ function readCardForm() {
   Object.assign(d, { name: v('name').trim() || 'Card', network: v('network'), annualFee: toNum(v('annualFee')), earnType: v('earnType'), cpp: v('cpp') === '' ? 1 : toNum(v('cpp')), debtId: v('debtId') || null, notes: v('notes') });
   d.rules.forEach((r, i) => Object.assign(r, { category: v(`r-cat-${i}`), merchants: v(`r-mer-${i}`).split(',').map((x) => x.trim()).filter(Boolean), rate: toNum(v(`r-rate-${i}`)), cap: toNum(v(`r-cap-${i}`)) > 0 ? toNum(v(`r-cap-${i}`)) : null, capPeriod: v(`r-capp-${i}`), afterRate: v(`r-after-${i}`) === '' ? null : toNum(v(`r-after-${i}`)) }));
   d.credits.forEach((c, i) => Object.assign(c, { name: v(`c-name-${i}`) || 'Credit', amount: toNum(v(`c-amt-${i}`)), period: v(`c-per-${i}`), resetMonth: toNum(v(`c-rm-${i}`)) || 1 }));
+  if (d._cd && f.elements['cd-limit']) {
+    const n = (k) => (v(k) === '' ? null : r2(Math.max(0, toNum(v(k)))));
+    Object.assign(d._cd, { creditLimit: n('cd-limit'), keepOpen: n('cd-keep') || 0, closingDay: dayOrNull(v('cd-close')), dueDay: dayOrNull(v('cd-due')),
+      openDate: parseISO(v('cd-open')) ? v('cd-open') : '', monthlySpend: n('cd-spend'), utilInclude: f.elements['cd-incl'] ? f.elements['cd-incl'].checked : d._cd.utilInclude !== false });
+    if (f.elements['cd-bal']) d._cd.currentBalance = n('cd-bal') || 0;
+  }
+  if ((d.debtId || null) !== (d._cdFrom || null)) loadCardCredit();   // linked debt changed: its details take over
+}
+function cardCreditFields(d) {
+  const cd = d._cd || {}, debt = d._cdFrom && S.data.debts.find((x) => x.id === d._cdFrom);
+  const val = (x) => (x == null || x === '' ? '' : esc(x));
+  const charge = cd.cardKind === 'charge';
+  return `<div class="ms-label" style="margin-top:14px">Credit details</div>
+    <p class="hint" style="margin:4px 0 10px">${debt ? `Shared with <b>${esc(debt.name)}</b> in Debt, which holds the balance.` : 'For utilization and the pay-before-it-reports planner. A card that isn\'t in Debt is treated as paid in full each month.'}</p>
+    <div class="seg" style="margin-bottom:12px"><button type="button" data-act="cd-kind" data-v="revolving" class="${charge ? '' : 'on'}">Credit card</button><button type="button" data-act="cd-kind" data-v="charge" class="${charge ? 'on' : ''}">Charge card</button></div>
+    <div class="grid-2"><label class="field"><span>Credit limit</span><div class="prefix"><b>${cur()}</b><input class="input num" name="cd-limit" type="number" inputmode="decimal" min="0" step="100" value="${val(cd.creditLimit)}" placeholder="${charge ? 'None' : '0'}"></div></label>
+      <label class="field"><span>Keep open</span><div class="prefix"><b>${cur()}</b><input class="input num" name="cd-keep" type="number" inputmode="decimal" min="0" step="50" value="${cd.keepOpen ? esc(cd.keepOpen) : ''}" placeholder="0"></div></label></div>
+    <div class="grid-2"><label class="field"><span>Statement closes (day)</span><input class="input num" name="cd-close" type="number" inputmode="numeric" min="1" max="31" step="1" value="${val(cd.closingDay)}" placeholder="e.g. 18"></label>
+      <label class="field"><span>Due day</span><input class="input num" name="cd-due" type="number" inputmode="numeric" min="1" max="31" step="1" value="${val(cd.dueDay)}" placeholder="e.g. 12"></label></div>
+    <div class="grid-2">${debt ? '' : `<label class="field"><span>Balance now</span><div class="prefix"><b>${cur()}</b><input class="input num" name="cd-bal" type="number" inputmode="decimal" min="0" step="0.01" value="${cd.currentBalance ? esc(cd.currentBalance) : ''}" placeholder="0"></div></label>`}
+      <label class="field"><span>New spending / mo</span><div class="prefix"><b>${cur()}</b><input class="input num" name="cd-spend" type="number" inputmode="decimal" min="0" step="1" value="${val(cd.monthlySpend)}" placeholder="Auto"></div></label></div>
+    <label class="field"><span>Account opened</span><input class="input num" name="cd-open" type="date" value="${esc(cd.openDate || '')}"></label>
+    ${charge ? `<label class="check"><input type="checkbox" name="cd-incl" ${cd.utilInclude !== false ? 'checked' : ''}> Count this charge card in utilization</label>
+      <p class="hint">Scoring models may treat charge cards differently than revolving cards: some leave them out of utilization, others count them. Counting it is the cautious view.</p>` : ''}`;
 }
 function renderCardForm() {
   const d = S.cardDraft, isNew = S.cardDraftNew;
@@ -2787,6 +3518,7 @@ function renderCardForm() {
           <button type="button" class="btn icon danger" data-act="card-del-credit" data-i="${i}" aria-label="Remove credit">${icon('trash', 'sm')}</button></div>
       </div>`).join('')}
       <button type="button" class="btn sm block" data-act="card-add-credit">${icon('plus', 'sm')} Add credit</button>
+      ${cardCreditFields(d)}
       <label class="field" style="margin-top:12px"><span>Notes</span><input class="input" name="notes" maxlength="200" value="${esc(d.notes || '')}"></label>
       <div class="sheet-actions"><button type="button" class="btn" data-close>Cancel</button><button type="submit" class="btn primary">${isNew ? 'Add card' : 'Save'}</button></div>
       ${isNew ? '' : `<button type="button" class="btn danger block" style="margin-top:12px" data-act="delete-card" data-id="${esc(d.id)}">${icon('trash', 'sm')} Remove card</button>`}
@@ -2794,10 +3526,19 @@ function renderCardForm() {
   if ($('#cardSheet')) { const top = $('.sheet').scrollTop; $('#cardSheet').outerHTML = html; $('.sheet').scrollTop = top; } else openSheet(html);
   const f = $('#cardForm');
   f.earnType.addEventListener('change', () => { readCardForm(); renderCardForm(); });
+  f.debtId.addEventListener('change', () => { readCardForm(); renderCardForm(); });
   f.addEventListener('submit', (e) => {
     e.preventDefault();
     readCardForm();
+    const cd = S.cardDraft._cd || {};
+    delete S.cardDraft._cd; delete S.cardDraft._cdFrom;
     const card = normalizeWalletCard(S.cardDraft);
+    const linked = card.debtId && S.data.debts.find((x) => x.id === card.debtId);
+    if (linked) {
+      Object.assign(linked, { closingDay: cd.closingDay, cardKind: cd.cardKind === 'charge' ? 'charge' : 'revolving', openDate: cd.openDate || '', utilInclude: cd.utilInclude !== false, monthlySpend: cd.monthlySpend });
+      if (linked.type !== 'loan') Object.assign(linked, { creditLimit: cd.creditLimit > 0 ? cd.creditLimit : null, keepOpen: cd.keepOpen || 0 });
+      if (cd.dueDay) linked.dueDay = cd.dueDay;
+    } else Object.assign(card, normalizeWalletCard(Object.assign({}, card, cd)));
     const i = S.data.wallet.findIndex((x) => x.id === card.id);
     if (i >= 0) S.data.wallet[i] = card; else S.data.wallet.push(card);
     S.cardDraft = null;
@@ -2931,10 +3672,8 @@ function renderHomeBuy(el) {
       ${affRow('28% front-end · now', c.now.front28, true)}${affRow('36% back-end · now', c.now.back36, true)}${affRow('43% back-end · now', c.now.back43, true)}
       ${affRow('36% back-end · after debt-free', c.after.back36, false)}
       <p class="small faint" style="margin:8px 0 0">The max price is the lower of the 28% housing and 36% total-debt limits. Many lenders allow up to 43%, but it's a stretch.${c.dti != null ? ` At ${money0(h.priceMin)} today your debt-to-income would be <b>${c.dti.toFixed(1)}%</b>.` : ''}</p></div>` : ''}
-    <div class="card"><div class="card-head"><h3>${icon('user')} Credit</h3></div>
-      <div class="grid-2">${homeField('Your credit score', 'creditScore', h.creditScore, { plain: true })}${homeField('Target score', 'creditTarget', h.creditTarget, { plain: true })}</div>
-      ${homeField('Debt-to-income target', 'dtiTarget', h.dtiTarget, { pct: true })}
-    </div>
+    ${creditReadinessHTML()}
+    ${rateTiersHTML()}
     <div class="group-label"><span>Assistance programs</span><button class="btn sm" data-act="add-program">${icon('plus', 'sm')} Add</button></div>
     <div class="card">${h.programs.length ? `<ul class="list">${h.programs.map((p) => `<li class="li tap" data-act="edit-program" data-id="${esc(p.id)}" role="button" tabindex="0"><span class="l-ico">${icon('gift')}</span>
       <div class="l-main"><b>${esc(p.name)}</b><span>${esc(p.amount || 'Add details')}${p.verify ? ' · verify current terms' : ''}</span></div><div class="l-end">${icon('chev', 'sm')}</div></li>`).join('')}</ul>` : '<p class="small muted" style="margin:0">No programs saved.</p>'}</div>
@@ -2975,7 +3714,7 @@ function renderInsightsPage(el) {
 }
 function renderSettingsPage(el) {
   const st = S.data.settings;
-  const counts = [['debts', S.data.debts.length], ['accounts', S.data.accounts.length], ['subscriptions', S.data.subscriptions.length], ['wallet cards', S.data.wallet.length], ['merchants', S.data.merchants.length], ['check-ins', S.data.checkins.length], ['history entries', S.data.history.length]];
+  const counts = [['debts', S.data.debts.length], ['accounts', S.data.accounts.length], ['subscriptions', S.data.subscriptions.length], ['wallet cards', S.data.wallet.length], ['merchants', S.data.merchants.length], ['credit scores', S.data.credit.scores.length], ['inquiries', S.data.credit.inquiries.length], ['check-ins', S.data.checkins.length], ['history entries', S.data.history.length]];
   el.innerHTML = `<div class="page-head"><div><button class="link-btn small" data-act="more-back">${icon('chev', 'sm')} More</button><div class="eyebrow" style="margin-top:6px">Preferences</div><h2 class="section-title" style="margin:6px 0 0">Settings</h2></div></div>
     <div class="card"><div class="card-head"><h3>Numbers</h3><span class="small muted num">${esc(money(1234.56))}</span></div>
       <label class="field"><span>Currency</span><select class="input" data-setting="currency">${CURRENCIES.map((c) => `<option ${c === st.currency ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
@@ -2991,6 +3730,15 @@ function renderSettingsPage(el) {
       <div class="stack"><button class="btn block" data-act="export">${icon('download', 'sm')} Export JSON</button><button class="btn block" data-act="import">${icon('upload', 'sm')} Import JSON</button>
         <button class="btn block" data-act="export-ics">${icon('cal', 'sm')} Export calendar (.ics)</button></div>
     </div>`;
+}
+/** "Pay $X to Card by <date> (statement closes <date>)" items from the planner, due within `days`. */
+function reportItems(days) {
+  const end = toISO(addDays(parseISO(todayISO()), days));
+  return creditCtx().next.rows.filter((r) => r.act && r.payBy <= end).map((r) => ({
+    kind: 'report', date: r.payBy, title: `Pay ${money0(r.need)} to ${r.name} by ${shortDate(r.payBy)}`,
+    detail: `statement closes ${shortDate(r.closing)}${r.limit ? ` · reports ${pctTxt(r.pctNew)}` : ''}${r.extraPre > 0.5 ? ` · ${money0(r.extraPre)} beyond plan` : ''}`,
+    amount: money0(r.need), sub: 'before it reports'
+  }));
 }
 /** Unused credits whose period ends within `days`, one row per card and last day. */
 function creditItems(days) {
@@ -3283,9 +4031,10 @@ function renderMore() {
     <div class="page-head"><div><div class="eyebrow">Tools &amp; settings</div><h2 class="section-title" style="margin:6px 0 0">More</h2></div></div>
     <div class="card"><ul class="list">
       ${row('house', 'Home buying', 'Readiness, affordability and assistance programs', 'goto', 'data-tab="homebuy"')}
+      ${row('gauge', 'Credit', 'Utilization, pay before it reports, score log', 'goto', 'data-tab="credit"')}
       ${row('spark', 'Insights', nIns ? `${plural(nIns, 'insight')} for you` : 'All caught up', 'goto', 'data-tab="insights"')}
       ${row('rocket', 'Guided setup', 'Add accounts and subscriptions step by step', 'onboard')}
-      ${row('cal', 'Export reminders (.ics)', 'Paydays, due dates, renewals and credit resets', 'export-ics')}
+      ${row('cal', 'Export reminders (.ics)', 'Paydays, due dates, statement dates, renewals and credit resets', 'export-ics')}
     </ul></div>
     <div class="group-label">Account</div>
     <div class="card"><ul class="list">
@@ -3295,7 +4044,7 @@ function renderMore() {
     </ul></div>
     <div class="card">
       <div class="card-head"><h3>${icon('info')} How the math works</h3></div>
-      <p class="small muted" style="margin:0">Interest is charged monthly at APR ÷ 12 (0% or the promo APR while a promo is active). Each paycheck pays this month's minimums first, then whatever brings any card back under its buffer line, then every extra dollar goes to the ${esc(S.data.strategy)} target. Net worth counts your HYSA and debts once each. Card rewards, mortgage math and all projections are estimates, not financial advice.</p>
+      <p class="small muted" style="margin:0">Interest is charged monthly at APR ÷ 12 (0% or the promo APR while a promo is active). Each paycheck pays this month's minimums first, then whatever brings any card back under its buffer line, then every extra dollar goes to the ${esc(S.data.strategy)} target. Net worth counts your HYSA and debts once each. Credit utilization uses the balance each card should report on its statement closing date. Card rewards, mortgage math and all projections are estimates, not financial advice.</p>
     </div>
     <div class="card"><ul class="list">${row('logout', '<span style="color:var(--debt)">Sign out</span>', 'Your data stays saved in the cloud', 'sign-out')}</ul></div>
     <p class="faint small" style="text-align:center">Money HQ · private to you · data stored in your Supabase account</p>`;
@@ -3406,24 +4155,31 @@ function ensurePaydayChecklist(now) {
 function payNowHTML() {
   const today = todayISO();
   const lists = S.data.payChecklists.filter((c) => !c.dismissed && c.items.length && (!c.completedAt || c.date === today));
-  return lists.map((c) => {
+  const cx = lists.length ? creditCtx() : null;
+  const byCard = cx ? Object.fromEntries(cx.next.rows.map((r) => [r.id, r])) : {};
+  const timingEv = cx ? cx.next.pays.find((p) => p.label === 'checklist' && p.changed) : null;
+  return lists.map((c, li) => {
     const done = c.items.filter((i) => i.done).length, n = c.items.length, isToday = c.date === today;
     const rows = c.items.map((i) => {
       const k = `${c.date}|${i.key}`;
-      const hint = i.kind === 'debt' ? (i.urgent ? '⚠ includes buffer restore' : 'card payment') : i.kind === 'hysa' ? 'adds to savings balance' : 'set aside for rent';
+      const r = i.kind === 'debt' && byCard[i.debtId || ('w:' + i.walletId)];
+      const hint = i.credit ? (i.credit.type === 'min' ? `minimum due ${shortDate(i.credit.payBy)} · statement closed ${shortDate(i.credit.closing)}` : `extra · pay by ${shortDate(i.credit.payBy)} · statement closes ${shortDate(i.credit.closing)}${i.credit.pct != null ? ` · reports ${pctTxt(i.credit.pct)}` : ''}`)
+        : i.kind === 'debt' ? (i.urgent ? '⚠ includes buffer restore' : r && r.payBy >= today && r.closing <= toISO(addDays(parseISO(today), 31)) ? `pay by ${shortDate(r.payBy)} · statement closes ${shortDate(r.closing)}` : 'card payment') : i.kind === 'hysa' ? 'adds to savings balance' : 'set aside for rent';
       if (i.done) {
         return `<div class="cl-row done"><button class="cl-check" data-act="cl-undo" data-date="${esc(c.date)}" data-key="${esc(i.key)}" aria-label="Undo ${esc(i.label)}">${icon('check')}</button>
-          <div class="nm"><b>${esc(i.label)}</b><span>${Math.abs(toNum(i.paid) - i.planned) > 0.004 ? `planned ${money(i.planned)}` : 'done'}</span></div>
+          <div class="nm"><b>${esc(i.label)}${i.credit ? (i.credit.type === 'min' ? ' · minimum' : ' · before it reports') : ''}</b><span>${Math.abs(toNum(i.paid) - i.planned) > 0.004 ? `planned ${money(i.planned)}` : 'done'}</span></div>
           <div class="cl-paid">${money(i.paid)}<div><button data-act="cl-undo" data-date="${esc(c.date)}" data-key="${esc(i.key)}">undo</button></div></div></div>`;
       }
       const v = S.clDraft[k] != null ? S.clDraft[k] : i.planned;
       return `<div class="cl-row"><button class="cl-check" data-act="cl-check" data-date="${esc(c.date)}" data-key="${esc(i.key)}" aria-label="Mark ${esc(i.label)} done"></button>
-        <div class="nm"><b>${esc(i.label)}</b><span>${hint}</span></div>
+        <div class="nm"><b>${esc(i.label)}${i.credit ? (i.credit.type === 'min' ? ' · minimum' : ' · before it reports') : ''}</b><span>${esc(hint)}</span></div>
         <div class="prefix"><b>${cur()}</b><input class="input num" type="number" inputmode="decimal" min="0" step="0.01" data-cl-amt="${esc(k)}" value="${esc(v)}" aria-label="${esc(i.label)} amount"></div></div>`;
     }).join('');
     return `<div class="card paynow ${isToday ? '' : 'missed'}">
       <div class="card-head"><h3>${isToday ? `${icon('cash')} PAYDAY · PAY NOW` : `${icon('clock')} MISSED · ${esc(fmtDate(c.date, { weekday: 'short', month: 'short', day: 'numeric' })).toUpperCase()}`}</h3><b class="num" style="color:${done === n ? 'var(--accent)' : 'var(--text)'}">${done} of ${n} done</b></div>
       <div class="progress" style="height:8px;margin-bottom:6px"><div style="width:${(done / n) * 100}%"></div></div>
+      ${li === 0 && timingEv ? `<div class="alert" style="margin:8px 0">${icon('clock', 'sm')} <b>Better timing, same ${money0(timingEv.total)}:</b> ${timingEv.lines.filter((l) => Math.abs(l.now - l.plan) >= 0.5).map((l) => `${esc(l.name)} ${money0(l.now)} <span style="opacity:.75">(was ${money0(l.plan)})</span>`).join(' · ')}. Lands before statements close; every card still gets its money and minimums stay on time.
+        <div><button class="btn sm" data-act="cl-timing">Use this timing</button> <button class="btn sm ghost" data-act="goto" data-tab="credit">Why?</button></div></div>` : ''}
       ${rows}
       <div class="row between wrap" style="margin-top:10px">
         <span class="small faint" style="flex:1;min-width:160px">${done === n ? 'Paycheck complete. 🎉' : 'Paid a different amount? Edit it before checking it off.'}</span>
@@ -3784,6 +4540,7 @@ function historyHTML(limit) {
     else if (e.kind === 'added') { what = `Added · ${esc(e.debtName)}`; amt = `<span class="amt">${money(e.after)}</span>`; }
     else if (e.kind === 'removed') { what = `Removed · ${esc(e.debtName)}`; }
     else if (e.kind === 'savings') { what = `HYSA deposit${e.source === 'payday' ? ' · payday' : ''}`; amt = `<span class="amt" style="color:var(--save)">+${money(e.amount)}</span>`; sub = `<div class="when num">now ${money(e.after)}</div>`; }
+    else if (e.kind === 'cardpay') { what = `Card payment · ${esc(e.name)}${e.source === 'payday' ? ' · payday' : ''}`; amt = `<span class="amt pos">−${money(e.amount)}</span>`; }
     else if (e.kind === 'account') { const diff = r2(e.after - e.before); what = `Account · ${esc(e.name)}`; amt = `<span class="amt">${diff >= 0 ? '+' : '−'}${money(Math.abs(diff))}</span>`; }
     else if (e.kind === 'checkin') { what = 'Monthly check-in'; amt = `<span class="amt">${money(e.after)}</span>`; sub = `<div class="when num">HYSA ${money(e.hysa)}</div>`; }
     else { what = esc(e.kind); }
@@ -3829,7 +4586,7 @@ function renderOverview() {
       </div>
       <div class="progress" role="progressbar" aria-valuenow="${t.pct.toFixed(0)}" aria-valuemin="0" aria-valuemax="100"><div style="width:${t.pct}%"></div></div>
       <div class="ticks"><span>0</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
-      ${util ? `<div class="row between small" style="margin-top:12px"><span class="muted">Credit utilization · ${plural(util.count, 'card')}</span><b class="num" style="color:${util.pct > 30 ? 'var(--warn)' : 'var(--text)'}">${util.pct.toFixed(1)}%</b></div>` : ''}
+      ${util ? `<button class="link-row" data-act="goto" data-tab="credit"><span class="muted">Credit utilization · ${plural(util.count, 'card')}</span><span class="row" style="gap:6px"><b class="num" style="color:${bandColor(util.pct)}">${util.pct.toFixed(1)}%</b>${icon('chev', 'sm')}</span></button>` : ''}
     </div>
 
     ${isFree ? freedomHTML(true) : ''}
@@ -3906,7 +4663,10 @@ function renderDebts() {
       <div class="chips">
         <span class="chip ${!(d.apr > 0) && !d.paid ? 'bad' : ''}">${toNum(d.apr).toFixed(2)}% APR</span>
         <span class="chip ${!(d.minPayment > 0) && !d.paid ? 'bad' : ''}">min ${money(d.minPayment)}</span>
-        ${d.dueDay ? `<span class="chip">due on the ${d.dueDay}${['th', 'st', 'nd', 'rd'][(d.dueDay % 100 > 10 && d.dueDay % 100 < 14) || d.dueDay % 10 > 3 ? 0 : d.dueDay % 10]}</span>` : ''}
+        ${d.dueDay ? `<span class="chip">due on the ${ordinal(d.dueDay)}</span>` : ''}
+        ${d.type !== 'loan' && d.closingDay ? `<span class="chip">closes on the ${ordinal(d.closingDay)}</span>` : ''}
+        ${d.type !== 'loan' && d.cardKind === 'charge' ? `<span class="chip">charge card${d.utilInclude === false ? ' · not in utilization' : ''}</span>` : ''}
+        ${d.openDate ? `<span class="chip">opened ${esc(fmtMonth(d.openDate))}</span>` : ''}
         ${d.promoEnd ? `<span class="chip ${promoActive ? 'hot' : ''}">0% ${promoActive ? 'until' : 'ended'} ${esc(fmtDate(d.promoEnd))}</span>` : ''}
         ${!d.paid && po ? `<span class="chip ok">#${po.order} · done ${esc(fmtMonth(po.date))}</span>` : ''}
         ${d.paid && d.paidAt ? `<span class="chip ok">paid ${esc(fmtDate(d.paidAt.slice(0, 10)))}</span>` : ''}
@@ -3932,8 +4692,8 @@ function renderDebts() {
     ${S.data.debts.length ? `<div class="grid-2" style="margin-bottom:14px">
       <div class="stat"><div class="k">Remaining</div><div class="v" style="color:var(--debt)">${money(t.current)}</div></div>
       <div class="stat"><div class="k">Paid so far</div><div class="v" style="color:var(--accent)">${money(t.paid)}</div></div>
-      ${util ? `<div class="stat" style="grid-column:1/-1"><div class="k">Overall utilization · ${money0(util.bal)} of ${money0(util.limit)}</div><div class="v">${util.pct.toFixed(1)}%</div>
-        <div class="progress util ${util.pct > 30 ? 'hot' : ''}" style="height:8px;margin-top:6px"><div style="width:${Math.min(100, util.pct)}%"></div></div></div>` : ''}
+      ${util ? `<button class="stat tap" data-act="goto" data-tab="credit" style="grid-column:1/-1;border:0;text-align:left;color:inherit;font:inherit;cursor:pointer"><div class="row between"><div class="k">Overall utilization · ${money0(util.bal)} of ${money0(util.limit)}</div><span class="small" style="color:var(--accent);font-weight:700">Credit plan ${icon('chev', 'sm')}</span></div><div class="v" style="color:${bandColor(util.pct)}">${util.pct.toFixed(1)}%</div>
+        ${utilMeter(util.pct)}</button>` : ''}
     </div>` : emptyState()}
     ${nudgesHTML()}
     ${active.map(card).join('')}
@@ -4080,10 +4840,18 @@ function renderPaychecks() {
   const b = S.data.budget;
   const act = activePlan();
   const nextPay = firstPaycheckOnOrAfter(b.payAnchor, b.frequency, parseISO(todayISO()));
-  const allocLine = (a, finished) => {
+  const cx = creditCtx(), byCard = Object.fromEntries(cx.next.rows.map((r) => [r.id, r]));
+  const payDates = act.paychecks.map((p) => p.date);
+  const allocLine = (a, finished, date) => {
     const done = finished.some((f) => f.id === a.id);
     const urgent = a.buffer > 0;
-    return `<div class="pc-line ${done ? 'done' : urgent ? 'urgent' : ''}"><span>→ ${esc(a.name)}${done ? ` ${icon('check', 'sm')} PAID OFF` : ''}${urgent ? ` <b>⚠ ${money(a.buffer)} restores buffer</b>` : ''}</span><span class="num">${money(a.amount)}</span></div>`;
+    const r = date && byCard[a.id], nextPd = date && payDates[payDates.indexOf(date) + 1];
+    const byHint = r && r.act && r.payBy >= date && (!nextPd || r.payBy < nextPd) ? ` <span class="faint small">· by ${esc(shortDate(r.payBy))}, closes ${esc(shortDate(r.closing))}</span>` : '';
+    return `<div class="pc-line ${done ? 'done' : urgent ? 'urgent' : ''}"><span>→ ${esc(a.name)}${done ? ` ${icon('check', 'sm')} PAID OFF` : ''}${urgent ? ` <b>⚠ ${money(a.buffer)} restores buffer</b>` : ''}${byHint}</span><span class="num">${money(a.amount)}</span></div>`;
+  };
+  const timingLine = (date) => {
+    const ev = cx.next.pays.find((p) => p.label === 'paycheck' && p.date === date && p.changed);
+    return ev ? `<div class="pc-line timing"><span>${icon('clock', 'sm')} Better timing: ${ev.lines.filter((l) => Math.abs(l.now - l.plan) >= 0.5).map((l) => `${esc(l.name)} ${money0(l.now)}`).join(' · ')} <span class="faint">(same money, lands before statements close)</span></span></div>` : '';
   };
   const lumpCard = act.lump ? `<div class="card pc lump">
       <div class="pc-head"><div class="pc-date">DAY 1 · LUMP SUM</div><div class="num muted">${money(act.lump.amount)}</div></div>
@@ -4100,7 +4868,8 @@ function renderPaychecks() {
     return `<div class="card pc ${p.urgent ? 'urgent' : ''}">
       <div class="pc-head"><div class="pc-date">${i === 0 ? 'NEXT · ' : ''}${esc(fmtDate(p.date, p.date.slice(0, 4) === todayISO().slice(0, 4) ? { weekday: 'short', month: 'short', day: 'numeric' } : { month: 'short', day: 'numeric', year: 'numeric' })).toUpperCase()}</div><div class="num small muted">${money0(p.remaining)} left</div></div>
       ${p.urgent ? '<div class="small" style="color:#FFB3C1;margin-bottom:4px;font-weight:700">URGENT · a card is over its buffer line</div>' : ''}
-      ${p.allocations.map((a) => allocLine(a, finished)).join('')}
+      ${p.allocations.map((a) => allocLine(a, finished, p.date)).join('')}
+      ${timingLine(p.date)}
       <div class="pc-line save"><span>→ HYSA${p.leftover > 0 ? ` (+${money(p.leftover)} freed up)` : ''}</span><span class="num">${money(r2(b.savingsPerPaycheck + p.leftover))}</span></div>
       ${fixedLines.length ? `<div class="pc-line"><span class="muted">→ ${fixedLines.map(([n]) => esc(n)).join(', ')}</span><span class="num muted">${money(r2(fixedLines.reduce((t, [, v]) => t + v, 0)))}</span></div>` : ''}
     </div>`;
@@ -4179,6 +4948,384 @@ function renderSavings() {
     ${afterPlanHTML()}`;
 }
 
+/* =====================================================================
+   DEBT › CREDIT: utilization, pay before it reports, score log, factors
+   ===================================================================== */
+let creditCache = { key: '' };
+/** Everything the credit screens need, computed once per data change. */
+function creditCtx() {
+  const today = todayISO();
+  const key = JSON.stringify([S.data, today]).length + ':' + S.meta.updatedAt + ':' + today + ':' + S.data.debts.length + ':' + S.data.payChecklists.length;
+  if (creditCache.key === key) return creditCache;
+  const plan = activePlan();
+  const pending = pendingChecklistMoney(S.data, today);
+  const next = planStatements(S.data, today, { plan, mode: 'next', pending });
+  const view = S.data.credit.mode === 'month' ? planStatements(S.data, today, { plan, mode: 'month', pending }) : next;
+  const proj = projectUtilization(S.data, today, plan);
+  creditCache = { key, today, plan, next, view, proj, util: utilizationNow(S.data), accts: creditAccounts(S.data), ages: accountAges(S.data, today),
+    factors: creditFactors(S.data, today, proj), best: bestPreapprovalMonth(S.data, today, proj), mw: mortgageWarnings(S.data, today) };
+  return creditCache;
+}
+/** Keep the open payday checklist's "before it reports" items in step with the planner. */
+function syncCreditChecklist() {
+  const today = todayISO();
+  const list = S.data.payChecklists.find((c) => !c.dismissed && c.items.length && c.date <= today && (!c.completedAt || c.date === today));
+  if (!list) return false;
+  const b = S.data.budget;
+  const next = toISO(firstPaycheckOnOrAfter(b.payAnchor, b.frequency, addDays(parseISO(today), 1)));
+  const sp = planStatements(S.data, today, { plan: activePlan(), mode: 'next', pending: pendingChecklistMoney(S.data, today), fixPending: true });
+  return mergeCreditItems(list, creditChecklistItems(sp, today, next));
+}
+const inquiriesTxt = (n, pre = '') => `${n} ${pre}${n === 1 ? 'inquiry' : 'inquiries'}`;
+const ordinal = (n) => `${n}${['th', 'st', 'nd', 'rd'][(n % 100 > 10 && n % 100 < 14) || n % 10 > 3 ? 0 : n % 10]}`;
+const pctTxt = (p) => (p == null ? '—' : `${toNum(p).toFixed(1)}%`);
+const bandColor = (p) => `var(--band-${utilBand(p).key})`;
+const bandChip = (p) => (p == null ? '<span class="band">No limit</span>' : `<span class="band ${utilBand(p).key}"><i></i>${esc(utilBand(p).label)}</span>`);
+const shortDate = (iso) => fmtDate(iso, { month: 'short', day: 'numeric' });
+const monthOptions = (sel, n, from = todayISO().slice(0, 7), none = '') => `${none ? `<option value="">${esc(none)}</option>` : ''}${Array.from({ length: n }, (_, i) => shiftMonth(from, i)).map((m) => `<option value="${m}" ${m === sel ? 'selected' : ''}>${esc(monthLabel(m))}</option>`).join('')}`;
+function bandScale(p) {
+  return `<div class="bandscale" aria-hidden="true"><i class="excellent"></i><i class="good"></i><i class="fair"></i><i class="high"></i>${p != null ? `<b style="left:${Math.min(100, Math.max(0, p))}%"></b>` : ''}</div>
+    <div class="bandscale-ticks" aria-hidden="true"><span style="left:10%">10%</span><span style="left:30%">30%</span><span style="left:50%">50%</span></div>`;
+}
+function utilMeter(p, mark) {
+  return `<div class="util-meter" role="img" aria-label="${p == null ? 'No limit set' : `${p.toFixed(1)}% used${mark != null ? `, ${mark.toFixed(1)}% projected next statement` : ''}`}">
+    <div style="width:${Math.min(100, Math.max(0, p || 0))}%;background:${bandColor(p)}"></div>
+    ${[10, 30, 50].map((t) => `<span class="tick" style="left:${t}%"></span>`).join('')}
+    ${mark != null ? `<span class="proj" style="left:${Math.min(99.4, Math.max(0.6, mark))}%"></span>` : ''}</div>`;
+}
+function openAccount(id) {
+  if (String(id).startsWith('w:')) { const c = S.data.wallet.find((x) => 'w:' + x.id === id); if (c) cardForm(c, false); return; }
+  const d = S.data.debts.find((x) => x.id === id);
+  if (d) debtForm(d);
+}
+
+function creditHeroHTML(cx) {
+  const o = cx.util.overall, ls = latestScore(S.data), n = cx.next;
+  const lastClose = n.rows.length ? n.rows.reduce((m, r) => (r.closing > m ? r.closing : m), '') : null;
+  return `<div class="card hero">
+    <div class="row between"><div class="label">Overall utilization · today</div>${o ? bandChip(o.pct) : ''}</div>
+    <div class="big" style="margin-top:6px;color:${o ? bandColor(o.pct) : 'var(--muted)'}">${o ? pctTxt(o.pct) : '—'}</div>
+    <p class="small muted" style="margin:8px 0 0">${o ? `${money0(o.bal)} of ${money0(o.limit)} across ${plural(o.count, 'card')}. ${esc(o.band.meaning)}` : 'Add credit limits to your cards to see utilization.'}</p>
+    ${o ? bandScale(o.pct) : ''}
+    <div class="grid-2" style="margin-top:12px">
+      <div class="stat"><div class="k">Next statements · on plan</div><div class="v" style="color:${n.overall ? bandColor(n.overall.planPct) : 'var(--muted)'}">${n.overall && n.rows.length ? pctTxt(n.overall.planPct) : '—'}</div>
+        <div class="small muted">${lastClose ? `all closed by ${esc(shortDate(lastClose))}` : 'add closing days'}</div></div>
+      <div class="stat"><div class="k">Latest score</div><div class="v">${ls ? ls.score : '—'}</div>
+        <div class="small muted">${ls ? (ls.logged ? `${esc(ls.model)} · ${esc(shortDate(ls.date))}` : 'from Home buying') : '<button class="link-btn small" data-act="add-score">Log a score</button>'}</div></div>
+    </div>
+  </div>`;
+}
+function creditFlagsHTML(cx) {
+  const rows = cx.util.rows;
+  const over = rows.filter((r) => r.overLimit), near = rows.filter((r) => r.nearLimit && !r.overLimit), hot = rows.filter((r) => r.include && r.over30 && !r.overLimit && !r.nearLimit);
+  const names = (list) => list.map((r) => `${esc(r.name)} <span class="num">(${pctTxt(r.pct)})</span>`).join(', ');
+  let h = '';
+  if (over.length) h += `<div class="alert bad"><b>⚠ Over the limit:</b> ${names(over)}. That likely hurts and can bring fees. Get these under the limit first.</div>`;
+  if (near.length) h += `<div class="alert bad"><b>⚠ Near the limit:</b> ${names(near)}. Nearly maxed-out cards likely hurt the most. Pay these before their statements close.</div>`;
+  if (hot.length) h += `<div class="alert"><b>30% or more on one card:</b> ${names(hot)}. A single high card likely hurts even when overall utilization is lower.</div>`;
+  const missing = cx.accts.filter((a) => a.kind !== 'loan' && !a.closingDay);
+  if (missing.length) {
+    const est = missing.filter((a) => a.closeEst);
+    h += `<div class="alert">${icon('info', 'sm')} ${missing.length === 1 ? `${esc(missing[0].name)} has` : `${missing.length} cards have`} no statement closing day${missing.length > 1 ? ` (${missing.map((a) => esc(a.name)).join(', ')})` : ''}. ${est.length ? `Until you add ${est.length === missing.length ? (missing.length === 1 ? 'it' : 'them') : 'them'}, Money HQ estimates it from the due day. ` : ''}It's on your statement as the "closing date".
+      <div><button class="btn sm" data-act="edit-acct" data-id="${esc(missing[0].id)}">Add it to ${esc(missing[0].name)}</button></div></div>`;
+  }
+  const noLim = cx.util.noLimit;
+  if (noLim.length) h += `<div class="alert">${icon('info', 'sm')} Add a credit limit to ${noLim.map((r) => esc(r.name)).join(', ')} to include ${noLim.length === 1 ? 'it' : 'them'} in utilization. <div><button class="btn sm" data-act="edit-acct" data-id="${esc(noLim[0].id)}">Edit ${esc(noLim[0].name)}</button></div></div>`;
+  return h;
+}
+
+function plannerRowHTML(r, sp) {
+  const keep = sp.goal === 'aze' && r.id === sp.keepId;
+  const dd = (iso) => esc(fmtDate(iso, { weekday: 'short', month: 'short', day: 'numeric' }));
+  const fromPlan = r2(Math.min(r.planBefore, r.need));
+  const act = r.act ? `<div class="rp-act">Pay <b>${money0(r.need)}</b> by ${dd(r.payBy)}</div>`
+    : `<div class="rp-act quiet">No early payment needed. ${r.reportedPlan > 0.004 ? `It reports ${money0(r.reportedPlan)}${r.limit ? ` (${pctTxt(r.pctPlan)})` : ''} on your plan.` : 'It reports $0.'}</div>`;
+  const flow = r.limit ? `<div class="rp-flow"><span class="muted">Reports</span><span class="num">${pctTxt(r.pctPlan)}</span>${bandChip(r.pctPlan)}${r.act ? `<span class="muted">→</span><span class="num">${pctTxt(r.pctNew)}</span>${bandChip(r.pctNew)}` : ''}</div>`
+    : `<div class="rp-flow"><span class="muted">Reports</span><span class="num">${money0(r.reportedPlan)}</span>${r.act ? `<span class="muted">→</span><span class="num">${money0(r.reportedNew)}</span>` : ''}<span class="faint small">no limit set</span></div>`;
+  const src = r.act ? `<div class="rp-src">${fromPlan > 0.5 ? `<span class="chip ok">${money0(fromPlan)} from your plan</span>` : ''}${r.moved > 0.5 ? `<span class="chip ok">${money0(r.moved)} moved earlier · same money</span>` : ''}${r.extraPre > 0.5 ? `<span class="chip hot">${money0(r.extraPre)} extra cash</span>` : ''}</div>` : '';
+  const notes = [];
+  if (r.tight && r.act) notes.push(`Closes ${r.closing === todayISO() ? 'today' : `in ${plural(daysBetween(todayISO(), r.closing), 'day')}`}: pay today so it posts in time.`);
+  if (r.min0) notes.push(`${r.act ? 'Includes' : 'Pay'} the ${money(r.min0.amount)} minimum due ${r.min0.due === todayISO() ? '<b>today</b>' : esc(shortDate(r.min0.due))}${r.min0.extra > 0.5 ? ` (${money0(r.min0.extra)} of it extra cash: your plan's next payment comes after the due date)` : ''}.`);
+  if (r.min1) notes.push(`Then pay at least ${money(r.min1.amount)} by ${esc(shortDate(r.min1.due))}${r.min1.estimated ? ' (estimated due date)' : ''}${r.min1.extra > 0.5 ? `, ${money0(r.min1.extra)} of it extra cash since the plan's payment moved earlier` : ', from your plan'}.`);
+  else if (r.acct.source === 'wallet' && r.reportedNew > 0.004) notes.push(`Then pay the statement in full by ${esc(shortDate(r.due.date))}${r.due.estimated ? ' (estimated)' : ''}.`);
+  if (r.closeEst) notes.push('Closing day estimated from the due day. Add the real one for exact timing.');
+  return `<div class="rp">
+    <div class="rp-head"><span class="rp-name">${esc(r.name)}${r.kind === 'charge' ? ' <span class="chip">charge</span>' : ''}${keep ? ' <span class="chip ok">keeps a small balance</span>' : ''}</span>
+      <span class="rp-when">closes ${esc(shortDate(r.closing))}${r.closeEst ? ' (est.)' : ''}</span></div>
+    ${act}${flow}${src}${notes.length ? `<div class="rp-note">${notes.join(' ')}</div>` : ''}
+  </div>`;
+}
+function timingHTML(sp, withApply) {
+  const changed = sp.pays.filter((p) => p.changed);
+  if (!changed.length) return '';
+  const label = (p) => (p.label === 'checklist' ? "Today's payday checklist" : p.label === 'lump' ? 'Day-1 lump sum' : `${fmtDate(p.date, { weekday: 'short', month: 'short', day: 'numeric' })} paycheck`);
+  return `<div class="ms-label" style="margin-top:16px">Same money, better timing</div>
+    <p class="small muted" style="margin:4px 0 0">Planned payments reshuffled so they land before statements close. Every card still gets the same total, and every minimum is still on time.</p>
+    ${changed.map((p) => {
+      const sent = r2(p.lines.reduce((t, l) => t + l.now, 0)), held = r2(p.total - sent);
+      return `<div class="timing"><div class="row between wrap" style="gap:4px 12px"><b>${esc(label(p))}</b><span class="num small muted">${money0(p.total)} planned</span></div>
+        ${p.lines.filter((l) => l.now > 0.004 || l.plan > 0.004).map((l) => `<div class="pc-line"><span>${esc(l.name)}</span><span class="num">${money0(l.now)}${Math.abs(l.now - l.plan) >= 0.5 ? ` <span class="faint">(plan ${money0(l.plan)})</span>` : ''}</span></div>`).join('')}
+        ${held > 0.5 ? `<div class="pc-line"><span class="muted">Keep in checking for the next payment</span><span class="num muted">${money0(held)}</span></div>` : ''}
+        ${withApply && p.label === 'checklist' ? `<button class="btn sm primary" style="margin-top:8px" data-act="cl-timing">${icon('check', 'sm')} Use this timing in my checklist</button>` : ''}</div>`;
+    }).join('')}`;
+}
+function plannerHTML(cx) {
+  const c = S.data.credit, sp = cx.view;
+  const utilRows = cx.accts.filter((a) => countsInUtil(a) && a.closeDay);
+  const goals = [['card', `Each card ≤${c.targetCard}%`], ['overall', `Overall ≤${c.targetOverall}%`], ['aze', 'All $0 but one']];
+  const t = sp.totals;
+  const goalNote = { card: `Every card reports ${c.targetCard}% of its limit or less.`, overall: `Every card ≤${c.targetCard}%, and overall ≤${c.targetOverall}%. The highest cards come down first.`,
+    aze: 'Every card reports $0 except one small balance. Some scoring models score this setup best; lenders see active, barely used credit.' }[sp.goal];
+  return `<div class="card" id="planner">
+    <div class="card-head"><h3>${icon('clock')} Pay before it reports</h3><span class="small muted">${sp.mode === 'month' ? 'pre-approval plan' : 'next statements'}</span></div>
+    <p class="small muted" style="margin-top:0">Card issuers usually send your balance to the credit bureaus on the <b style="color:var(--text)">statement closing date</b>, not the due date. Pay before a statement closes and a lower balance gets reported. The minimum is still due by the due date.</p>
+    <div class="seg" style="margin-bottom:10px"><button type="button" data-act="credit-mode" data-v="next" class="${sp.mode === 'next' ? 'on' : ''}">Next statements</button><button type="button" data-act="credit-mode" data-v="month" class="${sp.mode === 'month' ? 'on' : ''}">Pre-approval month</button></div>
+    ${sp.mode === 'month' ? `<label class="field"><span>Get pre-approved in</span><select class="input" data-bind="credit.preMonth">${monthOptions(sp.month, 18)}</select></label>
+      <p class="hint">Plans that month's statements, so they report low right before a lender pulls your credit.${cx.best ? ` Suggested: <b>${esc(monthLabel(cx.best.month))}</b>.` : ''}</p>` : ''}
+    <div class="seg" style="margin-bottom:6px">${goals.map(([k, l]) => `<button type="button" data-act="credit-goal" data-v="${k}" class="${sp.goal === k ? 'on' : ''}">${esc(l)}</button>`).join('')}</div>
+    <p class="hint" style="margin:6px 0 10px">${esc(goalNote)}</p>
+    ${sp.goal === 'aze' ? `<div class="grid-2">
+      <label class="field"><span>Card that keeps a balance</span><select class="input" data-bind="credit.azeKeepId"><option value="">Auto (biggest limit)</option>${utilRows.map((a) => `<option value="${esc(a.id)}" ${a.id === c.azeKeepId ? 'selected' : ''}>${esc(a.name)}</option>`).join('')}</select></label>
+      <label class="field"><span>Small balance</span><div class="prefix"><b>${cur()}</b><input class="input num" type="number" inputmode="decimal" min="0" step="1" data-bind="credit.azeAmount" value="${c.azeAmount == null ? '' : c.azeAmount}" placeholder="${sp.keepAmount != null ? r2(sp.keepAmount) : 'Auto'}"></div></label></div>` : ''}
+    <details style="margin-bottom:6px"><summary class="row between small" style="cursor:pointer;min-height:36px;color:var(--muted)"><span>Targets &amp; timing</span>${icon('chev', 'sm')}</summary>
+      <div class="grid-2" style="margin-top:8px">
+        <label class="field"><span>Per-card target</span><div class="suffix"><input class="input num" type="number" inputmode="decimal" min="0" max="100" step="1" data-bind="credit.targetCard" value="${c.targetCard}"><b>%</b></div></label>
+        <label class="field"><span>Overall target</span><div class="suffix"><input class="input num" type="number" inputmode="decimal" min="0" max="100" step="1" data-bind="credit.targetOverall" value="${c.targetOverall}"><b>%</b></div></label></div>
+      <label class="field"><span>Pay this many days before closing</span><div class="suffix"><input class="input num" type="number" inputmode="numeric" min="0" max="10" step="1" data-bind="credit.leadDays" value="${c.leadDays}" style="padding-right:56px"><b>days</b></div></label>
+      <p class="hint">Payments can take a couple of business days to post. Paying early makes sure the lower balance is the one on the statement.</p>
+    </details>
+    ${!sp.rows.length ? `<p class="small muted" style="margin:6px 0 0">${cx.accts.some((a) => a.kind !== 'loan') ? (sp.mode === 'month' ? 'No statements left to plan in that month.' : 'Add a statement closing day to your cards to plan payments.') : 'Add your credit cards (in Debts or in your Cards wallet) with their limits and closing days.'}</p>` : `
+    <div class="grid-2" style="margin:6px 0 4px">
+      <div class="stat"><div class="k">Pay before statements close</div><div class="v" style="color:${t.need > 0 ? 'var(--accent)' : 'var(--text)'}">${money0(t.need)}</div></div>
+      <div class="stat"><div class="k">Extra cash before closing</div><div class="v" style="color:${t.extraPre > 0.5 ? 'var(--warn)' : 'var(--text)'}">${money0(t.extraPre)}</div><div class="small muted">${t.extraMin > 0.5 ? `+ ${money0(t.extraMin)} for minimums due later` : t.moved > 0.5 ? `${money0(t.moved)} just moved earlier` : 'beyond your plan'}</div></div>
+    </div>
+    ${sp.overall ? `<div class="rp-flow" style="margin:10px 0 4px"><span class="muted">Overall reports</span><span class="num">${pctTxt(sp.overall.planPct)}</span>${bandChip(sp.overall.planPct)}${Math.abs(sp.overall.planPct - sp.overall.newPct) > 0.05 ? `<span class="muted">→</span><span class="num">${pctTxt(sp.overall.newPct)}</span>${bandChip(sp.overall.newPct)}` : ''}</div>` : ''}
+    ${sp.allZero ? '<div class="alert" style="margin:10px 0 0">Every card would report $0. Some scoring models treat "no balance at all" as slightly worse than one small balance, so let one card report a few dollars.</div>' : ''}
+    ${sp.overallShort > 0.5 ? `<div class="alert" style="margin:10px 0 0">Even paying these cards to $0 leaves overall above ${c.targetOverall}%: ${money0(sp.overallShort)} sits on cards without a closing day.</div>` : ''}
+    <div style="margin-top:8px">${sp.rows.map((r) => plannerRowHTML(r, sp)).join('')}</div>
+    ${timingHTML(sp, sp.mode === 'next')}
+    ${sp.skipped.filter((x) => x.why === 'closed').length ? `<p class="small faint" style="margin:10px 0 0">Already closed in ${esc(monthLabel(sp.month))}: ${sp.skipped.filter((x) => x.why === 'closed').map((x) => esc(x.name)).join(', ')}.</p>` : ''}`}
+    <p class="disclaimer">Estimates from your plan, balances${S.data.budget.cardSpending > 0 || cx.accts.some((a) => a.monthlySpend) ? ' and card spending' : ''}. Issuers report on their own schedule and scoring models weigh things differently, so the outcome isn't guaranteed. Always pay at least the minimum by the due date.</p>
+  </div>`;
+}
+function cardUtilHTML(cx) {
+  const rows = cx.util.rows;
+  if (!rows.length) return '';
+  const nx = Object.fromEntries(cx.next.rows.map((r) => [r.id, r]));
+  const charge = rows.filter((r) => r.kind === 'charge');
+  return `<div class="card"><div class="card-head"><h3>${icon('card')} By card</h3><span class="small muted">today · ▮ next statement</span></div>
+    ${rows.map((r) => {
+      const n = nx[r.id];
+      const flag = r.overLimit ? '<span class="chip bad">over limit</span>' : r.nearLimit ? '<span class="chip bad">near limit</span>' : r.include && r.over30 ? '<span class="chip hot">30%+ on its own</span>' : '';
+      return `<div class="ur">
+        <div class="row between" style="align-items:flex-start"><b class="ur-name">${esc(r.name)}</b><span class="num" style="color:${r.pct == null ? 'var(--muted)' : bandColor(r.pct)}">${pctTxt(r.pct)}</span></div>
+        <div class="chips" style="margin:6px 0 0">${r.pct != null ? bandChip(r.pct) : ''}${r.kind === 'charge' ? `<span class="chip">charge card${r.include ? '' : ' · not counted'}</span>` : ''}${r.source === 'wallet' ? '<span class="chip">wallet</span>' : ''}${flag}</div>
+        ${r.limit ? utilMeter(r.pct, n && n.pctPlan != null ? n.pctPlan : null) : ''}
+        <div class="util-line"><span>${money0(r.balance)} of ${r.limit ? money0(r.limit) : 'no limit'}</span><span>${n ? `${esc(shortDate(n.closing))} statement: ${n.limit ? pctTxt(n.pctPlan) : money0(n.reportedPlan)}` : r.closeDay ? '' : '<button class="link-btn small" data-act="edit-acct" data-id="' + esc(r.id) + '">add closing day</button>'}</span></div>
+      </div>`;
+    }).join('')}
+    <div class="ms-label" style="margin-top:14px">What the bands mean</div>
+    <div class="bands-key">${UTIL_BANDS.map((b) => `<div><span class="band ${b.key}"><i></i>${esc(b.range)}</span><span>${esc(b.label)}. ${esc(b.meaning)}</span></div>`).join('')}</div>
+    ${charge.length ? `<div class="alert" style="margin:14px 0 0">${icon('info', 'sm')} <b>Charge cards</b> may be treated differently than revolving cards: some scoring models leave them out of utilization, others count the balance.
+      ${charge.map((r) => `<div class="row between wrap" style="margin-top:8px;gap:6px"><span>${esc(r.name)}: ${r.include ? 'counted (the cautious view)' : 'left out'}</span><button class="btn sm" data-act="toggle-charge" data-id="${esc(r.id)}">${r.include ? 'Leave it out' : 'Count it'}</button></div>`).join('')}</div>` : ''}
+  </div>`;
+}
+/** Reported utilization over the next 12 statements: band backgrounds, overall + each card, band crossings marked. */
+function utilChart(id, p) {
+  const palette = ['var(--s-hysa)', 'var(--s-debt)', 'var(--s-total)', 'var(--b-custom)', 'var(--s-invest)', 'var(--muted)'];
+  const series = [{ label: 'Overall', color: 'var(--text)', width: 3, dots: true, points: [{ date: p.today, v: p.start }, ...p.overall.map((o) => ({ date: o.date, v: o.pct }))] },
+    ...p.cards.filter((c) => c.points).map((c, i) => ({ label: c.name, color: palette[i % palette.length], width: 1.5, points: [{ date: p.today, v: (c.balance / c.limit) * 100 }, ...c.points.map((x) => ({ date: x.date, v: x.pct }))] }))];
+  const all = series.flatMap((s) => s.points);
+  const t0 = parseISO(p.today).getTime(), t1 = Math.max(t0 + 86400000 * 30, ...all.map((q) => parseISO(q.date).getTime()));
+  const top = Math.max(60, Math.ceil(Math.max(...all.map((q) => q.v)) / 10) * 10);
+  const W = 340, H = 210, L = 36, R = 10, T = 10, B = 22;
+  const x = (iso) => L + ((parseISO(iso).getTime() - t0) / (t1 - t0)) * (W - L - R);
+  const y = (v) => T + ((top - Math.min(top, Math.max(0, v))) / top) * (H - T - B);
+  const bands = [[0, 10, 'excellent'], [10, 30, 'good'], [30, 50, 'fair'], [50, top, 'high']]
+    .map(([lo, hi, k]) => `<rect x="${L}" y="${y(hi).toFixed(1)}" width="${W - L - R}" height="${(y(lo) - y(hi)).toFixed(1)}" fill="var(--band-${k})" opacity=".07"/>`).join('');
+  const grid = [0, 10, 30, 50, top].map((g) => `<line x1="${L}" x2="${W - R}" y1="${y(g).toFixed(1)}" y2="${y(g).toFixed(1)}" stroke="var(--line)"/><text x="${L - 6}" y="${(y(g) + 4).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--faint)" font-family="DM Mono, monospace">${g}%</text>`).join('');
+  const marks = p.crossings.filter((c) => c.date).map((c) => `<line x1="${x(c.date).toFixed(1)}" x2="${x(c.date).toFixed(1)}" y1="${T}" y2="${H - B}" stroke="var(--band-${utilBand(c.t - 0.01).key})" stroke-dasharray="3 3" opacity=".8"/>
+    <text x="${Math.min(W - R - 2, x(c.date) + 3).toFixed(1)}" y="${(y(c.t) - 4).toFixed(1)}" font-size="10" fill="var(--band-${utilBand(c.t - 0.01).key})" font-family="DM Mono, monospace" text-anchor="${x(c.date) > W - 60 ? 'end' : 'start'}">&lt;${c.t}%</text>`).join('');
+  const paths = series.slice().reverse().map((s) => `<path d="${s.points.map((q, i) => `${i ? 'L' : 'M'}${x(q.date).toFixed(1)},${y(q.v).toFixed(1)}`).join('')}" fill="none" stroke="${s.color}" stroke-width="${s.width}" stroke-linejoin="round" stroke-linecap="round"/>${s.dots ? s.points.map((q) => `<circle cx="${x(q.date).toFixed(1)}" cy="${y(q.v).toFixed(1)}" r="2.6" fill="${s.color}"/>`).join('') : ''}`).join('');
+  CHARTS[id] = { series, x, t0, t1, W, L, R, fmt: (v) => `${toNum(v).toFixed(1)}%` };
+  const legend = `<div class="legend">${series.map((s) => `<span><i style="border-color:${s.color};border-top-width:${s.width > 2 ? 3 : 2}px"></i>${esc(s.label)}</span>`).join('')}</div>`;
+  return `${legend}<div class="chart-wrap" data-chart="${id}"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Projected reported utilization for the next 12 statements, overall and by card">
+    ${bands}${grid}
+    <text x="${L}" y="${H - 6}" font-size="10" fill="var(--faint)" font-family="DM Mono, monospace">Today</text>
+    <text x="${W - R}" y="${H - 6}" font-size="10" fill="var(--faint)" font-family="DM Mono, monospace" text-anchor="end">${esc(fmtMonth(toISO(new Date(t1))))}</text>
+    ${marks}${paths}
+    <line class="cx hidden" y1="${T}" y2="${H - B}" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 3"/>
+    <rect class="hit" x="${L}" y="0" width="${W - L - R}" height="${H}" fill="transparent"/>
+  </svg><div class="tip hidden"></div></div>`;
+}
+function utilProjectionHTML(cx) {
+  const p = cx.proj;
+  if (!p) return '';
+  const spend = S.data.budget.cardSpending > 0 || cx.accts.some((a) => a.monthlySpend);
+  return `<div class="card"><div class="card-head"><h3>${icon('trend')} Next 12 months</h3><span class="small muted">Plan ${S.data.activePlan}</span></div>
+    ${utilChart('utilproj', p)}
+    <div class="chips" style="margin-bottom:0">${p.crossings.map((c) => (c.already ? `<span class="chip ok">Under ${c.t}% now</span>` : c.date ? `<span class="chip ok">Under ${c.t}% · ${esc(fmtMonth(c.date))}</span>` : `<span class="chip">Under ${c.t}% · not within 12 months</span>`)).join('')}</div>
+    ${p.cards.filter((c) => c.points && (c.balance / c.limit) * 100 >= 30).length ? `<table class="mini-table"><colgroup><col style="width:58%"><col></colgroup><thead><tr><th>Card</th><th>Reports under 30%</th></tr></thead><tbody>
+      ${p.cards.filter((c) => c.points && (c.balance / c.limit) * 100 >= 30).map((c) => `<tr><td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.name)}</td><td>${c.under30 ? esc(fmtMonth(c.under30)) : '—'}</td></tr>`).join('')}</tbody></table>` : ''}
+    <p class="small faint" style="margin:10px 0 0">What each statement should report on your debt plan${spend ? ', with your card spending added each month' : ''}. Overall is plotted once every card's statement for that month has closed.${p.undated.length ? ` ${p.undated.map(esc).join(', ')}: no closing day, so today's balance is used.` : ''}</p>
+  </div>`;
+}
+function scoresHTML() {
+  const sc = S.data.credit.scores, ls = latestScore(S.data), target = toNum(S.data.home.creditTarget);
+  let chart = '';
+  if (sc.length >= 2) {
+    const palette = ['var(--s-nw)', 'var(--s-hysa)', 'var(--s-total)', 'var(--b-custom)', 'var(--s-debt)'];
+    const models = [...new Set(sc.map((x) => x.model))];
+    const vals = sc.map((x) => x.score);
+    chart = lineChart('scores', models.map((m, i) => ({ label: m, color: palette[i % palette.length], dots: true, points: sc.filter((x) => x.model === m).map((x) => ({ date: x.date, v: x.score })) })),
+      { yMin: Math.max(250, Math.floor((Math.min(...vals, target || 900) - 20) / 50) * 50), yMax: Math.min(900, Math.ceil((Math.max(...vals) + 20) / 50) * 50), fmt: (v) => String(Math.round(v)), aria: 'Logged credit scores over time' });
+  }
+  return `<div class="card"><div class="card-head"><h3>${icon('chart')} Score log</h3><button class="btn sm" data-act="add-score">${icon('plus', 'sm')} Log score</button></div>
+    ${ls ? `<div class="row between wrap" style="align-items:flex-end;gap:8px 16px;margin-bottom:10px">
+      <div><div class="score-big num" style="font-family:var(--font-head)">${ls.score}</div><div class="small muted">${ls.logged ? `${esc(ls.model)}${ls.source ? ` · ${esc(ls.source)}` : ''} · ${esc(fmtDate(ls.date))}` : 'Entered in Home buying'}</div></div>
+      ${target > 0 ? `<div style="text-align:right;margin-left:auto"><div class="eyebrow">Target</div><div class="num" style="font-size:20px">${target}</div><div class="small ${ls.score >= target ? '' : 'muted'}" style="${ls.score >= target ? 'color:var(--accent)' : ''}">${ls.score >= target ? 'At or above target' : `${target - ls.score} points to go`}</div></div>` : ''}</div>`
+      : '<p class="small muted" style="margin-top:0">Log a score whenever you check one (your bank app, a card issuer, a bureau). Tracking the same model over time shows the trend.</p>'}
+    ${chart}
+    ${sc.length ? `<ul class="list" style="margin-top:6px">${sc.slice().reverse().slice(0, 8).map((x) => `<li class="li tap" data-act="edit-score" data-id="${esc(x.id)}" role="button" tabindex="0"><span class="l-ico">${icon('gauge')}</span>
+      <div class="l-main"><b>${x.score} · ${esc(x.model)}</b><span>${esc(fmtDate(x.date))}${x.source ? ` · ${esc(x.source)}` : ''}</span></div><div class="l-end">${icon('chev', 'sm')}</div></li>`).join('')}</ul>` : ''}
+    <p class="small faint" style="margin:8px 0 0">Scores differ by model and bureau, so compare like with like. Money HQ never predicts a score.</p>
+  </div>`;
+}
+function factorsHTML(cx) {
+  const label = { helps: 'Likely helps', watch: 'Worth watching', hurts: 'Likely hurts', unknown: 'Add data' };
+  return `<div class="group-label"><span>What's shaping your score</span></div>
+    <div class="factors">${cx.factors.map((f) => `<div class="card factor"><div class="f-top"><b>${esc(f.title)}</b><span class="pill ${f.status}">${label[f.status]}</span></div>
+      <div class="f-val">${esc(f.value)}</div><p>${esc(f.text)}</p></div>`).join('')}</div>`;
+}
+function inquiriesHTML() {
+  const today = todayISO(), list = S.data.credit.inquiries;
+  const chip = (st) => (st.phase === 'active' ? `<span class="chip hot">counts until ${esc(fmtMonth(st.affectsUntil))}</span>` : st.phase === 'fading' ? `<span class="chip">no longer counts · listed until ${esc(fmtMonth(st.fallsOff))}</span>` : '<span class="chip ok">off your report</span>');
+  return `<div class="card"><div class="card-head"><h3>${icon('list')} Hard inquiries</h3><button class="btn sm" data-act="add-inquiry">${icon('plus', 'sm')} Log</button></div>
+    ${list.length ? `<ul class="list">${list.map((i) => { const st = inquiryStatus(i, today); return `<li class="li tap" data-act="edit-inquiry" data-id="${esc(i.id)}" role="button" tabindex="0" style="${st.phase === 'gone' ? 'opacity:.6' : ''}"><span class="l-ico">${icon('user')}</span>
+      <div class="l-main"><b>${esc(i.lender || 'Inquiry')}</b><span>${esc(INQUIRY_TYPES[i.type])} · ${esc(fmtDate(i.date))}</span><div class="chips" style="margin:6px 0 0">${chip(st)}</div></div><div class="l-end">${icon('chev', 'sm')}</div></li>`; }).join('')}</ul>`
+      : '<p class="small muted" style="margin:0">None logged. A hard inquiry happens when you apply for credit. Log each one to see when it stops affecting your score (about 12 months) and falls off your report (about 24).</p>'}
+  </div>`;
+}
+function mortgageTimingHTML(cx) {
+  const mw = cx.mw;
+  const ic = { hurts: 'alert', warn: 'alert', info: 'info' };
+  return `<div class="card"><div class="card-head"><h3>${icon('house')} Before you apply</h3>${mw.set && mw.inWindow ? '<span class="pill watch">In the 6-month window</span>' : ''}</div>
+    <label class="field"><span>Planned mortgage application</span><select class="input" data-bind="credit.mortgageMonth">${monthOptions(S.data.credit.mortgageMonth, 36, todayISO().slice(0, 7), 'Not planned yet')}</select></label>
+    ${!mw.set ? '<p class="small muted" style="margin:0">Pick a month to see what to avoid in the 6 months before it: new accounts, credit applications and closing old cards.</p>'
+      : mw.past ? '<p class="small muted" style="margin:0">That month has passed. Pick a new one if you haven\'t applied yet.</p>'
+      : `<p class="small muted" style="margin:0 0 6px">${mw.inWindow ? `You're inside the 6 months before ${esc(fmtMonth(mw.app))}. Lenders look closely at anything new.` : `The careful window starts ${esc(fmtMonth(mw.start))}. Until then, the same advice still applies.`}</p>
+        <ul class="warn-list">${mw.list.map((w) => `<li class="${w.level}">${icon(ic[w.level], 'sm')}<span>${esc(w.text)}</span></li>`).join('')}</ul>`}
+    ${cx.best ? `<div class="alert good" style="margin:12px 0 0">${icon('target', 'sm')} Best month to get pre-approved: <b>${esc(monthLabel(cx.best.month))}</b>, after ${esc(shortDate(cx.best.after))}. ${esc(bestWhy(cx.best))}</div>` : ''}
+  </div>`;
+}
+function bestWhy(b) {
+  return `Utilization should report ${b.pct.toFixed(1)}% (${b.band.label.toLowerCase()})${b.inq12 ? `, with ${inquiriesTxt(b.inq12)} in the year before` : ' with no inquiries in the year before'}${b.new6 ? ` and ${plural(b.new6, 'new account')} in the 6 months before` : ''}.`;
+}
+function renderCredit() {
+  const el = $('#view-credit');
+  const cx = creditCtx();
+  const cards = cx.accts.filter((a) => a.kind !== 'loan');
+  const head = `<div class="page-head"><div><div class="eyebrow">Credit score builder</div><h2 class="section-title" style="margin:6px 0 0">Credit <em>health</em></h2></div>
+    <button class="btn sm" data-act="add-inquiry">${icon('plus', 'sm')} Inquiry</button></div>`;
+  if (!cards.length) {
+    el.innerHTML = head + emptyCard('gauge', 'Build your <span style="color:var(--accent)">credit plan</span>', 'Add your credit cards with their limits and statement closing days. Money HQ shows your utilization and tells you what to pay before each statement closes.',
+      `<button class="btn primary block" data-act="add-debt">${icon('plus')} Add a card you owe on</button><button class="btn block" data-act="goto" data-tab="cards">Add a card from your wallet</button>`) + scoresHTML() + inquiriesHTML() + mortgageTimingHTML(cx);
+    return;
+  }
+  el.innerHTML = `${head}${creditHeroHTML(cx)}${creditFlagsHTML(cx)}${plannerHTML(cx)}${cardUtilHTML(cx)}${utilProjectionHTML(cx)}${scoresHTML()}${factorsHTML(cx)}${inquiriesHTML()}${mortgageTimingHTML(cx)}
+    <p class="disclaimer">Educational estimates, not credit or lending advice. Credit scores come from models Money HQ can't see; this screen shows the direction your data points, never a predicted score.</p>`;
+  const pl = $('#planner details');
+  if (pl) { pl.open = !!S.plannerOpen; pl.addEventListener('toggle', () => { S.plannerOpen = pl.open; }); }
+}
+function scoreForm(x) {
+  const isNew = !x;
+  x = x || { date: todayISO(), score: '', model: (S.data.credit.scores[S.data.credit.scores.length - 1] || {}).model || 'FICO 8', source: (S.data.credit.scores[S.data.credit.scores.length - 1] || {}).source || '' };
+  openSheet(`<h2>${isNew ? 'Log a score' : 'Edit score'}</h2>
+    <form id="scoreForm">
+      <div class="grid-2"><label class="field"><span>Score</span><input class="input num" name="score" type="number" inputmode="numeric" min="300" max="900" step="1" required value="${esc(x.score)}" placeholder="e.g. 700"></label>
+        <label class="field"><span>Date</span><input class="input num" name="date" type="date" required value="${esc(x.date)}"></label></div>
+      <label class="field"><span>Model</span><select class="input" name="model">${[...new Set([...SCORE_MODELS, x.model])].map((m) => `<option ${m === x.model ? 'selected' : ''}>${esc(m)}</option>`).join('')}</select></label>
+      <label class="field"><span>Source</span><input class="input" name="source" maxlength="60" value="${esc(x.source)}" placeholder="e.g. card issuer app, Experian"></label>
+      <p class="hint">Mortgage lenders usually use FICO 2, 4 and 5 (one per bureau). Apps often show FICO 8 or VantageScore, which can differ.</p>
+      <div class="sheet-actions"><button type="button" class="btn" data-close>Cancel</button><button type="submit" class="btn primary">${isNew ? 'Log it' : 'Save'}</button></div>
+      ${isNew ? '' : `<button type="button" class="btn danger block" style="margin-top:12px" data-act="delete-score" data-id="${esc(x.id)}">${icon('trash', 'sm')} Delete</button>`}
+    </form>`, (root) => {
+    const f = $('#scoreForm', root);
+    f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const score = Math.round(toNum(f.score.value));
+      if (!(score >= 300 && score <= 900)) { alert('Enter a score between 300 and 900.'); return; }
+      const vals = { date: parseISO(f.date.value) ? f.date.value : todayISO(), score, model: f.model.value, source: f.source.value.trim().slice(0, 60) };
+      if (isNew) S.data.credit.scores.push(Object.assign({ id: uid() }, vals)); else Object.assign(S.data.credit.scores.find((y) => y.id === x.id) || {}, vals);
+      S.data.credit.scores.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+      S.data.home.creditScore = S.data.credit.scores[S.data.credit.scores.length - 1].score;   // Home buying reads it too
+      closeSheet(); commit(); toast(isNew ? 'SCORE LOGGED' : 'SAVED', `${score} · ${vals.model}`, 'info');
+    });
+  });
+}
+function inquiryForm(x) {
+  const isNew = !x;
+  x = x || { date: todayISO(), lender: '', type: 'card', note: '' };
+  openSheet(`<h2>${isNew ? 'Log a hard inquiry' : 'Edit inquiry'}</h2>
+    <form id="inqForm">
+      <label class="field"><span>Lender</span><input class="input" name="lender" maxlength="60" value="${esc(x.lender)}" placeholder="e.g. Chase, a car dealer"></label>
+      <div class="grid-2"><label class="field"><span>Date</span><input class="input num" name="date" type="date" required value="${esc(x.date)}"></label>
+        <label class="field"><span>For</span><select class="input" name="type">${Object.entries(INQUIRY_TYPES).map(([k, l]) => `<option value="${k}" ${k === x.type ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></label></div>
+      <label class="field"><span>Note <span class="faint">(optional)</span></span><input class="input" name="note" maxlength="120" value="${esc(x.note || '')}"></label>
+      <p class="hint">An inquiry usually affects scores for about 12 months and stays on your report for about 24. Checking your own score is a soft inquiry and never counts.</p>
+      <div class="sheet-actions"><button type="button" class="btn" data-close>Cancel</button><button type="submit" class="btn primary">${isNew ? 'Log it' : 'Save'}</button></div>
+      ${isNew ? '' : `<button type="button" class="btn danger block" style="margin-top:12px" data-act="delete-inquiry" data-id="${esc(x.id)}">${icon('trash', 'sm')} Delete</button>`}
+    </form>`, (root) => {
+    const f = $('#inqForm', root);
+    f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const vals = { date: parseISO(f.date.value) ? f.date.value : todayISO(), lender: f.lender.value.trim().slice(0, 60), type: INQUIRY_TYPES[f.type.value] ? f.type.value : 'other', note: f.note.value.trim().slice(0, 120) };
+      if (isNew) S.data.credit.inquiries.push(Object.assign({ id: uid() }, vals)); else Object.assign(S.data.credit.inquiries.find((y) => y.id === x.id) || {}, vals);
+      S.data.credit.inquiries.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+      const st = inquiryStatus(vals, todayISO());
+      closeSheet(); commit(); toast(isNew ? 'INQUIRY LOGGED' : 'SAVED', st.phase === 'active' ? `Counts until about ${fmtMonth(st.affectsUntil)}` : st.phase === 'fading' ? 'Likely no longer counts' : 'Already off your report', 'info');
+    });
+  });
+}
+/** Credit readiness row and rate-by-score table for Home buying. */
+function creditReadinessHTML() {
+  const cx = creditCtx(), h = S.data.home, ls = latestScore(S.data), today = todayISO();
+  const active = S.data.credit.inquiries.filter((i) => inquiryStatus(i, today).phase === 'active').length;
+  const o = cx.util.overall, b = cx.best;
+  const row = (ic, title, sub, end) => `<li class="li"><span class="l-ico">${icon(ic)}</span><div class="l-main"><b style="white-space:normal">${title}</b><span style="white-space:normal">${sub}</span></div><div class="l-end">${end}</div></li>`;
+  return `<div class="card"><div class="card-head"><h3>${icon('gauge')} Credit readiness</h3><button class="btn sm ghost" data-act="goto" data-tab="credit">Credit plan ${icon('chev', 'sm')}</button></div>
+    <ul class="list">
+      ${row('user', `Score ${ls ? ls.score : '—'} <span class="faint" style="font-weight:400">· target ${toNum(h.creditTarget)}</span>`, ls ? `${ls.score >= toNum(h.creditTarget) ? 'At or above your target' : `${toNum(h.creditTarget) - ls.score} points below your target`}${ls.logged ? ` · ${esc(ls.model)}, ${esc(shortDate(ls.date))}` : ''}` : 'Log a score in Credit', ls && ls.score >= toNum(h.creditTarget) ? `<span style="color:var(--accent)">${icon('check', 'sm')}</span>` : '')}
+      ${row('card', `Utilization ${o ? pctTxt(o.pct) : '—'}`, o ? `${esc(o.band.label)} today${b ? ` · ${pctTxt(b.pct)} projected by ${esc(monthLabel(b.month, { month: 'short', year: 'numeric' }))}` : ''}` : 'Add limits to your cards', o ? bandChip(b ? b.pct : o.pct) : '')}
+      ${row('list', `${inquiriesTxt(active, 'hard ')} counting`, active ? 'Each likely hurts a little for about 12 months' : 'None in the last 12 months', '')}
+      ${b ? row('target', `Get pre-approved: ${esc(monthLabel(b.month))}`, `After ${esc(shortDate(b.after))}. ${esc(bestWhy(b))}`, '') : ''}
+    </ul>
+    <div class="grid-2" style="margin-top:12px">${homeField('Target score', 'creditTarget', h.creditTarget, { plain: true })}${homeField('Debt-to-income target', 'dtiTarget', h.dtiTarget, { pct: true })}</div>
+    ${S.data.credit.scores.length ? `<button class="btn sm block" data-act="add-score">${icon('plus', 'sm')} Log a new score</button>` : homeField('Your credit score', 'creditScore', h.creditScore, { plain: true })}
+  </div>`;
+}
+function rateTiersHTML() {
+  const h = S.data.home, price = toNum(h.priceMin), ls = latestScore(S.data);
+  const rows = rateTierTable(h, price), me = ls ? tierFor(ls.score, rows) : null, jump = ls && price > 0 ? tierJump(h, price, ls.score) : null;
+  const signed = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${money0(Math.abs(v))}`;
+  let msg = '';
+  if (!(price > 0)) msg = 'Set a target price above to see payments by tier.';
+  else if (!rows.some((t) => t.rate != null)) msg = 'Enter the rates a lender quotes for each score range. They\'re blank on purpose: Money HQ never assumes a rate.';
+  else if (jump && jump.to && jump.piDiff != null) msg = `Moving up from ${esc(jump.from.label)} to <b>${esc(jump.to.label)}</b> (${plural(jump.pointsToGo, 'point')}) changes your payment by <b>${signed(jump.piDiff)}/mo</b> and total interest by <b>${signed(jump.interestDiff)}</b> over ${h.termYears} years at ${money0(price)}.`;
+  else if (jump && !jump.to) msg = 'You\'re in the top tier already.';
+  else if (ls) msg = `Fill in the rate for your tier${jump && jump.to ? ` and ${esc(jump.to.label)}` : ''} to compare.`;
+  else msg = 'Log a score to see which tier you\'re in.';
+  return `<div class="card"><div class="card-head"><h3>${icon('trend')} Rate by credit score</h3><span class="small muted">${price > 0 ? `at ${money0(price)} · ${h.downPct}% down` : ''}</span></div>
+    <table class="mini-table tier-table"><colgroup><col style="width:23%"><col style="width:31%"><col><col></colgroup>
+      <thead><tr><th>Score</th><th>Rate</th><th>P&amp;I /mo</th><th>Interest</th></tr></thead>
+      <tbody>${rows.map((t, i) => `<tr class="${me && me.min === t.min ? 'me' : ''}"><td>${esc(t.label)}${me && me.min === t.min ? ' ◀' : ''}</td>
+        <td><div class="suffix"><input class="input num" type="number" inputmode="decimal" min="0" step="0.125" data-tier="${i}" value="${t.rate == null ? '' : t.rate}" placeholder="—" aria-label="Rate for ${esc(t.label)}"><b>%</b></div></td>
+        <td>${t.pi == null ? '—' : money0(t.pi)}</td><td>${t.totalInterest == null ? '—' : moneyK(t.totalInterest)}</td></tr>`).join('')}</tbody></table>
+    <p class="small muted" style="margin:10px 0 0">${msg}</p>
+    <p class="small faint" style="margin:6px 0 0">Principal and interest only. Tax, insurance and PMI (which can also depend on your score) come on top.</p>
+  </div>`;
+}
+
 /* ---------- calendar export ---------- */
 function icsEscape(s) { return String(s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n'); }
 /** Fold lines at 75 octets (RFC 5545) without splitting multi-byte characters. */
@@ -4226,6 +5373,16 @@ function buildICS() {
       `Minimum ${money(d.minPayment)}.${po ? ` Planned payoff: ${fmtMonth(po.date)}.` : ''}\nCheck Money HQ for this month's planned amount.\n${SITE_URL}`,
       `FREQ=MONTHLY;${monthDayRule(d.dueDay)}${until}`, 2);
   }
+  // statement closing days, and "pay before it reports" reminders for the next statements
+  const cx = creditCtx();
+  for (const a of cx.accts.filter((x) => x.kind !== 'loan' && x.closingDay)) {
+    add(`close-${a.id}`, nextClosing(a.closingDay, todayISO()), `🧾 ${a.name} statement closes`, `The balance on this day is what usually gets reported to the credit bureaus. Pay before it to report less.\n${SITE_URL}`, `FREQ=MONTHLY;${monthDayRule(a.closingDay)}`, 3);
+  }
+  for (const r of cx.next.rows.filter((x) => x.act)) {
+    const parts = [r.planBefore > 0.5 ? `${money0(Math.min(r.planBefore, r.need))} from your plan` : '', r.moved > 0.5 ? `${money0(r.moved)} moved earlier` : '', r.extraPre > 0.5 ? `${money0(r.extraPre)} extra cash` : ''].filter(Boolean).join(' + ');
+    add(`report-${r.id}-${r.closing}`, r.payBy, `💳 Pay ${money0(r.need)} to ${r.name} by ${shortDate(r.payBy)} (statement closes ${shortDate(r.closing)})`,
+      `Pay before the statement closes so a lower balance gets reported${r.limit ? ` (${pctTxt(r.pctNew)} of the limit)` : ''}.${parts ? ` ${parts}.` : ''}${r.min1 ? ` Then pay at least ${money(r.min1.amount)} by ${shortDate(r.min1.due)}.` : ''}\n${SITE_URL}`, null, 1);
+  }
   for (const x of activeSubs(S.data.subscriptions)) {
     const rule = { weekly: 'FREQ=WEEKLY', monthly: 'FREQ=MONTHLY;' + monthDayRule(x.anchorDay), quarterly: 'FREQ=MONTHLY;INTERVAL=3;' + monthDayRule(x.anchorDay), yearly: 'FREQ=YEARLY' }[x.cycle];
     const card = S.data.debts.find((d) => d.id === x.cardId);
@@ -4269,17 +5426,20 @@ function closeSheet() {
 
 function debtForm(d) {
   const isNew = !d;
-  d = d || { name: '', type: 'card', balance: '', startBalance: '', apr: '', minPayment: '', promoEnd: '', creditLimit: null, keepOpen: 0, dueDay: null };
+  d = d || { name: '', type: 'card', balance: '', startBalance: '', apr: '', minPayment: '', promoEnd: '', creditLimit: null, keepOpen: 0, dueDay: null, closingDay: null, cardKind: 'revolving', openDate: '', utilInclude: true, monthlySpend: null };
+  const kind = d.type === 'loan' ? 'loan' : d.cardKind === 'charge' ? 'charge' : 'card';
   const v = (x) => (x === '' || x === null || x === undefined || x === 0 ? '' : esc(x));
   openSheet(`
     <h2 style="margin-bottom:14px">${isNew ? 'Add a debt' : 'Edit debt'}</h2>
     <form id="debtForm">
       <label class="field"><span>Name</span><input class="input" name="name" required maxlength="60" value="${esc(d.name)}" placeholder="e.g. Travel card"></label>
-      <div class="seg" style="margin-bottom:12px">
-        <button type="button" data-type="card" class="${d.type !== 'loan' ? 'on' : ''}">Card</button>
-        <button type="button" data-type="loan" class="${d.type === 'loan' ? 'on' : ''}">Loan</button>
+      <div class="seg" style="margin-bottom:12px" role="group" aria-label="Account type">
+        <button type="button" data-type="card" class="${kind === 'card' ? 'on' : ''}">Credit card</button>
+        <button type="button" data-type="charge" class="${kind === 'charge' ? 'on' : ''}">Charge card</button>
+        <button type="button" data-type="loan" class="${kind === 'loan' ? 'on' : ''}">Loan</button>
       </div>
       <input type="hidden" name="type" value="${d.type === 'loan' ? 'loan' : 'card'}">
+      <input type="hidden" name="cardKind" value="${d.cardKind === 'charge' ? 'charge' : 'revolving'}">
       <div class="grid-2">
         <label class="field"><span>Balance</span><div class="prefix"><b>${cur()}</b><input class="input num" name="balance" type="number" inputmode="decimal" min="0" step="0.01" required value="${d.balance === '' ? '' : esc(d.balance)}"></div></label>
         <label class="field"><span>APR</span><div class="suffix"><input class="input num" name="apr" type="number" inputmode="decimal" min="0" step="0.01" value="${v(d.apr)}"><b>%</b></div></label>
@@ -4298,7 +5458,17 @@ function debtForm(d) {
           <label class="field"><span>Keep open</span><div class="prefix"><b>${cur()}</b><input class="input num" name="keepOpen" type="number" inputmode="decimal" min="0" step="0.01" value="${v(d.keepOpen)}" placeholder="0"></div></label>
         </div>
         <p class="hint">If the balance goes above limit − keep-open, the plan pays it back under that line first and flags it as urgent.</p>
+        <div class="grid-2">
+          <label class="field"><span>Statement closes (day)</span><input class="input num" name="closingDay" type="number" inputmode="numeric" min="1" max="31" step="1" value="${v(d.closingDay)}" placeholder="e.g. 18"></label>
+          <label class="field"><span>New spending / mo</span><div class="prefix"><b>${cur()}</b><input class="input num" name="monthlySpend" type="number" inputmode="decimal" min="0" step="1" value="${d.monthlySpend == null ? '' : esc(d.monthlySpend)}" placeholder="Auto"></div></label>
+        </div>
+        <p class="hint">The closing date is on your statement. That day's balance is what usually gets reported to the credit bureaus. Leave spending blank to share your monthly card allowance.</p>
+        <div id="chargeFields" class="${kind === 'charge' ? '' : 'hidden'}">
+          <label class="check"><input type="checkbox" name="utilInclude" ${d.utilInclude !== false ? 'checked' : ''}> Count this charge card in utilization</label>
+          <p class="hint">Scoring models may treat charge cards differently than revolving cards: some leave them out of utilization, others count them. Counting it is the cautious view.</p>
+        </div>
       </div>
+      <label class="field"><span>Account opened <span class="faint">(for credit age)</span></span><input class="input num" name="openDate" type="date" value="${esc(d.openDate || '')}"></label>
       ${isNew ? '' : `<label class="field"><span>Starting balance (for % paid)</span><div class="prefix"><b>${cur()}</b><input class="input num" name="startBalance" type="number" inputmode="decimal" min="0" step="0.01" value="${esc(d.startBalance)}"></div></label>`}
       <div class="grid-2" style="margin-top:6px">
         <button type="button" class="btn" data-close>Cancel</button>
@@ -4307,9 +5477,11 @@ function debtForm(d) {
     </form>`, (root) => {
     const form = $('#debtForm', root);
     root.querySelectorAll('[data-type]').forEach((b) => b.addEventListener('click', () => {
-      form.type.value = b.dataset.type;
+      form.type.value = b.dataset.type === 'loan' ? 'loan' : 'card';
+      form.cardKind.value = b.dataset.type === 'charge' ? 'charge' : 'revolving';
       root.querySelectorAll('[data-type]').forEach((x) => x.classList.toggle('on', x === b));
       $('#limitFields', root).classList.toggle('hidden', b.dataset.type === 'loan');
+      $('#chargeFields', root).classList.toggle('hidden', b.dataset.type !== 'charge');
     }));
     form.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -4322,7 +5494,10 @@ function debtForm(d) {
         minPayment: r2(Math.max(0, toNum(f.minPayment.value))), promoEnd: f.promoEnd.value || '', promoApr: Math.max(0, toNum(f.promoApr.value)),
         creditLimit: !isLoan && toNum(f.creditLimit.value) > 0 ? r2(toNum(f.creditLimit.value)) : null,
         keepOpen: isLoan ? 0 : r2(Math.max(0, toNum(f.keepOpen.value))),
-        dueDay: due >= 1 && due <= 31 ? due : null
+        dueDay: due >= 1 && due <= 31 ? due : null,
+        closingDay: isLoan ? null : dayOrNull(f.closingDay.value), cardKind: f.cardKind.value === 'charge' ? 'charge' : 'revolving',
+        openDate: parseISO(f.openDate.value) ? f.openDate.value : '', utilInclude: f.utilInclude.checked,
+        monthlySpend: isLoan || f.monthlySpend.value === '' ? null : r2(Math.max(0, toNum(f.monthlySpend.value)))
       };
       if (isNew) {
         const nd = Object.assign({ id: uid(), startBalance: vals.balance, paid: vals.balance <= 0, paidAt: null, createdAt: new Date().toISOString() }, vals);
@@ -4458,6 +5633,13 @@ function setPath(path, raw) {
     else if (key === 'termYears') target[key] = Math.max(1, Math.round(toNum(raw)) || 30);
     else target[key] = Math.max(0, toNum(raw));
   }
+  else if (obj === 'credit') {
+    if (key === 'preMonth' || key === 'mortgageMonth') target[key] = /^\d{4}-\d{2}$/.test(raw) ? raw : null;
+    else if (key === 'azeKeepId') target[key] = raw || null;
+    else if (key === 'azeAmount') target[key] = raw === '' ? null : r2(Math.max(0, toNum(raw)));
+    else if (key === 'leadDays') target[key] = Math.min(10, Math.max(0, Math.round(toNum(raw))));
+    else target[key] = raw === '' ? defaultCredit()[key] : Math.min(100, Math.max(0, toNum(raw)));
+  }
   else target[key] = Math.max(0, key === 'apy' ? toNum(raw) : r2(toNum(raw)));
 }
 
@@ -4471,6 +5653,7 @@ document.addEventListener('change', (e) => {
     Object.keys(NUMFMT).forEach((x) => delete NUMFMT[x]);
     commit(); return;
   }
+  if (t.matches('[data-tier]')) { const tr = S.data.home.rateTiers[+t.dataset.tier]; if (tr) { tr.rate = t.value === '' ? null : Math.max(0, toNum(t.value)); commit(); } return; }
   if (t.matches('[data-sp]')) { S.data.spendProfile[t.dataset.sp] = r2(Math.max(0, toNum(t.value))); commit(); return; }
   if (t.matches('[data-freed]')) {
     const key = t.dataset.freed, ci = S.data.budget.customItems.find((i) => i.id === key);
@@ -4635,7 +5818,7 @@ document.addEventListener('click', (e) => {
       break;
     case 'export-ics':
       downloadFile('money-hq-reminders.ics', buildICS(), 'text/calendar');
-      toast('CALENDAR FILE READY', 'Paydays, due dates, renewals and credit resets.', 'info');
+      toast('CALENDAR FILE READY', 'Paydays, due dates, statement dates, pay-before-it-reports reminders, renewals and credit resets.', 'info');
       break;
     case 'sync-now': pull(); break;
     case 'sign-out': signOut(); break;
@@ -4646,6 +5829,26 @@ document.addEventListener('click', (e) => {
       if (uncheckChecklistItem(S.data, b.dataset.date, b.dataset.key)) { S.checkinDraft = null; commit(); toast('UNDONE', 'Balance put back.', 'info'); }
       break;
     case 'cl-dismiss': { const c = S.data.payChecklists.find((x) => x.date === b.dataset.date); if (c) { c.dismissed = true; commit(); } break; }
+    case 'add-score': scoreForm(null); break;
+    case 'edit-score': { const x = S.data.credit.scores.find((y) => y.id === b.dataset.id); if (x) scoreForm(x); break; }
+    case 'delete-score': { const x = S.data.credit.scores.find((y) => y.id === b.dataset.id); if (x) { $('#sheetRoot').innerHTML = ''; undoable('SCORE DELETED', `${x.score} · ${x.model}`, () => { S.data.credit.scores = S.data.credit.scores.filter((y) => y !== x); }); } break; }
+    case 'add-inquiry': inquiryForm(null); break;
+    case 'edit-inquiry': { const x = S.data.credit.inquiries.find((y) => y.id === b.dataset.id); if (x) inquiryForm(x); break; }
+    case 'delete-inquiry': { const x = S.data.credit.inquiries.find((y) => y.id === b.dataset.id); if (x) { $('#sheetRoot').innerHTML = ''; undoable('INQUIRY DELETED', x.lender || 'Inquiry', () => { S.data.credit.inquiries = S.data.credit.inquiries.filter((y) => y !== x); }); } break; }
+    case 'credit-mode': S.data.credit.mode = b.dataset.v === 'month' ? 'month' : 'next'; if (S.data.credit.mode === 'month' && !S.data.credit.preMonth) { const bm = creditCtx().best; S.data.credit.preMonth = bm ? bm.month : shiftMonth(todayISO().slice(0, 7), 1); } commit(); break;
+    case 'credit-goal': S.data.credit.goal = ['card', 'overall', 'aze'].includes(b.dataset.v) ? b.dataset.v : 'card'; commit(); break;
+    case 'edit-acct': openAccount(b.dataset.id); break;
+    case 'toggle-charge': {
+      const id = b.dataset.id, x = id.startsWith('w:') ? S.data.wallet.find((c) => 'w:' + c.id === id) : S.data.debts.find((d) => d.id === id);
+      if (x) { x.utilInclude = x.utilInclude === false; commit(); toast(x.utilInclude ? 'COUNTED' : 'LEFT OUT', `${x.name} ${x.utilInclude ? 'counts toward' : 'no longer counts toward'} utilization.`, 'info'); }
+      break;
+    }
+    case 'cl-timing': {
+      const list = S.data.payChecklists.find((c) => !c.dismissed && c.items.length && c.date <= todayISO() && (!c.completedAt || c.date === todayISO()));
+      if (list && applyChecklistTiming(S.data, list, creditCtx().next)) { commit(); toast('TIMING UPDATED', 'Same money, now landing before your statements close.', 'info'); }
+      break;
+    }
+    case 'cd-kind': readCardForm(); S.cardDraft._cd.cardKind = b.dataset.v === 'charge' ? 'charge' : 'revolving'; renderCardForm(); break;
     case 'dismiss-summary': { const sm = S.data.monthlySummaries.find((x) => x.month === b.dataset.month); if (sm) { sm.dismissed = true; commit(); } break; }
   }
 });

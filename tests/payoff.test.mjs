@@ -12,8 +12,12 @@ const engine = new Function(`${src}; return { simulatePayoff, projectPlan, proje
   renewalsBetween, rollRenewals, cutItImpact, ACCOUNT_TYPES, CYCLES,
   merchantCategory, allMerchants, earnFor, rankCards, yearlyEarn, spentTowardRule, periodKeyFor, CARD_PRESETS, cardFromPreset, normalizeWalletCard,
   creditPeriod, toggleCreditUsed, creditUsed, creditsSummary, expiringCredits, monthlyPI, housingPayment, maxPriceForDTI, affordability, cashToClose,
-  homeReadyDate, computeInsights, visibleInsights, dismissInsight, sigOf, planOptionsFrom, defaultHome };`)();
-const { simulatePayoff, projectPlan, normalize, baselineAt, r2, parseISO } = engine;
+  homeReadyDate, computeInsights, visibleInsights, dismissInsight, sigOf, planOptionsFrom, defaultHome,
+  DATA_VERSION, nextClosing, prevClosing, closingIn, closingsFrom, statementDue, payByDate, creditAccounts, utilizationNow, monthlySpendByAccount,
+  reportedBalance, cycleSpend, planBalAt, planStatements, creditChecklistItems, mergeCreditItems, applyChecklistTiming, pendingChecklistMoney,
+  projectUtilization, onTimeRecord, inquiryStatus, accountAges, closeImpact, latestScore, mortgageWarnings, creditFactors, bestPreapprovalMonth,
+  rateTierTable, tierFor, tierJump, creditInsights, utilBand, defaultCredit, defaultRateTiers, monthlyPI };`)();
+const { simulatePayoff, projectPlan, normalize, baselineAt, r2, parseISO, planOptionsFrom, monthlyPI } = engine;
 
 // Three fake cards (sample data only).
 const cards = [
@@ -471,7 +475,7 @@ assert.ok(tooLow.warnings.length > 0);
     const snapshot = JSON.parse(JSON.stringify(src));
     const m = normalize(src, '2026-09-25');
     assert.deepEqual(src, snapshot, `${label}: input not mutated`);
-    assert.equal(m.version, 5, `${label}: bumped to the current version`);
+    assert.equal(m.version, engine.DATA_VERSION, `${label}: bumped to the current version`);
     // every field the old version saved is still there with the same value
     const same = (a, b, path) => {
       if (a && typeof a === 'object' && !Array.isArray(a)) { for (const k of Object.keys(a)) { if (k === 'version') continue; same(a[k], b[k], `${path}.${k}`); } }
@@ -828,7 +832,7 @@ const walletData = (extra = {}) => normalize(Object.assign({
     const snap = JSON.parse(JSON.stringify(src));
     const m = normalize(src, '2026-09-25');
     assert.deepEqual(src, snap, `${label}: not mutated`);
-    assert.equal(m.version, 5, `${label} → v5`);
+    assert.equal(m.version, engine.DATA_VERSION, `${label} → current version`);
     same(src, m, label);
     assert.deepEqual(m.wallet, []); assert.deepEqual(m.merchants, []); assert.deepEqual(m.cardSpend, []); assert.deepEqual(m.spendProfile, {});
     assert.deepEqual(m.insightDismissals, {});
@@ -849,6 +853,406 @@ const walletData = (extra = {}) => normalize(Object.assign({
   // Presets are complete and editable copies
   engine.CARD_PRESETS.forEach((p) => { const c = engine.cardFromPreset(p, '2026-09-25T00:00:00Z'); assert.ok(c.rules.some((r) => r.category === 'everything'), `${p.id} has a base rate`); assert.notEqual(c.id, p.id); });
   for (const id of ['amex-bcp', 'amex-plat', 'c1-savor', 'apple', 'rh-gold']) assert.ok(preset(id), `preset ${id}`);
+}
+
+// ===================== PHASE 3: CREDIT =====================
+// ----- statement closing dates across month lengths -----
+{
+  const { nextClosing, prevClosing, closingIn, closingsFrom, statementDue, payByDate } = engine;
+  assert.equal(nextClosing(31, '2026-02-10'), '2026-02-28', 'day 31 in a 28-day February');
+  assert.equal(nextClosing(31, '2028-02-10'), '2028-02-29', 'day 31 in a leap-year February');
+  assert.equal(nextClosing(29, '2027-02-01'), '2027-02-28', 'day 29 in a 28-day February');
+  assert.equal(nextClosing(29, '2028-02-01'), '2028-02-29', 'day 29 exists in a leap year');
+  assert.equal(nextClosing(30, '2026-02-01'), '2026-02-28', 'day 30 in February');
+  assert.equal(nextClosing(30, '2026-04-05'), '2026-04-30', 'day 30 in a 30-day month');
+  assert.equal(nextClosing(31, '2026-04-05'), '2026-04-30', 'day 31 in a 30-day month');
+  assert.equal(nextClosing(31, '2026-05-01'), '2026-05-31', 'day 31 in a 31-day month');
+  assert.equal(nextClosing(15, '2026-09-15'), '2026-09-15', 'closing today is the next closing');
+  assert.equal(nextClosing(15, '2026-09-16'), '2026-10-15');
+  assert.equal(nextClosing(31, '2026-02-28'), '2026-02-28');
+  assert.equal(nextClosing(31, '2026-03-01'), '2026-03-31', 'back to the 31st after February');
+  assert.deepEqual(closingsFrom(31, '2026-01-15', 5), ['2026-01-31', '2026-02-28', '2026-03-31', '2026-04-30', '2026-05-31']);
+  assert.deepEqual(closingsFrom(29, '2027-12-30', 3), ['2028-01-29', '2028-02-29', '2028-03-29']);
+  assert.deepEqual(closingsFrom(30, '2027-01-31', 3), ['2027-02-28', '2027-03-30', '2027-04-30'], 'the short month never shifts later ones');
+  assert.equal(prevClosing(31, '2026-03-31'), '2026-02-28');
+  assert.equal(prevClosing(30, '2026-03-30'), '2026-02-28');
+  assert.equal(prevClosing(31, '2026-05-31'), '2026-04-30');
+  assert.equal(prevClosing(5, '2026-01-05'), '2025-12-05', 'across the year');
+  assert.equal(closingIn(31, '2026-06'), '2026-06-30');
+  assert.equal(closingIn(28, '2026-02'), '2026-02-28');
+  // due date: the card's due day at least 21 days after closing; closing + 21 as an estimate without one
+  assert.deepEqual(statementDue({ dueDay: 12 }, '2026-10-18'), { date: '2026-11-12', estimated: false });
+  assert.deepEqual(statementDue({ dueDay: 31 }, '2026-01-31'), { date: '2026-02-28', estimated: false });
+  assert.deepEqual(statementDue({ dueDay: null }, '2026-10-18'), { date: '2026-11-08', estimated: true });
+  assert.equal(payByDate('2026-10-18', 2, '2026-09-25'), '2026-10-16', 'pay two days early so it posts');
+  assert.equal(payByDate('2026-09-26', 2, '2026-09-25'), '2026-09-25', 'never before today');
+}
+
+// ----- reported balance on the plan, with the spending allowance -----
+{
+  const { creditAccounts, reportedBalance, monthlySpendByAccount, planBalAt, cycleSpend } = engine;
+  const today = '2026-09-15';
+  const data = normalize({
+    debts: [{ id: 'p', name: 'Platinum', balance: 1000, apr: 0, minPayment: 50, creditLimit: 5000, closingDay: 25, dueDay: 20, monthlySpend: 100 }],
+    wallet: [{ id: 'x', name: 'Apple Card', creditLimit: 2000, closingDay: 30, currentBalance: 200, monthlySpend: 300, rules: [{ category: 'everything', rate: 2 }] }],
+    budget: { debtPerPaycheck: 200, frequency: 'biweekly', payAnchor: '2026-09-18' }
+  }, today);
+  const plan = engine.simulatePayoff(data.debts, planOptionsFrom(data, today));
+  assert.equal(planBalAt(plan, 'p', '2026-09-17'), 1000);
+  assert.equal(planBalAt(plan, 'p', '2026-09-18'), 800, 'the trace follows the plan paycheck by paycheck');
+  const [p, w] = creditAccounts(data);
+  assert.equal(w.id, 'w:x'); assert.equal(w.source, 'wallet');
+  // Sep 25 statement: plan balance on the pay-by date (Sep 23) is $800, plus 10 of the cycle's 31 days of $100 spending
+  assert.equal(cycleSpend(100, 25, '2026-09-25', today), r2(100 * 10 / 31));
+  assert.equal(reportedBalance(plan, p, '2026-09-25', today, 2, 100), r2(800 + 100 * 10 / 31));
+  // Oct 25: Oct 2 and Oct 16 paychecks → $400, plus a full month of spending
+  assert.equal(reportedBalance(plan, p, '2026-10-25', today, 2, 100), 500);
+  // Wallet-only card: paid in full each month, so only the first statement carries today's balance
+  assert.equal(reportedBalance(plan, w, '2026-09-30', today, 2, 300), r2(200 + 300 * 15 / 31));
+  assert.equal(reportedBalance(plan, w, '2026-10-30', today, 2, 300), 300);
+  // The allowance is split over cards you're not paying down, unless you set per-card amounts
+  const noSplit = normalize(Object.assign(JSON.parse(JSON.stringify(data)), { budget: Object.assign({}, data.budget, { cardSpending: 300 }) }), today);
+  noSplit.debts[0].monthlySpend = null; noSplit.wallet[0].monthlySpend = null;
+  assert.deepEqual(monthlySpendByAccount(noSplit, creditAccounts(noSplit)), { p: 0, 'w:x': 300 });
+  noSplit.wallet[0].monthlySpend = 120;
+  assert.deepEqual(monthlySpendByAccount(noSplit, creditAccounts(noSplit)), { p: 0, 'w:x': 120 }, 'per-card amounts win');
+}
+
+// ----- utilization today, charge cards included / excluded -----
+{
+  const { utilizationNow, utilBand } = engine;
+  assert.deepEqual([9.99, 10, 29.99, 30, 49.9, 50].map((x) => utilBand(x).key), ['excellent', 'good', 'good', 'fair', 'fair', 'high']);
+  const base = {
+    debts: [
+      { id: 'r', name: 'Revolver', balance: 1500, apr: 20, minPayment: 40, creditLimit: 5000 },
+      { id: 'c', name: 'Charge', balance: 3000, apr: 0, minPayment: 0, creditLimit: 5000, cardKind: 'charge' },
+      { id: 'l', name: 'Car loan', type: 'loan', balance: 9000, apr: 6, minPayment: 300 },
+      { id: 'n', name: 'Near limit', balance: 950, apr: 25, minPayment: 30, creditLimit: 1000 }
+    ]
+  };
+  const inc = utilizationNow(normalize(base, '2026-09-25'));
+  assert.equal(inc.overall.limit, 11000, 'loans never count; the charge card is included by default');
+  assert.equal(r2(inc.overall.pct), r2(5450 / 11000 * 100));
+  assert.equal(inc.excluded.length, 0);
+  const ex = JSON.parse(JSON.stringify(base)); ex.debts[1].utilInclude = false;
+  const exc = utilizationNow(normalize(ex, '2026-09-25'));
+  assert.equal(exc.overall.limit, 6000, 'excluded charge card leaves the math');
+  assert.equal(r2(exc.overall.pct), r2(2450 / 6000 * 100));
+  assert.deepEqual(exc.excluded.map((r) => r.id), ['c']);
+  const ex2 = JSON.parse(JSON.stringify(ex)); ex2.debts[1].cardKind = 'revolving';
+  assert.equal(utilizationNow(normalize(ex2, '2026-09-25')).overall.limit, 11000, 'the exclude switch only applies to charge cards');
+  const n = inc.rows.find((r) => r.id === 'n');
+  assert.equal(n.nearLimit, true); assert.equal(n.overLimit, false); assert.equal(n.over30, true);
+  assert.equal(inc.rows.find((r) => r.id === 'r').over30, true, '30% flags a single card');
+}
+
+// ----- pay before it reports: per-card and overall targets, same money re-timed, minimums kept -----
+const creditScenario = (extra = {}) => normalize(Object.assign({
+  debts: [
+    { id: 'a', name: 'Avalanche', balance: 3000, apr: 29.99, minPayment: 60, creditLimit: 5000, closingDay: 10, dueDay: 5 },
+    { id: 'b', name: 'Big limit', balance: 2000, apr: 19, minPayment: 40, creditLimit: 10000, closingDay: 28, dueDay: 23 },
+    { id: 'l', name: 'Loan', type: 'loan', balance: 4000, apr: 7, minPayment: 150, dueDay: 1 }
+  ],
+  wallet: [{ id: 'z', name: 'Zero card', creditLimit: 3000, closingDay: 14, currentBalance: 450, rules: [{ category: 'everything', rate: 1 }] }],
+  budget: { debtPerPaycheck: 750, frequency: 'biweekly', payAnchor: '2026-10-02' }
+}, extra), '2026-09-25');
+{
+  const { planStatements } = engine;
+  const today = '2026-09-25';
+  const data = creditScenario();
+  const plan = engine.simulatePayoff(data.debts, planOptionsFrom(data, today));
+  const sp = planStatements(data, today, { plan, goal: 'card' });
+  const row = (id) => sp.rows.find((r) => r.id === id);
+  assert.deepEqual(sp.rows.map((r) => [r.id, r.closing, r.payBy]), [['a', '2026-10-10', '2026-10-08'], ['b', '2026-09-28', '2026-09-26'], ['w:z', '2026-10-14', '2026-10-12']]);
+  // Card A: the plan's Oct 1 interest makes it $3,074.97 before any payment; 29% of $5,000 is $1,450
+  const A = row('a');
+  assert.equal(A.R0, 3074.97); assert.equal(A.target, 1450); assert.equal(A.need, 1625);
+  assert.ok(A.reportedNew <= A.target && A.pctNew <= 29, 'reports at or under the per-card target');
+  assert.ok(r2(A.paidBefore + A.extraPre) >= A.need);
+  assert.equal(A.planBefore, 560, 'the Oct 2 paycheck already sends $560 (min + avalanche extra)');
+  assert.equal(A.moved, 40, "Big limit's $40 minimum moves to Oct 16, still before its Oct 23 due date");
+  assert.equal(A.extraPre, 1025, 'the rest needs extra cash');
+  // Card B reports 20%, under target: nothing to do. The wallet card reports its $450 (15%).
+  assert.equal(row('b').need, 0); assert.equal(row('b').act, false);
+  assert.equal(row('w:z').need, 0);
+  // Same money: every card gets exactly its planned total over the window; cash is never spent before payday
+  const tot = (key, id) => r2(sp.pays.reduce((t, p) => t + (p.lines.find((l) => l.id === id) || { [key]: 0 })[key], 0));
+  for (const id of ['a', 'b', 'l']) assert.equal(tot('now', id), tot('plan', id), `${id}: same total`);
+  let cp = 0, cn = 0;
+  for (const p of sp.pays) { cp += p.lines.reduce((t, l) => t + l.plan, 0); cn += p.lines.reduce((t, l) => t + l.now, 0); assert.ok(cn <= cp + 0.005, `no spending ahead of payday ${p.date}`); }
+  // Debts without statement dates keep their planned payments on the planned day
+  sp.pays.forEach((p) => { const l = p.lines.find((x) => x.id === 'l'); if (l) assert.equal(l.now, l.plan, `loan untouched on ${p.date}`); });
+  // Minimums are never shorted: A's Oct 5 minimum is paid by then, and its next statement's minimum by Nov 5
+  const paidTo = (id, from, to) => r2(sp.pays.filter((p) => p.date > from && p.date <= to).reduce((t, p) => t + ((p.lines.find((l) => l.id === id) || {}).now || 0), 0));
+  assert.deepEqual([A.min0.amount, A.min0.due], [60, '2026-10-05']);
+  assert.ok(paidTo('a', '2026-09-24', A.min0.due) + A.min0.extra >= A.min0.amount);
+  assert.deepEqual([A.min1.amount, A.min1.due], [60, '2026-11-05']);
+  assert.ok(paidTo('a', A.closing, A.min1.due) + A.min1.extra >= A.min1.amount, 'statement minimum paid after it closes, by the due date');
+  const B = row('b');
+  assert.ok(paidTo('b', B.closing, B.min1.due) + B.min1.extra >= B.min1.amount);
+  assert.equal(sp.totals.extra, r2(sp.totals.extraPre + sp.totals.extraMin));
+  // A payment logged since the last statement means the current minimum is already handled
+  const logged = creditScenario({ history: [{ id: 'h', at: '2026-09-20T15:00:00Z', kind: 'payment', debtId: 'a', debtName: 'Avalanche', amount: 60, before: 3060, after: 3000 }] });
+  assert.equal(planStatements(logged, today, { goal: 'card' }).rows.find((r) => r.id === 'a').min0, null);
+
+  // Overall target: bring the highest cards down, evenly, until overall ≤ 9%
+  const so = planStatements(data, today, { plan, goal: 'overall' });
+  assert.ok(so.overall.newPct <= 9 + 1e-9, `overall ${so.overall.newPct}`);
+  assert.ok(so.overall.planPct > so.overall.newPct);
+  so.rows.forEach((r) => { if (r.limit) assert.ok(r.pctNew <= 29 + 1e-9, `${r.id} still under the per-card target`); });
+  const pcts = so.rows.filter((r) => r.reportedNew > 0).map((r) => r.pctNew);
+  assert.ok(Math.max(...pcts) - Math.min(...pcts) < 0.2, `cards brought to the same level: ${pcts}`);
+  assert.ok(so.totals.need > sp.totals.need);
+
+  // Unchecked payday items count as money going out today, and can be re-timed
+  const cl = creditScenario({ payChecklists: [{ date: today, items: [{ key: 'debt:b', kind: 'debt', debtId: 'b', label: 'Big limit', planned: 300, done: false, paid: null }] }] });
+  const pending = engine.pendingChecklistMoney(cl, today);
+  assert.deepEqual(pending, [{ date: today, label: 'checklist', allocations: { b: 300 } }]);
+  const sc = planStatements(cl, today, { goal: 'card', pending });
+  const ev = sc.pays.find((p) => p.label === 'checklist');
+  assert.equal(ev.changed, true, 'B reports fine without it, so today\'s $300 moves to A, which closes first');
+  assert.deepEqual(ev.lines.map((l) => [l.id, l.plan, l.now]), [['b', 300, 0], ['a', 0, 300]]);
+  // Extra-cash checklist items are figured against the checklist as it is, so nothing is counted twice
+  const fixed = planStatements(cl, today, { goal: 'card', pending, fixPending: true });
+  assert.equal(fixed.pays.find((p) => p.label === 'checklist').changed, false);
+  assert.equal(fixed.rows.find((r) => r.id === 'a').extraPre, r2(sc.rows.find((r) => r.id === 'a').extraPre + 300), "without re-timing, A needs today's $300 as extra cash");
+  // …and a kept checklist payment to the card that needs it counts toward that card
+  const cl2 = creditScenario({ payChecklists: [{ date: today, items: [{ key: 'debt:a', kind: 'debt', debtId: 'a', label: 'Avalanche', planned: 300, done: false, paid: null }] }] });
+  const p2 = engine.pendingChecklistMoney(cl2, today);
+  assert.equal(planStatements(cl2, today, { goal: 'card', pending: p2, fixPending: true }).rows.find((r) => r.id === 'a').extraPre, planStatements(cl2, today, { goal: 'card', pending: p2 }).rows.find((r) => r.id === 'a').extraPre);
+  assert.equal(planStatements(cl2, today, { goal: 'card', pending: p2, fixPending: true }).rows.find((r) => r.id === 'a').extraPre, r2(A.extraPre - 300));
+  assert.equal(engine.applyChecklistTiming(cl, cl.payChecklists[0], sc), true);
+  assert.deepEqual(cl.payChecklists[0].items.map((i) => [i.key, i.planned]), [['debt:a', 300]]);
+}
+
+// ----- "all zero except one" -----
+{
+  const { planStatements } = engine;
+  const data = creditScenario();
+  const sp = planStatements(data, '2026-09-25', { goal: 'aze' });
+  assert.equal(sp.keepId, 'b', 'by default the card with the biggest limit keeps the small balance');
+  assert.equal(sp.keepAmount, 100, '1% of its $10,000 limit');
+  sp.rows.forEach((r) => assert.equal(r.reportedNew, r.id === 'b' ? 100 : 0, r.id));
+  const W = sp.rows.find((r) => r.id === 'w:z');
+  assert.equal(W.need, 450); assert.equal(W.extraPre, 450, 'a card with no plan money needs cash');
+  assert.equal(sp.totals.extraPre, r2(sp.rows.reduce((t, r) => t + r.extraPre, 0)));
+  assert.equal(sp.overall.newBal, 100);
+  // Pick the card and the amount yourself
+  data.credit.azeKeepId = 'w:z'; data.credit.azeAmount = 25;
+  const mine = planStatements(data, '2026-09-25', { goal: 'aze' });
+  assert.equal(mine.keepId, 'w:z');
+  mine.rows.forEach((r) => assert.equal(r.reportedNew, r.id === 'w:z' ? 25 : 0, r.id));
+  assert.ok(mine.rows.find((r) => r.id === 'b').min1 === null, 'a $0 statement has no minimum');
+  // Pre-approval mode: that month's statements, with plan payments before the window already counted
+  const pre = planStatements(data, '2026-09-25', { goal: 'aze', mode: 'month', month: '2027-01' });
+  assert.deepEqual(pre.rows.map((r) => r.closing), ['2027-01-10', '2027-01-28', '2027-01-14']);
+  // by January the plan pays Big limit off and the wallet card has no new spending: every card reports $0
+  pre.rows.forEach((r) => assert.equal(r.reportedNew, 0, r.id));
+  assert.equal(pre.allZero, true, 'flagged: some models like one small balance');
+  assert.equal(pre.rows.find((r) => r.id === 'b').extraPre, 0, 'the plan covers it, no extra cash');
+  assert.equal(mine.allZero, false);
+}
+
+// ----- checklist items for the extra payments -----
+{
+  const { planStatements, creditChecklistItems, mergeCreditItems } = engine;
+  const data = creditScenario();
+  const sp = planStatements(data, '2026-09-25', { goal: 'aze' });
+  const items = creditChecklistItems(sp, '2026-09-25', '2026-10-09');
+  const keys = items.map((i) => i.key);
+  assert.ok(keys.includes('credit:a:2026-10-10') && keys.includes('credit:b:2026-09-28'), keys.join());
+  assert.ok(!keys.some((k) => k.startsWith('credit:w:z')), 'Zero card is due by Oct 12, after the next payday');
+  const itA = items.find((i) => i.key === 'credit:a:2026-10-10');
+  assert.equal(itA.kind, 'debt'); assert.equal(itA.debtId, 'a'); assert.equal(itA.credit.payBy, '2026-10-08');
+  const list = { date: '2026-09-25', items: [{ key: 'debt:a', kind: 'debt', debtId: 'a', planned: 60, done: true, paid: 60 }, { key: 'credit:old', kind: 'debt', debtId: 'b', planned: 5, credit: {}, done: true, paid: 5 }, { key: 'credit:stale', kind: 'debt', debtId: 'b', planned: 9, credit: {}, done: false, paid: null }], completedAt: 'x' };
+  assert.equal(mergeCreditItems(list, items), true);
+  assert.deepEqual(list.items.map((i) => i.key), ['debt:a', 'credit:old', ...keys], 'done items stay, stale ones go');
+  assert.equal(list.completedAt, null);
+  assert.equal(mergeCreditItems(list, items), false, 'idempotent');
+  // Checking off a wallet card item lowers that card's balance, and undo puts it back
+  const w = creditScenario({ payChecklists: [{ date: '2026-09-25', items: [{ key: 'credit:w:z:2026-10-14', kind: 'debt', debtId: null, walletId: 'z', label: 'Zero card', planned: 450, credit: { closing: '2026-10-14' }, done: false, paid: null }] }] });
+  assert.equal(engine.checkChecklistItem(w, '2026-09-25', 'credit:w:z:2026-10-14', 450).ok, true);
+  assert.equal(w.wallet[0].currentBalance, 0);
+  assert.equal(w.history[0].kind, 'cardpay');
+  engine.uncheckChecklistItem(w, '2026-09-25', 'credit:w:z:2026-10-14');
+  assert.equal(w.wallet[0].currentBalance, 450); assert.equal(w.history.length, 0);
+}
+
+// ----- 12-month projection and band crossings -----
+{
+  const { projectUtilization, bestPreapprovalMonth } = engine;
+  const data = creditScenario();
+  const plan = engine.simulatePayoff(data.debts, planOptionsFrom(data, '2026-09-25'));
+  const proj = projectUtilization(data, '2026-09-25', plan);
+  assert.equal(proj.overall.length, 12);
+  assert.equal(proj.limit, 18000);
+  assert.equal(r2(proj.start), r2((3000 + 2000 + 450) / 18000 * 100));
+  assert.ok(proj.overall.every((p, i) => i === 0 || p.pct <= proj.overall[i - 1].pct + 1e-9), 'the plan only goes down (no spending)');
+  const c10 = proj.crossings.find((c) => c.t === 10);
+  const first = proj.overall.find((p) => p.pct < 10);
+  assert.equal(c10.date, first.date);
+  assert.equal(proj.crossings.find((c) => c.t === 50).already, true);
+  // Best month to get pre-approved: the earliest month in the best band (utilization reports under 10% from Jan 2027)
+  assert.deepEqual(proj.overall.slice(0, 5).map((p) => [p.date, engine.utilBand(p.pct).key]),
+    [['2026-10-14', 'good'], ['2026-11-14', 'good'], ['2026-12-14', 'good'], ['2027-01-14', 'excellent'], ['2027-02-14', 'excellent']]);
+  const best = bestPreapprovalMonth(data, '2026-09-25', proj);
+  assert.deepEqual([best.month, best.band.key, best.inq12, best.after], ['2027-01', 'excellent', 0, '2027-01-14']);
+  // …then fewest recent inquiries: one from Feb 20, 2026 counts until Feb 2027, so March wins
+  data.credit.inquiries.push({ id: 'i', date: '2026-02-20', lender: 'Store card', type: 'card' });
+  const next = bestPreapprovalMonth(data, '2026-09-25', proj);
+  assert.deepEqual([next.month, next.inq12], ['2027-03', 0]);
+  // …and never after a planned application month
+  data.credit.mortgageMonth = '2027-02';
+  assert.equal(bestPreapprovalMonth(data, '2026-09-25', proj).month, '2027-01');
+  data.credit.mortgageMonth = null;
+}
+
+// ----- factors: on-time streak, inquiry aging, account ages, mortgage window -----
+{
+  const { onTimeRecord, inquiryStatus, accountAges, mortgageWarnings, creditFactors, latestScore, closeImpact } = engine;
+  const data = normalize({
+    checklistSince: '2026-06-01',
+    debts: [{ id: 'a', name: 'Old faithful', balance: 800, apr: 20, minPayment: 30, creditLimit: 4000, dueDay: 12, openDate: '2014-03-15', createdAt: '2026-05-01T00:00:00Z' },
+      { id: 'n', name: 'New card', balance: 0, apr: 20, minPayment: 0, creditLimit: 2000, openDate: '2026-05-02', createdAt: '2026-05-01T00:00:00Z' }],
+    history: [
+      { id: 'h1', at: '2026-06-10T12:00:00Z', kind: 'payment', debtId: 'a', amount: 30 },
+      { id: 'h2', at: '2026-07-11T12:00:00Z', kind: 'payment', debtId: 'a', amount: 30 },
+      { id: 'h4', at: '2026-09-02T12:00:00Z', kind: 'balance', debtId: 'a', before: 900, after: 800 }
+    ],
+    credit: { inquiries: [{ date: '2025-10-01', lender: 'Store card', type: 'card' }, { date: '2024-12-15', lender: 'Auto', type: 'auto' }, { date: '2024-01-01', lender: 'Old', type: 'card' }],
+      scores: [{ date: '2026-09-01', score: 688, model: 'FICO 8', source: 'Bank app' }, { date: '2026-06-01', score: 671, model: 'FICO 8', source: 'Bank app' }] }
+  }, '2026-09-25');
+  const rec = onTimeRecord(data, '2026-09-25');
+  // Tracking starts Jun 1: due dates Jul 12, Aug 12, Sep 12 have full windows; August had no payment logged
+  assert.deepEqual(rec.events.map((e) => [e.due, e.onTime]), [['2026-07-12', true], ['2026-08-12', false], ['2026-09-12', true]]);
+  assert.equal(rec.streak, 1); assert.equal(rec.since, '2026-09-12');
+  // Inquiries: count about 12 months, fall off after about 24
+  assert.deepEqual(inquiryStatus({ date: '2025-10-01' }, '2026-09-25'), { affectsUntil: '2026-10-01', fallsOff: '2027-10-01', phase: 'active', monthsOld: 11 });
+  assert.equal(inquiryStatus({ date: '2024-12-15' }, '2026-09-25').phase, 'fading');
+  assert.equal(inquiryStatus({ date: '2024-01-01' }, '2026-09-25').phase, 'gone');
+  assert.equal(inquiryStatus({ date: '2025-10-01' }, '2026-10-01').phase, 'fading', 'stops counting on its 12-month anniversary');
+  assert.equal(inquiryStatus({ date: '2024-02-29' }, '2025-02-28').affectsUntil, '2025-02-28', 'leap day ages to Feb 28');
+  // Ages from open dates
+  const ages = accountAges(data, '2026-09-25');
+  assert.equal(ages.oldest.name, 'Old faithful'); assert.equal(ages.oldest.months, 150);
+  assert.equal(ages.avgMonths, (150 + 4) / 2);
+  assert.deepEqual(ages.new12.map((a) => a.name), ['New card']);
+  // Factor cards: directional only, never a score
+  const f = Object.fromEntries(creditFactors(data, '2026-09-25', null).map((x) => [x.key, x]));
+  assert.equal(f.payments.status, 'watch'); assert.ok(/No payment logged for Old faithful \(due Aug 12\)/.test(f.payments.text));
+  assert.equal(f.inquiries.status, 'watch'); assert.equal(f.inquiries.value, '1 in the last 12 months');
+  assert.equal(f.new.status, 'watch');
+  assert.equal(f.age.status, 'helps', 'a 6.4-year average'); assert.equal(f.age.value, '6.4 yr average');
+  Object.values(f).forEach((x) => assert.ok(!/\b[3-8]\d\d\b/.test(x.value + x.text), `no score numbers in ${x.key}`));
+  assert.deepEqual(latestScore(data), { score: 688, date: '2026-09-01', model: 'FICO 8', source: 'Bank app', logged: true });
+  // Closing a paid-off card only removes its limit: the new card closed → 800/4000 instead of 800/6000
+  assert.deepEqual(closeImpact(data, 'n'), { before: 800 / 6000 * 100, after: 800 / 4000 * 100, limitLost: 2000 });
+  assert.deepEqual(closeImpact(data, 'a'), { before: 0, after: 0, limitLost: 4000 }, 'once the old card is paid off, the rest owe nothing here');
+  // Mortgage window: planned for Jan 2027 → window starts Jul 2026; the new card and any new inquiry are flagged
+  data.credit.mortgageMonth = '2027-01';
+  data.credit.inquiries.push({ id: 'q', date: '2026-08-20', lender: 'Furniture store', type: 'card' });
+  const mw = mortgageWarnings(data, '2026-09-25');
+  assert.equal(mw.inWindow, true); assert.equal(mw.monthsAway, 4);
+  assert.ok(mw.list.some((w) => w.level === 'hurts' && w.text.includes('Furniture store')));
+  assert.ok(!mw.list.some((w) => w.text.includes('New card was opened')), 'opened May 2, before the window');
+  assert.ok(mw.list.some((w) => /Keep Old faithful open/.test(w.text)));
+  data.credit.mortgageMonth = '2027-12';
+  assert.equal(mortgageWarnings(data, '2026-09-25').inWindow, false);
+}
+
+// ----- rate-by-score tiers: payment and total interest -----
+{
+  const { rateTierTable, tierFor, tierJump, defaultRateTiers } = engine;
+  assert.deepEqual(defaultRateTiers().map((t) => [t.min, t.max, t.rate]), [[760, null, null], [740, 759, null], [720, 739, null], [700, 719, null], [680, 699, null], [660, 679, null], [640, 659, null]], 'blank rates by default');
+  const home = Object.assign(engine.defaultHome(), { downPct: 5, termYears: 30 });
+  assert.ok(rateTierTable(home, 300000).every((t) => t.pi === null), 'nothing computed until you fill in rates');
+  home.rateTiers.find((t) => t.min === 720).rate = 6.5;
+  home.rateTiers.find((t) => t.min === 700).rate = 6.875;
+  const rows = rateTierTable(home, 300000);
+  const t720 = rows.find((t) => t.min === 720);
+  assert.equal(t720.loan, 285000); assert.equal(t720.pi, monthlyPI(285000, 6.5, 30));
+  assert.equal(t720.totalInterest, r2(t720.pi * 360 - 285000));
+  assert.equal(tierFor(725, home.rateTiers).min, 720); assert.equal(tierFor(760, home.rateTiers).max, null); assert.equal(tierFor(600, home.rateTiers), null);
+  const j = tierJump(home, 300000, 712);
+  assert.equal(j.from.min, 700); assert.equal(j.to.min, 720); assert.equal(j.pointsToGo, 8);
+  assert.equal(j.piDiff, r2(monthlyPI(285000, 6.5, 30) - monthlyPI(285000, 6.875, 30)));
+  assert.ok(j.piDiff < 0 && j.interestDiff < 0, 'a better tier costs less');
+  assert.equal(tierJump(home, 300000, 765).to, null, 'top tier: nowhere to go');
+  assert.equal(tierJump(home, 300000, 745).piDiff, null, 'missing rates → no fake numbers');
+}
+
+// ----- credit insights -----
+{
+  const { computeInsights } = engine;
+  const fmt = (v) => '$' + Math.round(v).toLocaleString('en-US');
+  const data = creditScenario();
+  data.debts[0].openDate = '2019-02-01';
+  data.credit.mortgageMonth = '2027-02';
+  const all = computeInsights(data, '2026-09-25', fmt);
+  const pay = all.find((i) => i.id === 'credit-pay:a:2026-10-10');
+  assert.ok(pay, all.map((i) => i.id).join());
+  assert.equal(pay.text, 'Pay **$1,625** to Avalanche by **Oct 8** to report under 30%. $1,025 of it is beyond your plan.');
+  assert.ok(all.some((i) => i.id.startsWith('util-cross:') && /Utilization drops below \*\*\d+%\*\* in \*\*\w+ \d{4}\*\* on your current plan\./.test(i.text)));
+  assert.equal(all.find((i) => i.id === 'oldest-account').text, 'Your oldest account, Avalanche, is **7 years** old. Keep it open: it anchors your credit age.');
+  assert.ok(all.some((i) => i.id === 'mortgage-window:2027-02'));
+  all.forEach((i) => assert.ok(i.action.tab && i.sig !== undefined));
+}
+
+// ----- migration from every previous version (v1…v5) to v6 -----
+{
+  const v5 = normalize({ version: 5, debts: [{ id: 'd1', name: 'Card', balance: 900, apr: 22, minPayment: 30, creditLimit: 3000, keepOpen: 200, dueDay: 12 }],
+    wallet: [Object.assign(JSON.parse(JSON.stringify(preset('amex-plat'))), { id: 'plat', debtId: 'd1' })], home: { priceMin: 250000, creditScore: 700, creditTarget: 680 } }, '2026-09-25');
+  const saved = JSON.parse(JSON.stringify(v5));
+  // pretend it was saved by v5: strip every v6 field
+  delete saved.credit; delete saved.home.rateTiers; saved.version = 5;
+  ['closingDay', 'cardKind', 'openDate', 'utilInclude', 'monthlySpend'].forEach((k) => delete saved.debts[0][k]);
+  ['creditLimit', 'keepOpen', 'currentBalance', 'closingDay', 'dueDay', 'cardKind', 'openDate', 'utilInclude', 'monthlySpend'].forEach((k) => delete saved.wallet[0][k]);
+  const olds = [['v5', saved]];
+  const v1 = { version: 1, debts: [{ id: 'd1', name: 'Card', type: 'card', balance: 1500, startBalance: 2000, apr: 22, minPayment: 40, promoEnd: '', paid: false, paidAt: null, createdAt: '2026-01-01T00:00:00Z' }],
+    budget: { takeHome: 2000, frequency: 'biweekly', payAnchor: '2026-09-25', debtPerPaycheck: 300, savingsPerPaycheck: 100, lumpSum: 0 }, strategy: 'snowball', activePlan: 'A',
+    savings: { balance: 800, goal: 5000, apy: 4, monthlyContribution: null }, history: [], milestones: {} };
+  const v2 = Object.assign(JSON.parse(JSON.stringify(v1)), { version: 2, customOrder: ['d1'], checkins: [], baseline: null });
+  Object.assign(v2.debts[0], { creditLimit: 5000, keepOpen: 500, dueDay: 31 });
+  const v3 = Object.assign(JSON.parse(JSON.stringify(v2)), { version: 3, checklistSince: '2026-09-20', payChecklists: [{ date: '2026-09-25', items: [{ key: 'debt:d1', kind: 'debt', debtId: 'd1', label: 'Card', planned: 100, done: false, paid: null }] }] });
+  const v4 = Object.assign(JSON.parse(JSON.stringify(v3)), { version: 4, accounts: [], subscriptions: [] });
+  olds.push(['v1', v1], ['v2', v2], ['v3', v3], ['v4', v4]);
+  const same = (a, b, path) => {
+    if (a && typeof a === 'object' && !Array.isArray(a)) { for (const k of Object.keys(a)) { if (k === 'version') continue; same(a[k], b[k], `${path}.${k}`); } }
+    else if (Array.isArray(a)) { assert.equal(b.length, a.length, `${path} length`); a.forEach((x, i) => same(x, b[i], `${path}[${i}]`)); }
+    else assert.deepEqual(b, a, path);
+  };
+  for (const [label, src] of olds) {
+    const snap = JSON.parse(JSON.stringify(src));
+    const m = normalize(src, '2026-09-25');
+    assert.deepEqual(src, snap, `${label}: not mutated`);
+    assert.equal(m.version, 6, `${label} → v6`);
+    same(src, m, label);
+    assert.deepEqual(m.credit, engine.defaultCredit(), `${label}: credit defaults (29% / 9%, nothing logged)`);
+    assert.equal(m.credit.targetCard, 29); assert.equal(m.credit.targetOverall, 9);
+    assert.deepEqual(m.home.rateTiers, engine.defaultRateTiers(), `${label}: blank rate tiers`);
+    const d = m.debts[0];
+    assert.deepEqual([d.closingDay, d.cardKind, d.openDate, d.utilInclude, d.monthlySpend], [null, 'revolving', '', true, null], `${label}: safe debt defaults`);
+    m.wallet.forEach((w) => assert.deepEqual([w.creditLimit, w.closingDay, w.cardKind, w.utilInclude, w.currentBalance], [null, null, 'revolving', true, 0]));
+    assert.deepEqual(normalize(JSON.parse(JSON.stringify(m)), '2026-09-25'), m, `${label}: idempotent`);
+    // the credit screen, planner and insights work on migrated data
+    const sp = engine.planStatements(m, '2026-09-25', {});
+    assert.ok(Array.isArray(sp.rows));
+    engine.computeInsights(m, '2026-09-25');
+    engine.creditFactors(m, '2026-09-25', null);
+  }
+  // v6 data round-trips, including a charge card excluded from utilization, scores and inquiries
+  const v6 = normalize({ debts: [{ id: 'c', name: 'Charge', balance: 100, cardKind: 'charge', utilInclude: false, closingDay: 31, openDate: '2020-01-15', monthlySpend: 250 }],
+    credit: { targetCard: 25, targetOverall: 5, goal: 'aze', leadDays: 3, mode: 'month', preMonth: '2027-03', mortgageMonth: '2027-06', azeKeepId: 'c', azeAmount: 20,
+      scores: [{ id: 's', date: '2026-09-01', score: 701, model: 'VantageScore 3.0', source: 'Credit Karma' }], inquiries: [{ id: 'i', date: '2026-02-02', lender: 'Bank', type: 'mortgage' }] },
+    home: { rateTiers: [{ min: 760, max: null, rate: 6.1 }, { min: 740, max: 759, rate: '' }] } }, '2026-09-25');
+  assert.deepEqual(normalize(JSON.parse(JSON.stringify(v6)), '2026-09-25'), v6);
+  assert.equal(v6.debts[0].utilInclude, false); assert.equal(v6.debts[0].closingDay, 31);
+  assert.equal(v6.credit.goal, 'aze'); assert.equal(v6.credit.preMonth, '2027-03');
+  assert.deepEqual(v6.home.rateTiers, [{ min: 760, max: null, rate: 6.1 }, { min: 740, max: 759, rate: null }]);
+  // unknown values fall back safely
+  const bad = normalize({ debts: [{ id: 'x', closingDay: 45, cardKind: 'weird', openDate: 'soon' }], credit: { goal: 'nope', targetCard: 500, leadDays: -4, preMonth: '2027-3', scores: [{ date: 'x', score: 700 }, { date: '2026-01-01', score: 12 }] } }, '2026-09-25');
+  assert.deepEqual([bad.debts[0].closingDay, bad.debts[0].cardKind, bad.debts[0].openDate], [null, 'revolving', '']);
+  assert.deepEqual([bad.credit.goal, bad.credit.targetCard, bad.credit.leadDays, bad.credit.preMonth, bad.credit.scores.length], ['card', 100, 0, null, 0]);
 }
 
 // ----- results table -----
