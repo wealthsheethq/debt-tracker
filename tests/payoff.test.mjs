@@ -7,8 +7,10 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const src = html.slice(html.indexOf('/* ENGINE START */'), html.indexOf('/* ENGINE END */'));
 const engine = new Function(`${src}; return { simulatePayoff, projectPlan, projectSavings, normalize, baselineAt, FREQUENCIES,
   buildChecklist, checkChecklistItem, uncheckChecklistItem, recordBalance, detectDrift, driftSummary, driftDelayDays,
-  projectInvesting, buildMonthlySummary, ensureMonthlySummary, daysAheadOfPlan, balanceTransferCheck, lastPaydayOnOrBefore, toISO, parseISO, r2 };`)();
-const { simulatePayoff, projectPlan, normalize, baselineAt, r2 } = engine;
+  projectInvesting, buildMonthlySummary, ensureMonthlySummary, daysAheadOfPlan, balanceTransferCheck, lastPaydayOnOrBefore, toISO, parseISO, r2,
+  netWorth, recordNetWorthSnapshot, netWorthChange, checkNetWorthMilestones, subscriptionTotals, subYearly, subMonthly,
+  renewalsBetween, rollRenewals, cutItImpact, ACCOUNT_TYPES, CYCLES };`)();
+const { simulatePayoff, projectPlan, normalize, baselineAt, r2, parseISO } = engine;
 
 // Three fake cards (sample data only).
 const cards = [
@@ -433,6 +435,170 @@ assert.ok(tooLow.warnings.length > 0);
   // Custom after-plan settings are kept, incl. an explicit "no Roth limit" (0)
   const ap = normalize({ afterPlan: { monthly: 1500, rothPct: 60, rothLimit: 0, annualReturn: 5.5 } }, '2026-10-01').afterPlan;
   assert.deepEqual(ap, { monthly: 1500, rothPct: 60, rothLimit: 0, annualReturn: 5.5 });
+}
+
+// ----- migration of data saved by EVERY previous version (v1, v2, v3) to v4 -----
+{
+  const v1 = {
+    version: 1,
+    debts: [{ id: 'd1', name: 'Card', type: 'card', balance: 1500, startBalance: 2000, apr: 22, minPayment: 40, promoEnd: '', paid: false, paidAt: null, createdAt: '2026-01-01T00:00:00Z' }],
+    budget: { takeHome: 2000, frequency: 'biweekly', payAnchor: '2026-09-25', debtPerPaycheck: 300, savingsPerPaycheck: 100, lumpSum: 0 },
+    strategy: 'snowball', activePlan: 'A', savings: { balance: 800, goal: 5000, apy: 4, monthlyContribution: null },
+    history: [{ id: 'h1', at: '2026-09-01T00:00:00Z', kind: 'payment', debtId: 'd1', debtName: 'Card', amount: 100, before: 1600, after: 1500 }],
+    milestones: { 25: '2026-09-01T00:00:00Z' }
+  };
+  const v2 = Object.assign(JSON.parse(JSON.stringify(v1)), {
+    version: 2, customOrder: ['d1'], customMilestones: [{ id: 'm1', title: 'Card gone', reward: 'Pizza', type: 'debtPaid', debtId: 'd1', value: 0, earnedAt: null }],
+    checkins: [{ id: 'c1', date: '2026-09-10', at: '2026-09-10T00:00:00Z', balances: { d1: 1500 }, totalDebt: 1500, hysa: 800 }],
+    baseline: { setAt: '2026-09-10T00:00:00Z', plan: 'A', strategy: 'snowball', points: [{ date: '2026-09-10', debt: 1500, hysa: 800 }] }
+  });
+  v2.debts[0] = Object.assign(v2.debts[0], { creditLimit: 5000, keepOpen: 500, dueDay: 12 });
+  Object.assign(v2.budget, { rentReserve: 600, spending: 200, customItems: [{ id: 'ci', name: 'Gym', amount: 25, freedLater: true }], freedLater: { spending: true }, lumpFromSavings: false });
+  const v3 = Object.assign(JSON.parse(JSON.stringify(v2)), {
+    version: 3, checklistSince: '2026-09-20',
+    payChecklists: [{ date: '2026-09-25', createdAt: '2026-09-25T12:00:00Z', dismissed: false, completedAt: null, items: [{ key: 'debt:d1', kind: 'debt', debtId: 'd1', label: 'Card', planned: 300, done: true, paid: 300, historyIds: ['h9'] }] }],
+    drift: [{ id: 'x1', debtId: 'd1', debtName: 'Card', at: '2026-09-15T00:00:00Z', month: '2026-09', before: 1400, after: 1500, rise: 100, interest: 0, source: 'checkin' }],
+    afterPlan: { monthly: 900, rothPct: 80, rothLimit: 7000, annualReturn: 6 },
+    monthlySummaries: [{ month: '2026-08', createdAt: '2026-09-01T00:00:00Z', paidToDebt: 500, dismissed: true }],
+    monthMarks: { '2026-09': { at: '2026-09-01T00:00:00Z', debt: 1600, hysa: 700, balances: { d1: 1600 } } }
+  });
+  v3.debts[0].promoApr = 0;
+  v3.budget.cardSpending = 150;
+  for (const [label, src] of [['v1', v1], ['v2', v2], ['v3', v3]]) {
+    const snapshot = JSON.parse(JSON.stringify(src));
+    const m = normalize(src, '2026-09-25');
+    assert.deepEqual(src, snapshot, `${label}: input not mutated`);
+    assert.equal(m.version, 4, `${label}: bumped to v4`);
+    // every field the old version saved is still there with the same value
+    const same = (a, b, path) => {
+      if (a && typeof a === 'object' && !Array.isArray(a)) { for (const k of Object.keys(a)) { if (k === 'version') continue; same(a[k], b[k], `${path}.${k}`); } }
+      else if (Array.isArray(a)) { assert.equal(b.length, a.length, `${path} length`); a.forEach((x, i) => same(x, b[i], `${path}[${i}]`)); }
+      else assert.deepEqual(b, a, path);
+    };
+    same(src, m, label);
+    // v4 defaults
+    assert.deepEqual(m.accounts, []);
+    assert.deepEqual(m.netWorthHistory, []);
+    assert.deepEqual(m.nwMilestones, {});
+    assert.equal(m.nwMilestonesInit, false);
+    assert.deepEqual(m.subscriptions, []);
+    assert.deepEqual(m.onboarding, { completedAt: null, skippedAt: null });
+    assert.deepEqual(normalize(JSON.parse(JSON.stringify(m)), '2026-09-25'), m, `${label}: idempotent`);
+    const o = { perPaycheck: 300, frequency: 'biweekly', payAnchor: '2026-09-25', today: '2026-09-25', strategy: 'snowball' };
+    assert.deepEqual(simulatePayoff(m.debts, o).payoffs, simulatePayoff(src.debts, o).payoffs, `${label}: same payoff plan`);
+  }
+  // v4 fields round-trip and bad values are cleaned up
+  const v4 = normalize({
+    accounts: [{ id: 'a1', name: 'Checking', type: 'checking', balance: 1200.5 }, { id: 'a2', name: 'Weird', type: 'spaceship', balance: -5 }],
+    subscriptions: [{ id: 's1', name: 'Music', amount: 10.99, cycle: 'monthly', nextRenewal: '2026-10-31', category: 'Music', cardId: 'd1', review: true }, { name: 'Bad', cycle: 'daily', amount: 'x' }],
+    netWorthHistory: [{ month: '2026-09', date: '2026-09-25', assets: 2000, liabilities: 1500, netWorth: 500 }, { month: 'nope' }],
+    onboarding: { skippedAt: '2026-09-25T00:00:00Z' }
+  }, '2026-09-25');
+  assert.equal(v4.accounts[1].type, 'other'); assert.equal(v4.accounts[1].balance, 0); assert.equal(v4.accounts[0].archived, false);
+  assert.equal(v4.subscriptions[0].anchorDay, 31);
+  assert.equal(v4.subscriptions[1].cycle, 'monthly'); assert.equal(v4.subscriptions[1].amount, 0); assert.equal(v4.subscriptions[1].cardId, 'other');
+  assert.equal(v4.netWorthHistory.length, 1);
+  assert.equal(v4.onboarding.skippedAt, '2026-09-25T00:00:00Z');
+  assert.deepEqual(normalize(JSON.parse(JSON.stringify(v4)), '2026-09-25'), v4);
+}
+
+// ----- net worth: debts and HYSA are linked, never double counted -----
+{
+  const { netWorth, recordNetWorthSnapshot, netWorthChange, checkNetWorthMilestones } = engine;
+  const data = normalize({
+    debts: [
+      { id: 'c', name: 'Card', balance: 3000, apr: 20, minPayment: 60 },
+      { id: 'l', name: 'Car loan', type: 'loan', balance: 8000, apr: 6, minPayment: 250 },
+      { id: 'p', name: 'Old card', balance: 0, apr: 20, minPayment: 0, paid: true }
+    ],
+    savings: { balance: 5000 },
+    accounts: [
+      { id: 'chk', name: 'Checking', type: 'checking', balance: 2500 },
+      { id: 'rth', name: 'Roth', type: 'roth', balance: 9000 },
+      { id: 'car', name: 'Car', type: 'vehicle', balance: 12000 },
+      { id: 'old', name: 'Closed brokerage', type: 'brokerage', balance: 4000, archived: true },
+      { id: 'mtg', name: 'Mortgage', type: 'mortgage', balance: 1000 }
+    ]
+  }, '2026-09-25');
+  let nw = netWorth(data);
+  assert.equal(nw.assets, 5000 + 2500 + 9000 + 12000, 'HYSA from savings + active assets; archived excluded');
+  assert.equal(nw.liabilities, 3000 + 8000 + 1000, 'unpaid debts + liability accounts; paid debts excluded');
+  assert.equal(nw.netWorth, 28500 - 12000);
+  assert.equal(nw.items.filter((i) => i.type === 'hysa').length, 1, 'HYSA counted once');
+  assert.equal(nw.items.filter((i) => i.linked === 'debt').length, 2, 'each unpaid debt counted once');
+  assert.deepEqual(nw.byType, { hysa: 5000, checking: 2500, roth: 9000, vehicle: 12000, debtCard: 3000, debtLoan: 8000, mortgage: 1000 });
+  // Updating the HYSA or a debt (e.g. via check-in) changes net worth exactly once
+  data.savings.balance = 5500; data.debts[0].balance = 2500;
+  nw = netWorth(data);
+  assert.equal(nw.netWorth, 16500 + 500 + 500);
+  // Snapshots: one per month, replaced within the month; change vs last month
+  recordNetWorthSnapshot(data, '2026-08-31T12:00:00.000Z');
+  data.netWorthHistory[0].netWorth = 15000;
+  assert.deepEqual(netWorthChange(data, '2026-09-25T12:00:00.000Z'), { from: 15000, month: '2026-08', change: 2500 });
+  recordNetWorthSnapshot(data, '2026-09-10T12:00:00.000Z');
+  recordNetWorthSnapshot(data, '2026-09-25T12:00:00.000Z');
+  assert.deepEqual(data.netWorthHistory.map((x) => x.month), ['2026-08', '2026-09']);
+  assert.equal(data.netWorthHistory[1].netWorth, 17500);
+  assert.equal(netWorthChange(data, '2026-09-25T12:00:00.000Z').from, 15000, 'this month\'s snapshot is not "last month"');
+  // Milestones: first run records what's already passed without celebrating
+  assert.deepEqual(checkNetWorthMilestones(data, '2026-09-25T12:00:00.000Z', true), []);
+  assert.deepEqual(data.nwMilestones, { 0: 'before', 10000: 'before' });
+  data.accounts[1].balance = 17000;   // Roth jumps → net worth 25,500
+  assert.deepEqual(checkNetWorthMilestones(data, '2026-10-01T12:00:00.000Z', false), [25000]);
+  assert.equal(data.nwMilestones[25000], '2026-10-01T12:00:00.000Z');
+  assert.deepEqual(checkNetWorthMilestones(data, '2026-10-02T12:00:00.000Z', false), [], 'never celebrated twice');
+  // Negative net worth reaching $0 is the first milestone
+  const neg = normalize({ debts: [{ id: 'x', name: 'X', balance: 1000, apr: 10, minPayment: 20 }], savings: { balance: 200 } }, '2026-09-25');
+  checkNetWorthMilestones(neg, '2026-09-25T00:00:00Z', true);
+  assert.deepEqual(neg.nwMilestones, {});
+  neg.debts[0].balance = 150;
+  assert.deepEqual(checkNetWorthMilestones(neg, '2026-10-25T00:00:00Z', false), [0]);
+}
+
+// ----- subscriptions: totals across billing cycles, renewals, cut it -----
+{
+  const { subscriptionTotals, subYearly, subMonthly, renewalsBetween, rollRenewals, cutItImpact } = engine;
+  const subs = normalize({ subscriptions: [
+    { id: 'w', name: 'Coffee club', amount: 10, cycle: 'weekly', nextRenewal: '2026-09-28', category: 'Food', cardId: 'c' },
+    { id: 'm', name: 'Streaming', amount: 15.49, cycle: 'monthly', nextRenewal: '2026-10-31', category: 'Streaming', cardId: 'c' },
+    { id: 'q', name: 'Box', amount: 30, cycle: 'quarterly', nextRenewal: '2026-11-15', category: 'Shopping', cardId: 'other' },
+    { id: 'y', name: 'Cloud', amount: 99.99, cycle: 'yearly', nextRenewal: '2027-02-01', category: 'Software' },
+    { id: 'x', name: 'Cancelled gym', amount: 50, cycle: 'monthly', nextRenewal: '2026-10-05', category: 'Fitness', cancelledAt: '2026-09-01T00:00:00Z' }
+  ] }, '2026-09-25').subscriptions;
+  assert.equal(subYearly(subs[0]), 520);    assert.equal(subMonthly(subs[0]), 43.33);
+  assert.equal(subYearly(subs[1]), 185.88); assert.equal(subMonthly(subs[1]), 15.49);
+  assert.equal(subYearly(subs[2]), 120);    assert.equal(subMonthly(subs[2]), 10);
+  assert.equal(subYearly(subs[3]), 99.99);  assert.equal(subMonthly(subs[3]), 8.33);
+  const debts = [{ id: 'c', name: 'Visa', balance: 2000, apr: 24, minPayment: 50 }];
+  const tot = subscriptionTotals(subs, debts);
+  assert.equal(tot.count, 4, 'cancelled subscriptions are excluded');
+  assert.equal(tot.yearly, r2(520 + 185.88 + 120 + 99.99));
+  assert.equal(tot.monthly, r2(tot.yearly / 12));
+  assert.deepEqual(tot.byCategory.map((g) => [g.name, g.yearly]), [['Food', 520], ['Streaming', 185.88], ['Shopping', 120], ['Software', 99.99]]);
+  assert.deepEqual(tot.byCard.map((g) => [g.name, g.yearly, g.count]), [['Visa', 705.88, 2], ['Other / not a tracked card', 219.99, 2]]);
+  // Renewals: month-end anchors clamp and come back; weekly/quarterly/yearly step correctly
+  assert.deepEqual(renewalsBetween(subs[1], '2026-10-01', '2027-03-31'), ['2026-10-31', '2026-11-30', '2026-12-31', '2027-01-31', '2027-02-28', '2027-03-31']);
+  assert.deepEqual(renewalsBetween(subs[0], '2026-09-25', '2026-10-15'), ['2026-09-28', '2026-10-05', '2026-10-12']);
+  assert.deepEqual(renewalsBetween(subs[2], '2026-09-25', '2027-06-30'), ['2026-11-15', '2027-02-15', '2027-05-15']);
+  assert.deepEqual(renewalsBetween(subs[3], '2026-09-25', '2028-03-01'), ['2027-02-01', '2028-02-01']);
+  assert.deepEqual(renewalsBetween(subs[4], '2026-09-25', '2026-12-31'), [], 'cancelled never renews');
+  assert.deepEqual(renewalsBetween(subs[1], '2026-11-01', '2026-11-29'), [], 'nothing in a window with no renewal');
+  // Past renewal dates roll forward
+  const data = normalize({ subscriptions: [{ id: 'm', name: 'M', amount: 5, cycle: 'monthly', nextRenewal: '2026-07-31' }] }, '2026-09-25');
+  assert.equal(rollRenewals(data, '2026-09-25'), true);
+  assert.equal(data.subscriptions[0].nextRenewal, '2026-09-30');
+  assert.equal(rollRenewals(data, '2026-09-25'), false);
+  // Cut it: yearly savings + days sooner via the payoff engine
+  const opts = { perPaycheck: 300, frequency: 'biweekly', payAnchor: '2026-10-02', today: '2026-09-24', strategy: 'avalanche' };
+  const cut = cutItImpact(cards, opts, subs[0]);
+  assert.equal(cut.yearly, 520); assert.equal(cut.monthly, 43.33);
+  assert.equal(cut.perPaycheck, r2(43.33 / (26 / 12)));
+  const faster = simulatePayoff(cards, { ...opts, perPaycheck: 300 + cut.perPaycheck });
+  const base = simulatePayoff(cards, opts);
+  assert.equal(cut.daysSooner, Math.round((parseISO(base.debtFree) - parseISO(faster.debtFree)) / 86400000));
+  assert.ok(cut.daysSooner > 0, `cutting $520/yr frees up days (got ${cut.daysSooner})`);
+  assert.ok(cut.interestSaved > 0);
+  assert.equal(cutItImpact([], opts, subs[0]).daysSooner, 0, 'no debt → nothing sooner');
 }
 
 // ----- results table -----
