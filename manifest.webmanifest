@@ -1,7 +1,7 @@
 {
   "name": "Money HQ",
   "short_name": "Money HQ",
-  "description": "Money HQ: your private money dashboard for debt payoff, net worth and subscriptions",
+  "description": "Money HQ: your private money dashboard for debt payoff, cards, net worth, subscriptions and home buying",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

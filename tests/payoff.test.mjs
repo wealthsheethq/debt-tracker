@@ -9,7 +9,10 @@ const engine = new Function(`${src}; return { simulatePayoff, projectPlan, proje
   buildChecklist, checkChecklistItem, uncheckChecklistItem, recordBalance, detectDrift, driftSummary, driftDelayDays,
   projectInvesting, buildMonthlySummary, ensureMonthlySummary, daysAheadOfPlan, balanceTransferCheck, lastPaydayOnOrBefore, toISO, parseISO, r2,
   netWorth, recordNetWorthSnapshot, netWorthChange, checkNetWorthMilestones, subscriptionTotals, subYearly, subMonthly,
-  renewalsBetween, rollRenewals, cutItImpact, ACCOUNT_TYPES, CYCLES };`)();
+  renewalsBetween, rollRenewals, cutItImpact, ACCOUNT_TYPES, CYCLES,
+  merchantCategory, allMerchants, earnFor, rankCards, yearlyEarn, spentTowardRule, periodKeyFor, CARD_PRESETS, cardFromPreset, normalizeWalletCard,
+  creditPeriod, toggleCreditUsed, creditUsed, creditsSummary, expiringCredits, monthlyPI, housingPayment, maxPriceForDTI, affordability, cashToClose,
+  homeReadyDate, computeInsights, visibleInsights, dismissInsight, sigOf, planOptionsFrom, defaultHome };`)();
 const { simulatePayoff, projectPlan, normalize, baselineAt, r2, parseISO } = engine;
 
 // Three fake cards (sample data only).
@@ -468,7 +471,7 @@ assert.ok(tooLow.warnings.length > 0);
     const snapshot = JSON.parse(JSON.stringify(src));
     const m = normalize(src, '2026-09-25');
     assert.deepEqual(src, snapshot, `${label}: input not mutated`);
-    assert.equal(m.version, 4, `${label}: bumped to v4`);
+    assert.equal(m.version, 5, `${label}: bumped to the current version`);
     // every field the old version saved is still there with the same value
     const same = (a, b, path) => {
       if (a && typeof a === 'object' && !Array.isArray(a)) { for (const k of Object.keys(a)) { if (k === 'version') continue; same(a[k], b[k], `${path}.${k}`); } }
@@ -599,6 +602,253 @@ assert.ok(tooLow.warnings.length > 0);
   assert.ok(cut.daysSooner > 0, `cutting $520/yr frees up days (got ${cut.daysSooner})`);
   assert.ok(cut.interestSaved > 0);
   assert.equal(cutItImpact([], opts, subs[0]).daysSooner, 0, 'no debt → nothing sooner');
+}
+
+// ===================== PHASE 2 =====================
+const preset = (id) => engine.CARD_PRESETS.find((p) => p.id === id);
+const walletData = (extra = {}) => normalize(Object.assign({
+  wallet: [
+    Object.assign(JSON.parse(JSON.stringify(preset('amex-bcp'))), { id: 'bcp' }),
+    Object.assign(JSON.parse(JSON.stringify(preset('apple'))), { id: 'apl' }),
+    Object.assign(JSON.parse(JSON.stringify(preset('amex-plat'))), { id: 'plat', cpp: 2 })
+  ]
+}, extra), '2026-09-25');
+
+// ----- merchant category mapping -----
+{
+  const { merchantCategory } = engine;
+  const data = normalize({ merchants: [{ name: 'Costco', category: 'supermarket' }, { name: 'Corner Deli', category: 'dining' }] }, '2026-09-25');
+  assert.equal(merchantCategory(data, 'Harris Teeter').category, 'supermarket');
+  assert.equal(merchantCategory(data, '  harris   teeter ').name, 'Harris Teeter', 'case and spacing insensitive');
+  assert.equal(merchantCategory(data, 'Walmart').category, 'superstore', 'Walmart is NOT a supermarket');
+  assert.equal(merchantCategory(data, 'Target').category, 'superstore', 'Target is NOT a supermarket');
+  assert.equal(merchantCategory(normalize({}, '2026-09-25'), 'Costco').category, 'wholesale', 'Costco is a warehouse club by default');
+  assert.equal(merchantCategory(data, 'Costco').category, 'supermarket', 'your merchant list overrides the built-in one');
+  assert.equal(merchantCategory(data, 'Costco').source, 'mine');
+  assert.equal(merchantCategory(data, 'Amazon').category, 'online');
+  assert.equal(merchantCategory(data, 'Corner Deli').category, 'dining', 'merchants you add are found');
+  assert.equal(merchantCategory(data, 'harris').name, 'Harris Teeter', 'partial match');
+  assert.deepEqual(merchantCategory(data, 'gas'), { name: null, category: 'gas', source: 'category' }, 'category names work too');
+  assert.equal(merchantCategory(data, 'Supermarkets').category, 'supermarket');
+  assert.equal(merchantCategory(data, 'zzzz'), null);
+  assert.equal(merchantCategory(data, ''), null);
+}
+
+// ----- earn-rule ranking with caps and points values -----
+{
+  const { rankCards, earnFor, spentTowardRule, yearlyEarn } = engine;
+  const data = walletData();
+  const bcp = data.wallet[0], apl = data.wallet[1], plat = data.wallet[2];
+  // Supermarket $100: BCP 6% ($6) > Apple 2% ($2) > Platinum 1x at 2¢ ($2), ties broken by lower fee
+  let r = rankCards(data, { category: 'supermarket', merchant: 'Harris Teeter', amount: 100, today: '2026-09-25' });
+  assert.deepEqual(r.ranked.map((x) => [x.card.id, x.value]), [['bcp', 6], ['apl', 2], ['plat', 2]]);
+  assert.equal(r.best.card.id, 'bcp');
+  // Walmart isn't a supermarket: BCP falls to 1%, Apple's 2% wins
+  r = rankCards(data, { category: 'superstore', merchant: 'Walmart', amount: 100, today: '2026-09-25' });
+  assert.equal(r.best.card.id, 'apl'); assert.equal(r.best.value, 2);
+  // Merchant-specific rule: Apple 3% at Uber beats BCP 3% transit (tie → lower fee), Platinum 1x·2¢
+  r = rankCards(data, { category: 'transit', merchant: 'Uber', amount: 50, today: '2026-09-25' });
+  assert.deepEqual(r.ranked.map((x) => [x.card.id, x.value]), [['apl', 1.5], ['bcp', 1.5], ['plat', 1]]);
+  // Points value: Platinum flights 5x at 2¢ = 10%
+  r = rankCards(data, { category: 'flights', merchant: 'Delta', amount: 400, today: '2026-09-25' });
+  assert.equal(r.best.card.id, 'plat'); assert.equal(r.best.value, 40); assert.equal(r.best.effectivePct, 10);
+  plat.cpp = 0.6;   // a lower cents-per-point value changes the answer
+  assert.equal(earnFor(plat, 'flights', 'Delta', 400).value, 12);
+  plat.cpp = 2;
+  // Cap: $6,000/calendar year at 6%, then 1%. Log $5,950 this year → $100 purchase earns 50×6% + 50×1%
+  data.cardSpend.push({ id: 's1', cardId: 'bcp', category: 'supermarket', merchant: 'Harris Teeter', amount: 5950, date: '2026-03-01' });
+  data.cardSpend.push({ id: 's0', cardId: 'bcp', category: 'supermarket', merchant: '', amount: 999, date: '2025-12-20' });   // last year: doesn't count
+  data.cardSpend.push({ id: 's2', cardId: 'bcp', category: 'gas', merchant: '', amount: 300, date: '2026-04-01' });           // other category: doesn't count
+  const supRule = bcp.rules.find((x) => x.category === 'supermarket');
+  assert.equal(spentTowardRule(data, bcp, supRule, '2026-09-25'), 5950);
+  r = rankCards(data, { category: 'supermarket', merchant: 'Harris Teeter', amount: 100, today: '2026-09-25' });
+  const b = r.ranked.find((x) => x.card.id === 'bcp');
+  assert.equal(b.value, 3.5); assert.equal(b.partial, true); assert.equal(b.capRemaining, 50);
+  // Cap fully used → recommendation switches to Apple
+  data.cardSpend.push({ id: 's3', cardId: 'bcp', category: 'supermarket', merchant: '', amount: 50, date: '2026-09-01' });
+  r = rankCards(data, { category: 'supermarket', merchant: 'Harris Teeter', amount: 100, today: '2026-09-25' });
+  assert.equal(r.best.card.id, 'apl', 'cap hit → switch cards');
+  assert.equal(r.ranked.find((x) => x.card.id === 'bcp').capHit, true);
+  // …and resets in the new calendar year
+  r = rankCards(data, { category: 'supermarket', merchant: 'Harris Teeter', amount: 100, today: '2027-01-02' });
+  assert.equal(r.best.card.id, 'bcp');
+  // Paying down a card: flagged, and never the "best" pick
+  const debtData = walletData({ debts: [{ id: 'd-bcp', name: 'Blue Cash', balance: 1200, apr: 25, minPayment: 40 }] });
+  debtData.wallet[0].debtId = 'd-bcp';
+  r = rankCards(debtData, { category: 'supermarket', merchant: 'Harris Teeter', amount: 100, today: '2026-09-25' });
+  assert.equal(r.ranked[0].card.id, 'bcp'); assert.equal(r.ranked[0].payingDown, true);
+  assert.equal(r.best.card.id, 'apl', 'best skips cards with a balance being paid down');
+  debtData.debts[0].paid = true;
+  assert.equal(rankCards(debtData, { category: 'supermarket', merchant: null, amount: 100, today: '2026-09-25' }).best.card.id, 'bcp');
+  // Yearly value with an annual cap: $700/mo groceries = $8,400/yr → 6,000×6% + 2,400×1% = $384
+  assert.equal(yearlyEarn(bcp, 'supermarket', 700), 384);
+  // Monthly caps scale to a year
+  const mcap = engine.normalizeWalletCard({ name: 'M', rules: [{ category: 'dining', rate: 5, cap: 100, capPeriod: 'month', afterRate: 1 }, { category: 'everything', rate: 1 }] });
+  assert.equal(yearlyEarn(mcap, 'dining', 200), r2(1200 * 0.05 + 1200 * 0.01));
+}
+
+// ----- card credits: periods, resets, used toggles -----
+{
+  const { creditPeriod, toggleCreditUsed, creditUsed, creditsSummary, expiringCredits } = engine;
+  const c = (period, extra = {}) => Object.assign({ id: 'c', name: 'X', amount: 10, period, resetMonth: 1, used: {} }, extra);
+  assert.deepEqual(creditPeriod(c('monthly'), '2026-09-25'), { key: '2026-09-01', start: '2026-09-01', reset: '2026-10-01', daysLeft: 6 });
+  assert.equal(creditPeriod(c('monthly'), '2026-12-31').reset, '2027-01-01');
+  assert.deepEqual(creditPeriod(c('quarterly'), '2026-08-15'), { key: '2026-07-01', start: '2026-07-01', reset: '2026-10-01', daysLeft: 47 });
+  assert.equal(creditPeriod(c('semiannual'), '2026-03-10').reset, '2026-07-01');
+  assert.equal(creditPeriod(c('semiannual'), '2026-09-25').key, '2026-07-01');
+  assert.equal(creditPeriod(c('calendarYear'), '2026-09-25').reset, '2027-01-01');
+  // Card-year credit that resets every May
+  assert.deepEqual(creditPeriod(c('annual', { resetMonth: 5 }), '2026-03-01'), { key: '2025-05-01', start: '2025-05-01', reset: '2026-05-01', daysLeft: 61 });
+  assert.equal(creditPeriod(c('annual', { resetMonth: 5 }), '2026-05-01').key, '2026-05-01');
+  // Used toggles belong to one period and clear themselves when it resets
+  const uber = c('monthly', { amount: 15 });
+  assert.equal(toggleCreditUsed(uber, '2026-09-25', '2026-09-25T10:00:00Z'), true);
+  assert.equal(creditUsed(uber, '2026-09-30'), true);
+  assert.equal(creditUsed(uber, '2026-10-01'), false, 'a new period starts unused');
+  assert.equal(toggleCreditUsed(uber, '2026-09-26'), false, 'toggle back off');
+  toggleCreditUsed(uber, '2026-08-10'); toggleCreditUsed(uber, '2026-09-10');
+  const card = engine.normalizeWalletCard({ name: 'Plat', annualFee: 895, credits: [uber, c('quarterly', { id: 'q', amount: 100, used: { '2026-07-01': 'x', '2025-10-01': 'x' } }), c('monthly', { id: 'y', name: 'Y', amount: 5 })] });
+  assert.deepEqual(creditsSummary(card, '2026-09-25'), { captured: 130, potential: 15 * 12 + 400 + 60, fee: 895, net: 130 - 895 });
+  // Unused credits resetting within 7 days
+  const data = normalize({ wallet: [card] }, '2026-09-25');
+  const exp = expiringCredits(data, '2026-09-25', 7);
+  assert.deepEqual(exp.map((e) => [e.credit.name, e.period.daysLeft, e.lastDay]), [['Y', 6, '2026-09-30']], 'only the unused credit that resets soon');
+  assert.equal(expiringCredits(data, '2026-09-20', 7).length, 0, 'nothing resets within a week of Sep 20');
+}
+
+// ----- mortgage payment and DTI max-price math -----
+{
+  const { monthlyPI, housingPayment, maxPriceForDTI, affordability, cashToClose } = engine;
+  assert.equal(monthlyPI(200000, 6, 30), 1199.1);    // standard amortization
+  assert.equal(monthlyPI(300000, 7, 30), 1995.91);
+  assert.equal(monthlyPI(120000, 0, 30), 333.33);    // 0% rate
+  const h = Object.assign(engine.defaultHome(), { downPct: 5, closingPct: 3, ratePct: 6.5, termYears: 30, taxRatePct: 1.2, insuranceYr: 1800, pmiRatePct: 0.5, hoaMonthly: 50, grossIncomeYr: 90000 });
+  const p = housingPayment(300000, h);
+  assert.equal(p.loan, 285000); assert.equal(p.down, 15000);
+  assert.equal(p.pi, monthlyPI(285000, 6.5, 30));
+  assert.equal(p.tax, 300); assert.equal(p.ins, 150); assert.equal(p.pmi, 118.75); assert.equal(p.hoa, 50);
+  assert.equal(p.total, r2(p.pi + 300 + 150 + 118.75 + 50));
+  assert.equal(housingPayment(300000, Object.assign({}, h, { downPct: 20 })).pmi, 0, 'no PMI at 20% down');
+  // 28% of $7,500/mo = $2,100 for housing; the max price is the highest one that fits
+  const front = maxPriceForDTI(h, 28, 0);
+  assert.ok(housingPayment(front, h).total <= 2100 && housingPayment(front + 200, h).total > 2100, `front-end max ${front}`);
+  // Back-end 36% with $600/mo of other debt = $2,100 left for housing too
+  assert.equal(maxPriceForDTI(h, 36, 600), front);
+  const a = affordability(h, 900);
+  assert.equal(a.max, Math.min(a.front28, a.back36));
+  assert.ok(a.back36 < a.front28 && a.back43 > a.back36, 'debts tighten back-end; 43% allows more');
+  assert.equal(affordability(h, 0).max, front, 'with no other debt the 28% front-end limit binds');
+  assert.equal(maxPriceForDTI(Object.assign({}, h, { grossIncomeYr: 0 }), 28, 0), 0);
+  assert.deepEqual(cashToClose(300000, h, 3000), { down: 15000, closing: 9000, emergency: 9000, total: 33000 });
+}
+
+// ----- down-payment-ready date -----
+{
+  const { homeReadyDate } = engine;
+  const points = [{ date: '2026-09-25', debt: 10000, hysa: 5000 }, { date: '2026-10-01', debt: 8000, hysa: 5500 }, { date: '2026-11-01', debt: 4000, hysa: 6000 }, { date: '2026-11-20', debt: 0, hysa: 6000 }];
+  // Already reached during the debt plan
+  assert.deepEqual(homeReadyDate({ points, debtFree: '2026-11-20', apy: 0, monthlyContribution: 500, freedMonthly: 2000, target: 5500 }), { date: '2026-10-01', monthsAfterDebtFree: -1, hysaAtDate: 5500 });
+  // After debt-free: +$500 contribution + $2,000 freed each month, 0% APY → $6,000 + 2×$2,500 = $11,000 in Jan
+  assert.deepEqual(homeReadyDate({ points, debtFree: '2026-11-20', apy: 0, monthlyContribution: 500, freedMonthly: 2000, target: 11000 }), { date: '2027-01-01', monthsAfterDebtFree: 2, hysaAtDate: 11000 });
+  assert.equal(homeReadyDate({ points, debtFree: '2026-11-20', apy: 0, monthlyContribution: 500, freedMonthly: 2000, target: 11001 }).date, '2027-02-01');
+  // Today when it's already there
+  assert.equal(homeReadyDate({ points, debtFree: '2026-11-20', apy: 0, monthlyContribution: 0, freedMonthly: 0, target: 4000 }).date, '2026-09-25');
+  // Never, if nothing is being saved
+  assert.equal(homeReadyDate({ points, debtFree: '2026-11-20', apy: 0, monthlyContribution: 0, freedMonthly: 0, target: 1e6, maxMonths: 24 }), null);
+}
+
+// ----- insights: generation and dismissal -----
+{
+  const { computeInsights, visibleInsights, dismissInsight } = engine;
+  const fmt = (v) => '$' + Math.round(v).toLocaleString('en-US');
+  const data = walletData({
+    debts: [{ id: 'd1', name: 'Card', balance: 12000, apr: 22, minPayment: 240, creditLimit: 15000 }],
+    budget: { debtPerPaycheck: 400, savingsPerPaycheck: 200, takeHome: 2500, frequency: 'biweekly', payAnchor: '2026-10-02', cardSpending: 100 },
+    savings: { balance: 4000, apy: 4 },
+    subscriptions: [{ id: 's', name: 'Streamer', amount: 20, cycle: 'monthly', nextRenewal: '2026-10-10', review: true }, { id: 't', name: 'Gym', amount: 45, cycle: 'monthly', nextRenewal: '2026-10-03', review: true }],
+    spendProfile: { supermarket: 600, gas: 100 },
+    home: { priceMin: 250000, priceMax: 300000, downPct: 3, closingPct: 3, ratePct: 6.5, taxRatePct: 1, insuranceYr: 1500, grossIncomeYr: 85000 }
+  });
+  data.drift.push({ id: 'dr', debtId: 'd1', debtName: 'Card', at: '2026-09-20T12:00:00Z', month: '2026-09', rise: 400, before: 2600, after: 3000 });
+  const all = computeInsights(data, '2026-09-25', fmt);
+  const ids = all.map((i) => i.id);
+  // Credit resets in 6 days, unused (Disney credit on BCP, monthly credits on Platinum)
+  assert.ok(ids.some((x) => x.startsWith('credit:bcp:')), 'unused credit expiring soon');
+  assert.ok(all.find((x) => x.id.startsWith('credit:')).text.includes('resets in 6 days, unused'));
+  assert.ok(ids.includes('drift:2026-09') && all.find((i) => i.id === 'drift:2026-09').text.includes('$300'), 'drift beyond allowance');
+  const best = all.find((i) => i.id === 'bestcard:supermarket');
+  assert.ok(best, 'best card for groceries');
+  assert.equal(best.text, `Harris Teeter on **Amex Blue Cash Preferred** earns **${fmt((6000 * 0.06 + 1200 * 0.01) - 7200 * 0.02)} more a year** than Apple Card.`);
+  const rev = all.find((i) => i.id === 'review-subs');
+  assert.ok(rev && /moves debt-free day up \*\*\d+ days?\*\*/.test(rev.text), 'flagged subscriptions → days sooner');
+  assert.ok(ids.includes('home-ready'), 'down payment timing');
+  assert.ok(ids.includes('utilization'));
+  // Every insight has a type, priority, action and signature; sorted by priority
+  all.forEach((i) => { assert.ok(i.type && Number.isFinite(i.priority) && i.action && i.action.tab && i.sig !== undefined, i.id); });
+  assert.deepEqual(all.map((i) => i.priority), all.map((i) => i.priority).slice().sort((a, b) => b - a));
+  // Dismiss: gone while the numbers hold, back when they change meaningfully
+  const drift = all.find((i) => i.id === 'drift:2026-09');
+  dismissInsight(data, drift, '2026-09-25T13:00:00Z');
+  assert.ok(!visibleInsights(computeInsights(data, '2026-09-25', fmt), data.insightDismissals).some((i) => i.id === drift.id), 'dismissed');
+  data.drift[0].rise = 402;   // tiny change: still dismissed
+  assert.ok(!visibleInsights(computeInsights(data, '2026-09-25', fmt), data.insightDismissals).some((i) => i.id === drift.id), 'small change keeps it dismissed');
+  data.drift[0].rise = 900;   // meaningful change: comes back
+  assert.ok(visibleInsights(computeInsights(data, '2026-09-25', fmt), data.insightDismissals).some((i) => i.id === drift.id), 'returns when numbers change');
+  // Dismissals survive save/load
+  assert.deepEqual(normalize(JSON.parse(JSON.stringify(data)), '2026-09-25').insightDismissals, data.insightDismissals);
+  // Using the credit removes that insight
+  const exp = all.find((x) => x.id.startsWith('credit:bcp:'));
+  engine.toggleCreditUsed(data.wallet[0].credits[0], '2026-09-25');
+  assert.ok(!computeInsights(data, '2026-09-25', fmt).some((i) => i.id === exp.id));
+  // Empty data → no crash, nothing to say
+  assert.deepEqual(computeInsights(normalize({}, '2026-09-25'), '2026-09-25', fmt), []);
+}
+
+// ----- migration from every previous version (v1…v4) to v5 -----
+{
+  const v1 = { version: 1, debts: [{ id: 'd1', name: 'Card', type: 'card', balance: 1500, startBalance: 2000, apr: 22, minPayment: 40, promoEnd: '', paid: false, paidAt: null, createdAt: '2026-01-01T00:00:00Z' }],
+    budget: { takeHome: 2000, frequency: 'biweekly', payAnchor: '2026-09-25', debtPerPaycheck: 300, savingsPerPaycheck: 100, lumpSum: 0 }, strategy: 'snowball', activePlan: 'A',
+    savings: { balance: 800, goal: 5000, apy: 4, monthlyContribution: null }, history: [{ id: 'h1', at: '2026-09-01T00:00:00Z', kind: 'payment', debtId: 'd1', debtName: 'Card', amount: 100, before: 1600, after: 1500 }], milestones: { 25: '2026-09-01T00:00:00Z' } };
+  const v2 = Object.assign(JSON.parse(JSON.stringify(v1)), { version: 2, customOrder: ['d1'], customMilestones: [{ id: 'm1', title: 'Gone', reward: 'Pizza', type: 'debtPaid', debtId: 'd1', value: 0, earnedAt: null }],
+    checkins: [{ id: 'c1', date: '2026-09-10', at: '2026-09-10T00:00:00Z', balances: { d1: 1500 }, totalDebt: 1500, hysa: 800 }], baseline: null });
+  Object.assign(v2.debts[0], { creditLimit: 5000, keepOpen: 500, dueDay: 12 });
+  Object.assign(v2.budget, { rentReserve: 600, spending: 200, customItems: [], freedLater: {}, lumpFromSavings: false });
+  const v3 = Object.assign(JSON.parse(JSON.stringify(v2)), { version: 3, checklistSince: '2026-09-20', payChecklists: [], drift: [], afterPlan: { monthly: 900, rothPct: 80, rothLimit: 7000, annualReturn: 6 }, monthlySummaries: [], monthMarks: {} });
+  v3.debts[0].promoApr = 0; v3.budget.cardSpending = 150;
+  const v4 = Object.assign(JSON.parse(JSON.stringify(v3)), { version: 4, accounts: [{ id: 'a1', name: 'Checking', type: 'checking', balance: 1200, archived: false, createdAt: '2026-09-25T00:00:00Z', updatedAt: null }],
+    netWorthHistory: [{ month: '2026-09', date: '2026-09-25', at: '2026-09-25T00:00:00Z', assets: 2000, liabilities: 1500, netWorth: 500, byType: {} }], nwMilestones: { 0: 'before' }, nwMilestonesInit: true,
+    subscriptions: [{ id: 's1', name: 'Music', amount: 10.99, cycle: 'monthly', nextRenewal: '2026-10-31', anchorDay: 31, category: 'Music', cardId: 'd1', review: true, cancelledAt: null, createdAt: '2026-09-25T00:00:00Z' }],
+    onboarding: { completedAt: '2026-09-25T00:00:00Z', skippedAt: null } });
+  const same = (a, b, path) => {
+    if (a && typeof a === 'object' && !Array.isArray(a)) { for (const k of Object.keys(a)) { if (k === 'version') continue; same(a[k], b[k], `${path}.${k}`); } }
+    else if (Array.isArray(a)) { assert.equal(b.length, a.length, `${path} length`); a.forEach((x, i) => same(x, b[i], `${path}[${i}]`)); }
+    else assert.deepEqual(b, a, path);
+  };
+  for (const [label, src] of [['v1', v1], ['v2', v2], ['v3', v3], ['v4', v4]]) {
+    const snap = JSON.parse(JSON.stringify(src));
+    const m = normalize(src, '2026-09-25');
+    assert.deepEqual(src, snap, `${label}: not mutated`);
+    assert.equal(m.version, 5, `${label} → v5`);
+    same(src, m, label);
+    assert.deepEqual(m.wallet, []); assert.deepEqual(m.merchants, []); assert.deepEqual(m.cardSpend, []); assert.deepEqual(m.spendProfile, {});
+    assert.deepEqual(m.insightDismissals, {});
+    assert.deepEqual(m.settings, { currency: 'USD', locale: 'en-US', weekStart: 0, reduceMotion: false });
+    assert.equal(m.home.downPct, 5); assert.equal(m.home.closingPct, 3); assert.equal(m.home.ratePct, null, 'no hardcoded mortgage rate');
+    assert.deepEqual(m.home.programs.map((p) => p.name), ['NC Home Advantage Mortgage', 'NC 1st Home Advantage Down Payment', 'NC Mortgage Credit Certificate', 'HouseCharlotte']);
+    assert.ok(m.home.programs.every((p) => p.verify), 'programs are labeled "verify current terms"');
+    assert.deepEqual(normalize(JSON.parse(JSON.stringify(m)), '2026-09-25'), m, `${label}: idempotent`);
+    const o = { perPaycheck: 300, frequency: 'biweekly', payAnchor: '2026-09-25', today: '2026-09-25', strategy: 'snowball' };
+    assert.deepEqual(simulatePayoff(m.debts, o).payoffs, simulatePayoff(src.debts, o).payoffs, `${label}: same plan`);
+  }
+  // v5 data round-trips; a deleted program list stays deleted
+  const v5 = normalize({ wallet: [preset('amex-bcp')], merchants: [{ name: 'Harris Teeter', category: 'supermarket' }], home: { programs: [] }, settings: { currency: 'EUR', locale: 'de-DE', weekStart: 1, reduceMotion: true } }, '2026-09-25');
+  assert.deepEqual(v5.home.programs, []);
+  assert.deepEqual(v5.settings, { currency: 'EUR', locale: 'de-DE', weekStart: 1, reduceMotion: true });
+  assert.equal(v5.wallet[0].rules.find((r) => r.category === 'supermarket').cap, 6000);
+  assert.deepEqual(normalize(JSON.parse(JSON.stringify(v5)), '2026-09-25'), v5);
+  // Presets are complete and editable copies
+  engine.CARD_PRESETS.forEach((p) => { const c = engine.cardFromPreset(p, '2026-09-25T00:00:00Z'); assert.ok(c.rules.some((r) => r.category === 'everything'), `${p.id} has a base rate`); assert.notEqual(c.id, p.id); });
+  for (const id of ['amex-bcp', 'amex-plat', 'c1-savor', 'apple', 'rh-gold']) assert.ok(preset(id), `preset ${id}`);
 }
 
 // ----- results table -----

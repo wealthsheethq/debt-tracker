@@ -167,7 +167,7 @@ main { max-width: 720px; margin: 0 auto; padding: var(--sp-4) var(--sp-4) calc(v
 /* ---------- tab bar ---------- */
 .tabbar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
-  display: grid; grid-template-columns: repeat(5, minmax(0,1fr));
+  display: grid; grid-template-columns: repeat(6, minmax(0,1fr));
   height: calc(var(--tab-h) + env(safe-area-inset-bottom));
   padding: 6px var(--sp-2) env(safe-area-inset-bottom);
   background: rgba(17,19,24,.92); backdrop-filter: saturate(160%) blur(16px); -webkit-backdrop-filter: saturate(160%) blur(16px);
@@ -175,10 +175,10 @@ main { max-width: 720px; margin: 0 auto; padding: var(--sp-4) var(--sp-4) calc(v
 }
 .tabbar button {
   position: relative; background: none; border: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
-  color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .2px; cursor: pointer; min-width: 0; padding: 0 2px; white-space: nowrap; border-radius: var(--r-md);
+  color: var(--faint); font-size: 10.5px; font-weight: 700; letter-spacing: .1px; cursor: pointer; min-width: 0; padding: 0 1px; white-space: nowrap; overflow: hidden; border-radius: var(--r-md);
   transition: color var(--dur-1);
 }
-.tabbar button .ic { width: 24px; height: 24px; transition: transform var(--dur-2) var(--ease); }
+.tabbar button .ic { width: 23px; height: 23px; transition: transform var(--dur-2) var(--ease); }
 .tabbar button::before { content: ''; position: absolute; top: 4px; width: 44px; height: 32px; border-radius: var(--r-pill); background: var(--accent-soft); opacity: 0; transform: scale(.6); transition: opacity var(--dur-2) var(--ease), transform var(--dur-2) var(--ease); }
 .tabbar button.active { color: var(--accent); }
 .tabbar button.active::before { opacity: 1; transform: none; }
@@ -272,6 +272,25 @@ select.input { background-image: linear-gradient(45deg, transparent 50%, var(--m
 .insight.warn .i-ico { background: var(--warn-soft); color: var(--warn); }
 .insight.bad .i-ico { background: var(--debt-soft); color: var(--debt); }
 .insight p { margin: 0; font-size: var(--fs-md); line-height: 1.4; }
+.insight { position: relative; }
+.insight .i-main { flex: 1; min-width: 0; background: none; border: 0; padding: 0 22px 0 0; text-align: left; color: inherit; font: inherit; cursor: pointer; }
+.insight .i-x { position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; border-radius: 50%; border: 0; background: transparent; color: var(--faint); cursor: pointer; display: grid; place-items: center; }
+.insight .i-x:hover { background: var(--surface-3); color: var(--text); }
+.insight .i-x .ic { vertical-align: 0; }
+.insight.wide { flex: none; width: 100%; }
+@media (min-width: 760px) {
+  .insights { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); overflow: visible; margin: 0 0 var(--sp-3); padding: 0; }
+  .insights .insight { flex: none; }
+}
+.up.credit .d b { color: var(--warn); }
+/* global search */
+.gsearch { position: relative; margin-bottom: var(--sp-4); }
+.gsearch .ic.lead { position: absolute; left: 14px; top: 15px; color: var(--faint); pointer-events: none; }
+.gsearch .input { padding-left: 42px; border-radius: var(--r-pill); background: var(--surface); }
+.gs-out { position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 25; background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--r-lg); padding: 4px var(--sp-3); box-shadow: var(--shadow-pop); max-height: 60vh; overflow-y: auto; }
+@media (min-width: 900px) { .tabbar { padding-left: calc(50% - 380px); padding-right: calc(50% - 380px); } }
+/* user-chosen reduced motion */
+html.rm *, html.rm *::before, html.rm *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 
 /* list rows */
 .list { list-style: none; margin: 0; padding: 0; }
@@ -644,6 +663,7 @@ details.recap[open] summary { margin-bottom: 10px; }
       <section class="subview" id="view-paychecks"></section>
       <section class="subview" id="view-savings"></section>
     </section>
+    <section class="view" id="view-cards" aria-label="Cards"></section>
     <section class="view" id="view-networth" aria-label="Net worth"></section>
     <section class="view" id="view-spending" aria-label="Spending"></section>
     <section class="view" id="view-more" aria-label="More"></section>
@@ -651,6 +671,7 @@ details.recap[open] summary { margin-bottom: 10px; }
   <nav class="tabbar" id="tabbar" aria-label="Main">
     <button data-tab="home" type="button"><svg class="ic"><use href="#i-home"/></svg>Home</button>
     <button data-tab="debt" type="button"><svg class="ic"><use href="#i-card"/></svg>Debt</button>
+    <button data-tab="cards" type="button"><svg class="ic"><use href="#i-bolt"/></svg>Cards</button>
     <button data-tab="networth" type="button"><svg class="ic"><use href="#i-trend"/></svg>Net Worth</button>
     <button data-tab="spending" type="button"><svg class="ic"><use href="#i-receipt"/></svg>Spending</button>
     <button data-tab="more" type="button"><svg class="ic"><use href="#i-more"/></svg>More</button>
@@ -1053,10 +1074,408 @@ function cutItImpact(debts, opts, sub) {
   return { yearly, monthly, perPaycheck, daysSooner, baseDebtFree: base.ok ? base.debtFree : null, newDebtFree: faster.ok ? faster.debtFree : null, interestSaved: r2(base.totalInterest - faster.totalInterest) };
 }
 
+/* ---------- plan helpers shared by the app and the insights engine ---------- */
+function effectiveOrderFrom(data) {
+  const ids = data.customOrder.filter((id) => data.debts.some((d) => d.id === id && !d.paid));
+  data.debts.forEach((d) => { if (!d.paid && !ids.includes(d.id)) ids.push(d.id); });
+  return ids;
+}
+/** The payoff options the app uses for `data` on `today` (active plan's lump, skip a payday already handled by a checklist). */
+function planOptionsFrom(data, today, extra = 0, strategy = data.strategy, lump = data.activePlan === 'B' ? data.budget.lumpSum : 0) {
+  const b = data.budget;
+  return {
+    perPaycheck: Math.max(0, b.debtPerPaycheck + extra), frequency: b.frequency, payAnchor: b.payAnchor, today,
+    strategy, customOrder: effectiveOrderFrom(data), lumpSum: lump,
+    skipThrough: data.payChecklists.some((c) => c.date === today) ? today : null
+  };
+}
+function monthlyContributionFrom(data) {
+  if (data.savings.monthlyContribution !== null) return data.savings.monthlyContribution;
+  return r2(data.budget.savingsPerPaycheck * FREQUENCIES[data.budget.frequency].perMonth);
+}
+/** Money freed up each month after debt-free day: debt payments + budget items marked "freed later". */
+function freedMonthlyFrom(data) {
+  const b = data.budget;
+  let per = b.debtPerPaycheck;
+  if (b.freedLater.rentReserve) per += b.rentReserve;
+  if (b.freedLater.spending) per += b.spending;
+  b.customItems.forEach((i) => { if (i.freedLater) per += i.amount; });
+  return r2(per * FREQUENCIES[b.frequency].perMonth);
+}
+
+/* ---------- cards: categories, merchants, earn rules ---------- */
+const SPEND_CATEGORIES = {
+  supermarket: 'Supermarkets', dining: 'Dining', streaming: 'Streaming', gas: 'Gas', transit: 'Transit & rideshare',
+  travel: 'Travel', flights: 'Flights', hotels: 'Hotels', online: 'Online shopping', drugstore: 'Drugstores',
+  superstore: 'Superstores', wholesale: 'Warehouse clubs', entertainment: 'Entertainment', phone: 'Phone & internet', everything: 'Everything else'
+};
+const CAP_PERIODS = { calendarYear: { label: 'per calendar year', perYear: 1 }, quarter: { label: 'per quarter', perYear: 4 }, month: { label: 'per month', perYear: 12 }, none: { label: 'no reset', perYear: 1 } };
+const NETWORKS = ['Visa', 'Mastercard', 'Amex', 'Discover', 'Other'];
+/** Built-in merchant → category map. Your own merchant list overrides these by name. */
+const DEFAULT_MERCHANTS = [
+  ['Harris Teeter', 'supermarket'], ['Food Lion', 'supermarket'], ['Publix', 'supermarket'], ['Kroger', 'supermarket'], ['Whole Foods', 'supermarket'],
+  ["Trader Joe's", 'supermarket'], ['Aldi', 'supermarket'], ['Lidl', 'supermarket'], ['Wegmans', 'supermarket'],
+  ['Walmart', 'superstore'], ['Target', 'superstore'], ['Costco', 'wholesale'], ["Sam's Club", 'wholesale'], ["BJ's", 'wholesale'],
+  ['Amazon', 'online'], ['Apple', 'online'], ['Netflix', 'streaming'], ['Spotify', 'streaming'], ['Hulu', 'streaming'], ['Disney+', 'streaming'],
+  ['YouTube TV', 'streaming'], ['Max', 'streaming'], ['Shell', 'gas'], ['Exxon', 'gas'], ['Mobil', 'gas'], ['BP', 'gas'], ['Circle K', 'gas'],
+  ['QuikTrip', 'gas'], ['Sheetz', 'gas'], ['Starbucks', 'dining'], ["McDonald's", 'dining'], ['Chipotle', 'dining'], ['DoorDash', 'dining'],
+  ['Uber Eats', 'dining'], ['Uber', 'transit'], ['Lyft', 'transit'], ['CVS', 'drugstore'], ['Walgreens', 'drugstore'], ['Delta', 'flights'],
+  ['American Airlines', 'flights'], ['Southwest', 'flights'], ['Marriott', 'hotels'], ['Hilton', 'hotels'], ['AMC Theatres', 'entertainment'],
+  ['Ticketmaster', 'entertainment'], ['T-Mobile', 'phone'], ['Verizon', 'phone'], ['Nike', 'everything'], ['Home Depot', 'everything'], ["Lowe's", 'everything']
+];
+const normName = (s) => String(s || '').toLowerCase().replace(/[’']/g, "'").replace(/\s+/g, ' ').trim();
+/** All merchants: yours first (they override built-ins with the same name), then the built-in list. */
+function allMerchants(data) {
+  const mine = data.merchants.map((m) => ({ name: m.name, category: m.category, source: 'mine', id: m.id }));
+  const taken = new Set(mine.map((m) => normName(m.name)));
+  return [...mine, ...DEFAULT_MERCHANTS.filter(([n]) => !taken.has(normName(n))).map(([name, category]) => ({ name, category, source: 'builtin' }))];
+}
+/** Look up where a purchase is: a merchant name (exact, then partial) or a category name. */
+function merchantCategory(data, query) {
+  const q = normName(query);
+  if (!q) return null;
+  const list = allMerchants(data);
+  const exact = list.find((m) => normName(m.name) === q);
+  if (exact) return { name: exact.name, category: exact.category, source: exact.source };
+  const cat = Object.entries(SPEND_CATEGORIES).find(([k, label]) => k === q || normName(label) === q);
+  if (cat) return { name: null, category: cat[0], source: 'category' };
+  const partial = list.find((m) => normName(m.name).startsWith(q)) || list.find((m) => q.startsWith(normName(m.name)) && normName(m.name).length >= 3);
+  return partial ? { name: partial.name, category: partial.category, source: partial.source } : null;
+}
+function periodKeyFor(period, iso) {
+  const d = parseISO(iso), y = d.getFullYear(), m = d.getMonth();
+  if (period === 'month') return `${y}-${String(m + 1).padStart(2, '0')}`;
+  if (period === 'quarter') return `${y}-Q${Math.floor(m / 3) + 1}`;
+  if (period === 'none') return 'all';
+  return String(y);
+}
+const ruleMatches = (rule, category, merchant) => (rule.merchants && rule.merchants.length
+  ? !!merchant && rule.merchants.some((m) => normName(m) === normName(merchant))
+  : rule.category === category || rule.category === 'everything');
+/** Spend logged toward a capped rule in its current cap period. */
+function spentTowardRule(data, card, rule, today) {
+  const key = periodKeyFor(rule.capPeriod, today);
+  return r2(data.cardSpend.filter((e) => e.cardId === card.id && periodKeyFor(rule.capPeriod, e.date) === key && rule.category !== 'everything' && ruleMatches(rule, e.category, e.merchant))
+    .reduce((t, e) => t + e.amount, 0));
+}
+const valuePerDollar = (card, rate) => (card.earnType === 'points' ? toNum(rate) * toNum(card.cpp) / 100 : toNum(rate) / 100);
+function baseRate(card) { const r = card.rules.find((x) => x.category === 'everything' && !(x.merchants && x.merchants.length)); return r ? r.rate : 1; }
+/**
+ * Reward for one purchase on one card. Every matching rule (merchant-specific, category, everything)
+ * is tried and the best one wins. Caps: spend past the remaining cap earns the rule's after-cap rate.
+ * opts.spent(rule) → spend already counted toward that rule this period; opts.yearly scales caps to a year.
+ */
+function earnFor(card, category, merchant, amount, opts = {}) {
+  amount = Math.max(0, toNum(amount));
+  let best = null;
+  for (const rule of card.rules) {
+    if (!ruleMatches(rule, category, merchant)) continue;
+    const after = rule.afterRate == null ? baseRate(card) : rule.afterRate;
+    let remaining = Infinity;
+    if (rule.cap > 0) remaining = opts.yearly ? rule.cap * CAP_PERIODS[rule.capPeriod].perYear : Math.max(0, rule.cap - (opts.spent ? opts.spent(rule) : 0));
+    const inCap = Math.min(amount, remaining);
+    const value = inCap * valuePerDollar(card, rule.rate) + (amount - inCap) * valuePerDollar(card, after);
+    if (!best || value > best.value + 1e-9) {
+      best = { value, rule, rate: inCap >= amount ? rule.rate : after, capped: rule.cap > 0, capRemaining: remaining === Infinity ? null : r2(remaining), capHit: rule.cap > 0 && remaining <= 0, partial: rule.cap > 0 && remaining > 0 && remaining < amount };
+    }
+  }
+  if (!best) best = { value: amount * valuePerDollar(card, 1), rule: null, rate: 1, capped: false, capRemaining: null, capHit: false, partial: false };
+  best.value = r2(best.value);
+  best.effectivePct = amount > 0 ? r2((best.value / amount) * 100) : 0;
+  return best;
+}
+/** A wallet card is "being paid down" when it's linked to a debt that still has a balance. */
+function payingDown(data, card) {
+  const d = card.debtId && data.debts.find((x) => x.id === card.debtId);
+  return !!(d && !d.paid && toNum(d.balance) > 0.004);
+}
+/** Rank wallet cards for a purchase. `best` is the top card you're not paying down. */
+function rankCards(data, { category, merchant, amount, today }) {
+  const ranked = data.wallet.filter((c) => !c.archived).map((card) => {
+    const e = earnFor(card, category, merchant, amount, { spent: (rule) => spentTowardRule(data, card, rule, today) });
+    return Object.assign(e, { card, payingDown: payingDown(data, card) });
+  }).sort((a, b) => b.value - a.value || a.card.annualFee - b.card.annualFee);
+  return { ranked, best: ranked.find((x) => !x.payingDown) || null };
+}
+/** Yearly reward for a category at a monthly spend (caps scaled to a year). */
+function yearlyEarn(card, category, monthlySpend, merchant) { return earnFor(card, category, merchant || null, monthlySpend * 12, { yearly: true }).value; }
+
+/* ---------- card credits ---------- */
+const CREDIT_PERIODS = { monthly: { label: 'Monthly', perYear: 12 }, quarterly: { label: 'Quarterly', perYear: 4 }, semiannual: { label: 'Every 6 months', perYear: 2 }, annual: { label: 'Card year', perYear: 1 }, calendarYear: { label: 'Calendar year', perYear: 1 } };
+/** The credit's current period: its key, start, the reset date (first day of the next period) and days left. */
+function creditPeriod(credit, today) {
+  const d = parseISO(today), y = d.getFullYear(), m = d.getMonth();
+  let start;
+  if (credit.period === 'monthly') start = new Date(y, m, 1, 12);
+  else if (credit.period === 'quarterly') start = new Date(y, Math.floor(m / 3) * 3, 1, 12);
+  else if (credit.period === 'semiannual') start = new Date(y, m < 6 ? 0 : 6, 1, 12);
+  else if (credit.period === 'annual') { const am = (credit.resetMonth || 1) - 1; start = new Date(m >= am ? y : y - 1, am, 1, 12); }
+  else start = new Date(y, 0, 1, 12);
+  const len = { monthly: 1, quarterly: 3, semiannual: 6, annual: 12, calendarYear: 12 }[credit.period] || 1;
+  const reset = new Date(start.getFullYear(), start.getMonth() + len, 1, 12);
+  return { key: toISO(start), start: toISO(start), reset: toISO(reset), daysLeft: Math.round((reset - d) / 86400000) };
+}
+const creditUsed = (credit, today) => !!credit.used[creditPeriod(credit, today).key];
+function toggleCreditUsed(credit, today, nowISO) {
+  const k = creditPeriod(credit, today).key;
+  if (credit.used[k]) delete credit.used[k]; else credit.used[k] = nowISO || new Date().toISOString();
+  return !!credit.used[k];
+}
+/** Credits captured this calendar year vs. the card's annual fee. */
+function creditsSummary(card, today) {
+  const year = today.slice(0, 4);
+  let captured = 0, potential = 0;
+  for (const c of card.credits) {
+    captured += Object.keys(c.used).filter((k) => k.slice(0, 4) === year).length * c.amount;
+    potential += c.amount * CREDIT_PERIODS[c.period].perYear;
+  }
+  return { captured: r2(captured), potential: r2(potential), fee: card.annualFee, net: r2(captured - card.annualFee) };
+}
+/** Unused credits whose period ends within `days` days. */
+function expiringCredits(data, today, days = 7) {
+  const out = [];
+  data.wallet.filter((c) => !c.archived).forEach((card) => card.credits.forEach((credit) => {
+    const p = creditPeriod(credit, today);
+    if (!credit.used[p.key] && p.daysLeft <= days && credit.amount > 0) out.push({ card, credit, period: p, lastDay: toISO(addDays(parseISO(p.reset), -1)) });
+  }));
+  return out.sort((a, b) => a.period.daysLeft - b.period.daysLeft);
+}
+
+/* ---------- card presets (typical terms; always "verify with your card terms") ---------- */
+const CARD_PRESETS = [
+  { id: 'amex-bcp', name: 'Amex Blue Cash Preferred', network: 'Amex', annualFee: 95, earnType: 'cash', cpp: 1,
+    rules: [{ category: 'supermarket', rate: 6, cap: 6000, capPeriod: 'calendarYear', afterRate: 1 }, { category: 'streaming', rate: 6 }, { category: 'gas', rate: 3 }, { category: 'transit', rate: 3 }, { category: 'everything', rate: 1 }],
+    credits: [{ name: 'Disney bundle credit', amount: 7, period: 'monthly' }] },
+  { id: 'amex-plat', name: 'Amex Platinum', network: 'Amex', annualFee: 895, earnType: 'points', cpp: 1,
+    rules: [{ category: 'flights', rate: 5, cap: 500000, capPeriod: 'calendarYear', afterRate: 1, note: 'Booked directly with airlines or Amex Travel' }, { category: 'everything', rate: 1 }],
+    credits: [{ name: 'Uber Cash', amount: 15, period: 'monthly' }, { name: 'Digital entertainment', amount: 25, period: 'monthly' }, { name: 'Walmart+ membership', amount: 12.95, period: 'monthly' },
+      { name: 'Resy dining', amount: 100, period: 'quarterly' }, { name: 'lululemon', amount: 75, period: 'quarterly' }, { name: 'Hotel (FHR/THC)', amount: 300, period: 'semiannual' },
+      { name: 'Airline fee', amount: 200, period: 'calendarYear' }, { name: 'CLEAR+', amount: 209, period: 'calendarYear' }] },
+  { id: 'c1-savor', name: 'Capital One Savor', network: 'Mastercard', annualFee: 0, earnType: 'cash', cpp: 1,
+    rules: [{ category: 'dining', rate: 3 }, { category: 'entertainment', rate: 3 }, { category: 'streaming', rate: 3 }, { category: 'supermarket', rate: 3, note: 'Grocery stores; superstores like Walmart and Target excluded' }, { category: 'everything', rate: 1 }],
+    credits: [] },
+  { id: 'apple', name: 'Apple Card', network: 'Mastercard', annualFee: 0, earnType: 'cash', cpp: 1,
+    rules: [{ category: 'everything', merchants: ['Apple', 'Uber', 'Uber Eats', 'Walgreens', 'Nike', 'Exxon', 'Mobil', 'T-Mobile'], rate: 3, note: 'With Apple Pay at select merchants' }, { category: 'everything', rate: 2, note: 'With Apple Pay (1% with the physical card)' }],
+    credits: [] },
+  { id: 'rh-gold', name: 'Robinhood Gold Card', network: 'Visa', annualFee: 0, earnType: 'cash', cpp: 1, notes: 'Requires a Robinhood Gold membership',
+    rules: [{ category: 'travel', rate: 5, note: 'Booked through the Robinhood travel portal' }, { category: 'everything', rate: 3 }],
+    credits: [] },
+  { id: 'citi-dc', name: 'Citi Double Cash', network: 'Mastercard', annualFee: 0, earnType: 'cash', cpp: 1, rules: [{ category: 'everything', rate: 2 }], credits: [] },
+  { id: 'chase-csp', name: 'Chase Sapphire Preferred', network: 'Visa', annualFee: 95, earnType: 'points', cpp: 1.25,
+    rules: [{ category: 'dining', rate: 3 }, { category: 'streaming', rate: 3 }, { category: 'travel', rate: 2 }, { category: 'flights', rate: 2 }, { category: 'hotels', rate: 2 }, { category: 'everything', rate: 1 }],
+    credits: [{ name: 'Chase Travel hotel credit', amount: 50, period: 'annual' }] }
+];
+function cardFromPreset(preset, nowISO) {
+  return normalizeWalletCard(Object.assign(JSON.parse(JSON.stringify(preset)), { id: newId(), presetId: preset.id, createdAt: nowISO }));
+}
+function normalizeWalletCard(c) {
+  const arr = (v) => (Array.isArray(v) ? v : []);
+  return Object.assign({}, c, {
+    id: String(c.id || newId()), name: String(c.name || 'Card').slice(0, 60), network: NETWORKS.includes(c.network) ? c.network : 'Other',
+    annualFee: r2(nonNeg(c.annualFee)), earnType: c.earnType === 'points' ? 'points' : 'cash', cpp: c.cpp == null || c.cpp === '' ? 1 : nonNeg(c.cpp),
+    debtId: c.debtId ? String(c.debtId) : null, presetId: c.presetId || null, archived: !!c.archived, notes: String(c.notes || '').slice(0, 200),
+    createdAt: c.createdAt || new Date().toISOString(),
+    rules: arr(c.rules).filter(isObj).map((r) => Object.assign({}, r, {
+      id: String(r.id || newId()), category: SPEND_CATEGORIES[r.category] ? r.category : 'everything',
+      merchants: arr(r.merchants).map((m) => String(m).trim()).filter(Boolean), rate: nonNeg(r.rate),
+      cap: toNum(r.cap) > 0 ? r2(toNum(r.cap)) : null, capPeriod: CAP_PERIODS[r.capPeriod] ? r.capPeriod : 'calendarYear',
+      afterRate: r.afterRate == null || r.afterRate === '' ? null : nonNeg(r.afterRate), note: String(r.note || '').slice(0, 120)
+    })),
+    credits: arr(c.credits).filter(isObj).map((x) => {
+      const rm = Math.round(toNum(x.resetMonth));
+      return Object.assign({}, x, { id: String(x.id || newId()), name: String(x.name || 'Credit').slice(0, 60), amount: r2(nonNeg(x.amount)),
+        period: CREDIT_PERIODS[x.period] ? x.period : 'monthly', resetMonth: rm >= 1 && rm <= 12 ? rm : 1, used: isObj(x.used) ? Object.assign({}, x.used) : {} });
+    })
+  });
+}
+
+/* ---------- home buying ---------- */
+const NC_PROGRAMS = [
+  { name: 'NC Home Advantage Mortgage', amount: 'Down payment help up to 3% of the loan', terms: 'NC Housing Finance Agency 30-year fixed loan with a forgivable second mortgage for down payment. Income and credit score limits apply.', link: 'https://www.nchfa.com/home-buyers' },
+  { name: 'NC 1st Home Advantage Down Payment', amount: 'Up to $15,000', terms: 'Deferred, forgivable down payment help for first-time buyers and military veterans using an NC Home Advantage Mortgage.', link: 'https://www.nchfa.com/home-buyers' },
+  { name: 'NC Mortgage Credit Certificate', amount: 'Tax credit on part of your mortgage interest (up to $2,000/yr)', terms: 'Federal tax credit for first-time buyers and veterans. Income and purchase price limits apply.', link: 'https://www.nchfa.com/home-buyers' },
+  { name: 'HouseCharlotte', amount: 'Down payment help (amount set by the City)', terms: 'City of Charlotte down payment assistance for eligible buyers purchasing inside city limits. Income limits and homebuyer education apply.', link: 'https://www.charlottenc.gov' }
+];
+function defaultHome() {
+  return {
+    priceMin: null, priceMax: null, downPct: 5, closingPct: 3, ratePct: null, termYears: 30, taxRatePct: null, insuranceYr: null, pmiRatePct: 0.5, hoaMonthly: 0,
+    grossIncomeYr: null, emergencyMonths: 3, monthlyExpenses: null, creditScore: null, creditTarget: 640, dtiTarget: 36, preapproved: false,
+    programs: NC_PROGRAMS.map((p) => Object.assign({ id: newId(), verify: true }, p))
+  };
+}
+function monthlyPI(principal, ratePct, years) {
+  const n = Math.max(1, Math.round(toNum(years) * 12)), r = toNum(ratePct) / 1200, L = Math.max(0, toNum(principal));
+  return r > 0 ? r2(L * r / (1 - Math.pow(1 + r, -n))) : r2(L / n);
+}
+/** Monthly housing cost at a price: principal & interest, property tax, insurance, PMI (under 20% down) and HOA. */
+function housingPayment(price, h) {
+  price = Math.max(0, toNum(price));
+  const down = price * toNum(h.downPct) / 100, loan = price - down;
+  const pi = monthlyPI(loan, h.ratePct, h.termYears);
+  const tax = r2(price * toNum(h.taxRatePct) / 100 / 12), ins = r2(toNum(h.insuranceYr) / 12);
+  const pmi = toNum(h.downPct) < 20 ? r2(loan * toNum(h.pmiRatePct) / 100 / 12) : 0, hoa = r2(toNum(h.hoaMonthly));
+  return { price: r2(price), down: r2(down), loan: r2(loan), pi, tax, ins, pmi, hoa, total: r2(pi + tax + ins + pmi + hoa) };
+}
+/** Highest price whose housing cost (plus other debt payments, for back-end) stays under `ratioPct` of gross monthly income. */
+function maxPriceForDTI(h, ratioPct, otherDebtMonthly = 0) {
+  const budget = toNum(h.grossIncomeYr) / 12 * toNum(ratioPct) / 100 - Math.max(0, toNum(otherDebtMonthly));
+  if (budget <= 0) return 0;
+  let lo = 0, hi = 20000000;
+  for (let i = 0; i < 80; i++) { const mid = (lo + hi) / 2; if (housingPayment(mid, h).total <= budget) lo = mid; else hi = mid; }
+  return Math.floor(lo / 100) * 100;
+}
+function affordability(h, otherDebtMonthly) {
+  const front = maxPriceForDTI(h, 28, 0), back = maxPriceForDTI(h, 36, otherDebtMonthly), back43 = maxPriceForDTI(h, 43, otherDebtMonthly);
+  return { front28: front, back36: back, back43, max: Math.min(front, back) };
+}
+/** Cash needed to buy at `price`: down payment + closing costs + an emergency fund. */
+function cashToClose(price, h, monthlyExpenses) {
+  const down = price * toNum(h.downPct) / 100, closing = price * toNum(h.closingPct) / 100, ef = toNum(h.emergencyMonths) * Math.max(0, toNum(monthlyExpenses));
+  return { down: r2(down), closing: r2(closing), emergency: r2(ef), total: r2(down + closing + ef) };
+}
+/**
+ * First month the HYSA reaches `target`: follows the plan's projection until debt-free day, then keeps
+ * growing with the monthly contribution plus the freed-up debt money.
+ * o: { points (projectPlan output), debtFree (ISO|null), apy, monthlyContribution, freedMonthly, target, maxMonths }
+ */
+function homeReadyDate(o) {
+  const pts = o.points && o.points.length ? o.points : [];
+  if (!pts.length) return null;
+  const target = toNum(o.target);
+  const hit = pts.find((p) => p.hysa >= target - 0.004);
+  const df = o.debtFree || pts[pts.length - 1].date;
+  const diff = (iso) => monthKey(parseISO(iso)) - monthKey(parseISO(df));
+  if (hit) return { date: hit.date, monthsAfterDebtFree: diff(hit.date), hysaAtDate: hit.hysa };
+  const r = Math.pow(1 + toNum(o.apy) / 100, 1 / 12) - 1, add = toNum(o.monthlyContribution) + toNum(o.freedMonthly);
+  const last = pts[pts.length - 1];
+  let hysa = last.hysa, d = parseISO(last.date);
+  for (let i = 1; i <= (o.maxMonths || 600); i++) {
+    hysa = hysa * (1 + r) + add;
+    const date = toISO(new Date(d.getFullYear(), d.getMonth() + i, 1, 12));
+    if (hysa >= target - 0.004) return { date, monthsAfterDebtFree: diff(date), hysaAtDate: r2(hysa) };
+  }
+  return null;
+}
+function defaultMonthlyExpenses(data) {
+  const b = data.budget, per = FREQUENCIES[b.frequency].perMonth;
+  return r2(Math.max(0, b.takeHome - b.savingsPerPaycheck) * per);
+}
+function homeChecklist(data, ctx) {
+  const h = data.home;
+  const items = [
+    { key: 'credit', label: `Credit score ${h.creditTarget}+`, done: toNum(h.creditScore) >= toNum(h.creditTarget) && toNum(h.creditScore) > 0, detail: h.creditScore ? `Now ${h.creditScore}` : 'Add your score' },
+    { key: 'dti', label: `Debt-to-income under ${h.dtiTarget}%`, done: ctx.dti != null && ctx.dti <= toNum(h.dtiTarget), detail: ctx.dti == null ? 'Add income and a target price' : `Now ${ctx.dti.toFixed(1)}%` },
+    { key: 'down', label: 'Down payment + closing saved', done: ctx.need != null && data.savings.balance >= ctx.need.down + ctx.need.closing, detail: ctx.need ? `${Math.min(100, (data.savings.balance / Math.max(1, ctx.need.down + ctx.need.closing)) * 100).toFixed(0)}% there` : 'Set a target price' },
+    { key: 'emergency', label: `${h.emergencyMonths}-month emergency fund on top`, done: ctx.need != null && data.savings.balance >= ctx.need.total, detail: ctx.need ? `${Math.min(100, (data.savings.balance / Math.max(1, ctx.need.total)) * 100).toFixed(0)}% of the full cash goal` : 'Set a target price' },
+    { key: 'preapproval', label: 'Mortgage pre-approval', done: !!h.preapproved, detail: h.preapproved ? 'Done' : 'Tap to mark done', manual: true }
+  ];
+  return { items, done: items.filter((i) => i.done).length, total: items.length };
+}
+
+/* ---------- insights engine ---------- */
+/** Round to 2 significant figures so a dismissed insight only returns when its numbers change meaningfully. */
+function sigRound(v) { v = toNum(v); if (v === 0) return 0; const m = Math.pow(10, Math.floor(Math.log10(Math.abs(v))) - 1); return Math.round(v / m) * m; }
+const sigOf = (...vals) => vals.map((v) => (typeof v === 'number' ? sigRound(v) : String(v))).join('|');
+/**
+ * Plain-English insights from all the data. Each: { id, type, priority, text (with **bold**), action: { tab, sub }, sig }.
+ * fmt formats money (the app passes its currency formatter).
+ */
+function computeInsights(data, today, fmt) {
+  fmt = fmt || ((v) => '$' + Math.round(v).toLocaleString('en-US'));
+  const out = [];
+  const add = (i) => out.push(i);
+  const nowISO = today + 'T12:00:00.000Z';
+  const unpaidDebts = data.debts.filter((d) => !d.paid);
+  const opts = planOptionsFrom(data, today);
+  const plan = unpaidDebts.length ? simulatePayoff(data.debts, opts) : null;
+  const perDayPlan = plan && plan.monthlyBudget > 0 ? plan.monthlyBudget * 12 / 365 : 0;
+
+  // credits about to reset unused
+  expiringCredits(data, today, 7).slice(0, 3).forEach(({ card, credit, period }) => add({
+    id: `credit:${card.id}:${credit.id}:${period.key}`, type: 'credits', priority: 95 - period.daysLeft,
+    text: `Your ${card.name} **${fmt(credit.amount)} ${credit.name}** credit resets ${period.daysLeft <= 1 ? 'tomorrow' : `in ${period.daysLeft} days`}, unused.`,
+    action: { tab: 'cards' }, sig: sigOf(period.key)
+  }));
+  // new card spending beyond the allowance
+  const dr = driftSummary(data, monthOf(nowISO));
+  if (dr.excess > 0) add({ id: `drift:${dr.month}`, type: 'spending', priority: 90, text: `Card balances rose **${fmt(dr.excess)}** beyond your spending allowance this month.`, action: { tab: 'debts' }, sig: sigOf(dr.excess) });
+  // paying down a card that's still the "best" pick somewhere
+  const cards = data.wallet.filter((c) => !c.archived);
+  const profile = Object.entries(data.spendProfile).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+  // best card vs. the next one for your biggest spend category
+  if (cards.length >= 2 && profile.length) {
+    for (const [cat, monthly] of profile.slice(0, 2)) {
+      const merchant = (data.merchants.find((m) => m.category === cat) || {}).name || (DEFAULT_MERCHANTS.find(([, c]) => c === cat) || [])[0] || null;
+      const vals = cards.map((c) => ({ c, v: yearlyEarn(c, cat, monthly, merchant) })).sort((a, b) => b.v - a.v);
+      const gap = r2(vals[0].v - vals[1].v);
+      if (gap >= 10) {
+        add({ id: `bestcard:${cat}`, type: 'cards', priority: 65, text: `${merchant || SPEND_CATEGORIES[cat]} on **${vals[0].c.name}** earns **${fmt(gap)} more a year** than ${vals[1].c.name}.`, action: { tab: 'cards' }, sig: sigOf(gap, vals[0].c.id, vals[1].c.id) });
+        break;
+      }
+    }
+  }
+  const pd = cards.filter((c) => payingDown(data, c));
+  if (pd.length) add({ id: `payingdown:${pd.map((c) => c.id).join(',')}`, type: 'cards', priority: 80, text: `You're paying off **${pd.map((c) => c.name).join(' and ')}**. Put new spending on a card with no balance, or pay it in full.`, action: { tab: 'cards' }, sig: sigOf(pd.length) });
+  // subscriptions flagged for review
+  const review = activeSubs(data.subscriptions).filter((x) => x.review);
+  if (review.length && plan && plan.ok && data.budget.debtPerPaycheck > 0) {
+    const monthly = review.reduce((t, x) => t + subMonthly(x), 0);
+    const faster = simulatePayoff(data.debts, Object.assign({}, opts, { perPaycheck: opts.perPaycheck + monthly / FREQUENCIES[data.budget.frequency].perMonth }));
+    const days = faster.ok ? Math.round((parseISO(plan.debtFree) - parseISO(faster.debtFree)) / 86400000) : 0;
+    if (days > 0) add({ id: 'review-subs', type: 'subscriptions', priority: 75, text: `Canceling the ${plural_(review.length, 'subscription')} flagged for review moves debt-free day up **${plural_(days, 'day')}**.`, action: { tab: 'spending' }, sig: sigOf(days, review.length) });
+  }
+  // ahead / behind the saved plan
+  const last = data.checkins[data.checkins.length - 1];
+  if (last && data.baseline && unpaidDebts.length) {
+    const diff = r2(baselineAt(data.baseline.points, last.date, 'debt') - last.totalDebt);
+    if (Math.abs(diff) >= 1) add({ id: 'plan-pace', type: 'debt', priority: diff > 0 ? 55 : 70, text: diff > 0 ? `You're **${fmt(diff)} ahead** of your debt plan.` : `You're **${fmt(-diff)} behind** your debt plan. The next check-in will show if you've caught up.`, action: { tab: 'checkin' }, sig: sigOf(diff) });
+  }
+  // home buying: when the down payment will be there
+  const h = data.home;
+  if (toNum(h.priceMin) > 0) {
+    const proj = plan ? projectPlan(plan, { balance: data.savings.balance, apy: data.savings.apy, monthlyContribution: monthlyContributionFrom(data), lumpFromSavings: data.activePlan === 'B' && data.budget.lumpFromSavings }) : [{ date: today, debt: 0, hysa: data.savings.balance }];
+    const need = cashToClose(h.priceMin, h, h.monthlyExpenses == null ? defaultMonthlyExpenses(data) : h.monthlyExpenses);
+    const ready = homeReadyDate({ points: proj, debtFree: plan && plan.ok ? plan.debtFree : today, apy: data.savings.apy, monthlyContribution: monthlyContributionFrom(data), freedMonthly: freedMonthlyFrom(data), target: need.total });
+    if (ready) {
+      const m = ready.monthsAfterDebtFree;
+      add({ id: 'home-ready', type: 'home', priority: 60, text: ready.date <= today ? `You already have the **${fmt(need.total)}** you need to buy at ${fmt(h.priceMin)}.`
+        : plan && plan.ok ? `You'll have your down payment, closing costs and emergency fund **${m > 0 ? `${plural_(m, 'month')} after` : m === 0 ? 'the same month as' : `${plural_(-m, 'month')} before`} debt-free day**.`
+        : `You'll have your down payment, closing costs and emergency fund around **${ready.date.slice(0, 7)}**.`, action: { tab: 'more', sub: 'homebuy' }, sig: sigOf(ready.date.slice(0, 7), need.total) });
+    }
+  }
+  // subscriptions in debt-plan days
+  const subsYearly = activeSubs(data.subscriptions).reduce((t, x) => t + subYearly(x), 0);
+  if (subsYearly > 0 && perDayPlan > 0) add({ id: 'subs-days', type: 'subscriptions', priority: 40, text: `Subscriptions cost **${fmt(subsYearly)}/yr**. That's ${plural_(Math.round(subsYearly / perDayPlan), 'day')} of your debt plan.`, action: { tab: 'spending' }, sig: sigOf(subsYearly) });
+  // net worth change
+  const ch = netWorthChange(data, nowISO);
+  if (ch && Math.abs(ch.change) >= 1) add({ id: `nw:${ch.month}`, type: 'networth', priority: 50, text: `Net worth is **${ch.change > 0 ? 'up' : 'down'} ${fmt(Math.abs(ch.change))}** since last month.`, action: { tab: 'networth' }, sig: sigOf(ch.change) });
+  // credits captured vs. fee
+  cards.filter((c) => c.annualFee > 0 && c.credits.length).forEach((c) => {
+    const s = creditsSummary(c, today);
+    if (s.captured < s.fee && parseISO(today).getMonth() >= 5) add({ id: `fee:${c.id}:${today.slice(0, 4)}`, type: 'credits', priority: 45, text: `You've used **${fmt(s.captured)}** of credits on ${c.name} this year, against a ${fmt(s.fee)} fee.`, action: { tab: 'cards' }, sig: sigOf(s.captured) });
+  });
+  // utilization
+  const lim = data.debts.filter((d) => toNum(d.creditLimit) > 0);
+  if (lim.length) {
+    const pct = lim.reduce((t, d) => t + (d.paid ? 0 : d.balance), 0) / lim.reduce((t, d) => t + d.creditLimit, 0) * 100;
+    if (pct > 30) add({ id: 'utilization', type: 'debt', priority: 35, text: `Card utilization is **${pct.toFixed(0)}%**. Getting under 30% usually helps your credit score.`, action: { tab: 'debts' }, sig: sigOf(Math.round(pct / 5) * 5) });
+  }
+  // freedom money
+  if (plan && plan.ok && data.budget.debtPerPaycheck > 0) {
+    const f = freedMonthlyFrom(data);
+    if (f > 0) add({ id: 'freedom', type: 'debt', priority: 20, text: `On debt-free day you free up **${fmt(f)}/mo**, about ${fmt(r2(f * 12 / 365))} a day.`, action: { tab: 'overview' }, sig: sigOf(f, plan.debtFree.slice(0, 7)) });
+  }
+  return out.sort((a, b) => b.priority - a.priority);
+}
+function plural_(n, w) { return `${n} ${w}${Math.abs(n) === 1 ? '' : 's'}`; }
+/** Hide insights you dismissed, until their numbers change (a different signature). */
+function visibleInsights(list, dismissals) { return list.filter((i) => !(dismissals[i.id] && dismissals[i.id].sig === i.sig)); }
+function dismissInsight(data, insight, nowISO) { data.insightDismissals[insight.id] = { sig: insight.sig, at: nowISO || new Date().toISOString() }; }
+
 /* ---------- saved-data shape & migration ---------- */
 function defaultData(todayISO) {
   return {
-    version: 4,
+    version: 5,
     debts: [],
     budget: {
       takeHome: 0, frequency: 'biweekly', payAnchor: todayISO || toISO(new Date()), debtPerPaycheck: 0, savingsPerPaycheck: 0, lumpSum: 0,
@@ -1082,7 +1501,14 @@ function defaultData(todayISO) {
     nwMilestones: {},
     nwMilestonesInit: false,
     subscriptions: [],
-    onboarding: { completedAt: null, skippedAt: null }
+    onboarding: { completedAt: null, skippedAt: null },
+    wallet: [],
+    merchants: [],
+    cardSpend: [],
+    spendProfile: {},
+    home: defaultHome(),
+    insightDismissals: {},
+    settings: { currency: 'USD', locale: 'en-US', weekStart: 0, reduceMotion: false }
   };
 }
 const nonNeg = (v) => Math.max(0, toNum(v));
@@ -1097,7 +1523,7 @@ function normalize(raw, todayISO) {
   const src = isObj(raw) ? raw : {};
   const def = defaultData(todayISO);
   const d = Object.assign({}, src, def);
-  d.version = Math.max(4, toNum(src.version));
+  d.version = Math.max(5, toNum(src.version));
 
   d.debts = Array.isArray(src.debts) ? src.debts.filter(isObj).map((x) => {
     const due = Math.round(toNum(x.dueDay));
@@ -1197,6 +1623,38 @@ function normalize(raw, todayISO) {
   }) : [];
   const ob = isObj(src.onboarding) ? src.onboarding : {};
   d.onboarding = Object.assign({}, ob, { completedAt: ob.completedAt || null, skippedAt: ob.skippedAt || null });
+
+  // v5: card wallet, merchants, cap spend, home buying, insights, settings
+  d.wallet = Array.isArray(src.wallet) ? src.wallet.filter(isObj).map(normalizeWalletCard) : [];
+  d.merchants = Array.isArray(src.merchants) ? src.merchants.filter((m) => isObj(m) && String(m.name || '').trim()).map((m) => Object.assign({}, m, {
+    id: String(m.id || newId()), name: String(m.name).trim().slice(0, 60), category: SPEND_CATEGORIES[m.category] ? m.category : 'everything'
+  })) : [];
+  d.cardSpend = Array.isArray(src.cardSpend) ? src.cardSpend.filter((e) => isObj(e) && parseISO(e.date) && e.cardId).map((e) => Object.assign({}, e, {
+    id: String(e.id || newId()), date: String(e.date).slice(0, 10), cardId: String(e.cardId), category: SPEND_CATEGORIES[e.category] ? e.category : 'everything',
+    merchant: e.merchant ? String(e.merchant).slice(0, 60) : '', amount: r2(nonNeg(e.amount))
+  })).slice(-3000) : [];
+  d.spendProfile = {};
+  if (isObj(src.spendProfile)) Object.keys(src.spendProfile).forEach((k) => { if (SPEND_CATEGORIES[k]) d.spendProfile[k] = r2(nonNeg(src.spendProfile[k])); });
+  const sh = isObj(src.home) ? src.home : {};
+  const hd = defaultHome();
+  const numOrNull = (v) => (v === null || v === undefined || v === '' ? null : nonNeg(v));
+  d.home = Object.assign({}, hd, sh, {
+    priceMin: numOrNull(sh.priceMin), priceMax: numOrNull(sh.priceMax),
+    downPct: sh.downPct === undefined ? 5 : nonNeg(sh.downPct), closingPct: sh.closingPct === undefined ? 3 : nonNeg(sh.closingPct),
+    ratePct: numOrNull(sh.ratePct), termYears: sh.termYears ? Math.max(1, Math.round(toNum(sh.termYears))) : 30,
+    taxRatePct: numOrNull(sh.taxRatePct), insuranceYr: numOrNull(sh.insuranceYr), pmiRatePct: sh.pmiRatePct === undefined ? 0.5 : nonNeg(sh.pmiRatePct),
+    hoaMonthly: nonNeg(sh.hoaMonthly), grossIncomeYr: numOrNull(sh.grossIncomeYr), emergencyMonths: sh.emergencyMonths === undefined ? 3 : nonNeg(sh.emergencyMonths),
+    monthlyExpenses: numOrNull(sh.monthlyExpenses), creditScore: numOrNull(sh.creditScore), creditTarget: sh.creditTarget === undefined ? 640 : nonNeg(sh.creditTarget),
+    dtiTarget: sh.dtiTarget === undefined ? 36 : nonNeg(sh.dtiTarget), preapproved: !!sh.preapproved,
+    programs: Array.isArray(sh.programs) ? sh.programs.filter(isObj).map((x) => Object.assign({}, x, { id: String(x.id || newId()), name: String(x.name || 'Program').slice(0, 80),
+      amount: String(x.amount || '').slice(0, 120), terms: String(x.terms || '').slice(0, 600), link: String(x.link || '').slice(0, 300), verify: x.verify !== false })) : hd.programs
+  });
+  d.insightDismissals = isObj(src.insightDismissals) ? Object.assign({}, src.insightDismissals) : {};
+  const st = isObj(src.settings) ? src.settings : {};
+  d.settings = Object.assign({}, def.settings, st, {
+    currency: /^[A-Z]{3}$/.test(st.currency || '') ? st.currency : 'USD', locale: typeof st.locale === 'string' && st.locale.length <= 12 && st.locale ? st.locale : 'en-US',
+    weekStart: st.weekStart === 1 ? 1 : 0, reduceMotion: !!st.reduceMotion
+  });
   return d;
 }
 
@@ -1494,10 +1952,7 @@ const $ = (sel, root = document) => root.querySelector(sel);
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const uid = newId;
 const todayISO = () => toISO(new Date());
-const money = (n, dp = 2) => {
-  const v = toNum(n);
-  return (v < 0 ? '-$' : '$') + Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp });
-};
+const money = (n, dp = 2) => numFmt('money', dp).format(toNum(n) === 0 ? 0 : toNum(n));
 const money0 = (n) => money(n, 0);
 const fmtDate = (iso, opts = { month: 'short', day: 'numeric', year: 'numeric' }) => { const d = parseISO(iso); return d ? d.toLocaleDateString('en-US', opts) : '—'; };
 const fmtMonth = (iso) => fmtDate(iso, { month: 'short', year: 'numeric' });
@@ -1520,6 +1975,10 @@ const S = {
   cal: { month: null, sel: null },
   subFilter: 'all',
   ob: null,              // onboarding in progress
+  moreView: '',          // More sub-page: '' | homebuy | insights | settings
+  gq: '',                // global search query
+  wb: { query: 'Harris Teeter', amount: 100 },   // "where are you buying?" (never saved)
+  cardDraft: null, cardDraftNew: false, openMerchants: false,
   syncState: 'saved',
   pushTimer: null, pushing: false, pulling: false,
   showAllPaychecks: 24, showAllHistory: false,
@@ -1650,19 +2109,8 @@ function overallUtilization() {
   return { limit, bal, pct: (bal / limit) * 100, count: cards.length };
 }
 /** Saved custom order, plus any unpaid debts not in it yet (appended at the end). */
-function effectiveCustomOrder() {
-  const ids = S.data.customOrder.filter((id) => S.data.debts.some((d) => d.id === id && !d.paid));
-  S.data.debts.forEach((d) => { if (!d.paid && !ids.includes(d.id)) ids.push(d.id); });
-  return ids;
-}
-function planOpts(lump, extra = 0, strategy = S.data.strategy) {
-  const b = S.data.budget;
-  return {
-    perPaycheck: Math.max(0, b.debtPerPaycheck + extra), frequency: b.frequency, payAnchor: b.payAnchor, today: todayISO(),
-    strategy, customOrder: effectiveCustomOrder(), lumpSum: lump,
-    skipThrough: S.data.payChecklists.some((c) => c.date === todayISO()) ? todayISO() : null
-  };
-}
+function effectiveCustomOrder() { return effectiveOrderFrom(S.data); }
+function planOpts(lump, extra = 0, strategy = S.data.strategy) { return planOptionsFrom(S.data, todayISO(), extra, strategy, lump); }
 let planCache = { key: '' };
 function plans() {
   const key = JSON.stringify([S.data.debts, S.data.budget, S.data.strategy, S.data.customOrder, S.data.activePlan, S.data.savings, S.data.payChecklists.map((c) => c.date), todayISO()]);
@@ -1762,7 +2210,7 @@ function toast(title, body, kind = '', action = null) {
 }
 
 function confetti(count = 220) {
-  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (reducedMotion()) return;
   const cv = $('#confetti'), ctx = cv.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
   cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -1805,7 +2253,7 @@ function lineChart(id, series, opts = {}) {
   const W = 340, H = opts.height || 180, L = 44, R = 10, T = 16, B = 22;
   const x = (iso) => L + ((parseISO(iso).getTime() - t0) / (t1 - t0)) * (W - L - R);
   const y = (v) => T + ((top - v) / (top - lo)) * (H - T - B);
-  const fmtY = (v) => (Math.abs(v) >= 1000 ? (v < 0 ? '−$' : '$') + (Math.abs(v) / 1000).toFixed(Math.abs(v) >= 10000 ? 0 : 1) + 'k' : money0(v));
+  const fmtY = (v) => (Math.abs(v) >= 1000 ? moneyK(v) : money0(v));
   const gridVals = lo < 0 ? [lo, 0, top] : [0, top / 2, top];
   const grid = gridVals.map((g) => `<line x1="${L}" x2="${W - R}" y1="${y(g).toFixed(1)}" y2="${y(g).toFixed(1)}" stroke="${g === 0 && lo < 0 ? 'var(--line-strong)' : 'var(--line)'}" stroke-width="1"/><text x="${L - 6}" y="${(y(g) + 4).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--faint)" font-family="DM Mono, monospace">${fmtY(g)}</text>`).join('');
   const paths = series.map((s) => {
@@ -1877,7 +2325,7 @@ function wireCharts(root) {
 
 /* ---------- rendering ---------- */
 function moneyField(label, key, value, attrs = '') {
-  return `<label class="field"><span>${label}</span><div class="prefix"><b>$</b><input class="input num" type="number" inputmode="decimal" min="0" step="0.01" data-bind="${key}" value="${value ? value : ''}" placeholder="0" ${attrs}></div></label>`;
+  return `<label class="field"><span>${label}</span><div class="prefix"><b>${cur()}</b><input class="input num" type="number" inputmode="decimal" min="0" step="0.01" data-bind="${key}" value="${value ? value : ''}" placeholder="0" ${attrs}></div></label>`;
 }
 
 function emptyState() {
@@ -1889,7 +2337,7 @@ function emptyState() {
    Money HQ shell: icons, navigation, count-ups, undo, skeletons
    ===================================================================== */
 const icon = (n, cls = '') => `<svg class="ic ${cls}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
-const reducedMotion = () => !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+const reducedMotion = () => !!((S.data && S.data.settings && S.data.settings.reduceMotion) || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches));
 const countSpan = (key, v, fmt = 'money0') => `<span data-count="${r2(v)}" data-count-key="${esc(key)}" data-fmt="${fmt}">${(fmt === 'money' ? money : money0)(v)}</span>`;
 /** Animate key figures from the value last shown to the new one (skipped for reduced motion). */
 function countUps(root) {
@@ -1929,23 +2377,26 @@ function emptyCard(ic, title, text, actions) {
     <div class="stack" style="max-width:320px;margin:0 auto">${actions}</div></div>`;
 }
 
-const TABS = ['home', 'debt', 'networth', 'spending', 'more'];
+const TABS = ['home', 'debt', 'cards', 'networth', 'spending', 'more'];
+const MORE_PAGES = ['homebuy', 'insights', 'settings'];
 const DEBT_SUBS = ['overview', 'debts', 'checkin', 'paychecks', 'savings'];
 function switchTab(tab, sub) {
   if (DEBT_SUBS.includes(tab)) { sub = tab; tab = 'debt'; }
-  if (tab === 'settings') tab = 'more';
+  if (MORE_PAGES.includes(tab)) { sub = tab; tab = 'more'; }
+  if (tab === 'more') S.moreView = MORE_PAGES.includes(sub) ? sub : '';
   if (!TABS.includes(tab)) tab = 'home';
   S.navDir = TABS.indexOf(tab) < TABS.indexOf(S.tab) ? 'left' : 'right';
   const changed = tab !== S.tab;
   S.tab = tab;
   if (sub && DEBT_SUBS.includes(sub)) S.debtTab = sub;
-  storageSet('money-hq:tab', JSON.stringify({ tab: S.tab, sub: S.debtTab }));
+  storageSet('money-hq:tab', JSON.stringify({ tab: S.tab, sub: S.debtTab, more: S.moreView }));
   render(changed);
   window.scrollTo(0, 0);
 }
 function render(animate) {
   S.pendingRender = false;
-  ({ home: renderHome, debt: renderDebtSection, networth: renderNetWorth, spending: renderSpending, more: renderMore })[S.tab]();
+  document.documentElement.classList.toggle('rm', !!S.data.settings.reduceMotion);
+  ({ home: renderHome, debt: renderDebtSection, cards: renderCards, networth: renderNetWorth, spending: renderSpending, more: renderMore })[S.tab]();
   document.querySelectorAll('.view').forEach((v) => {
     const on = v.id === 'view-' + S.tab;
     if (on && animate) { v.classList.remove('active'); void v.offsetWidth; }
@@ -1988,36 +2439,12 @@ function renewalItems(days) {
 function upcomingRows(items) {
   const today = parseISO(todayISO());
   const rel = (iso) => { const n = Math.round((parseISO(iso) - today) / 86400000); return n === 0 ? 'Today' : n === 1 ? 'Tomorrow' : `In ${n} days`; };
-  const ic = { pay: 'cash', due: 'cal', sub: 'repeat' };
+  const ic = { pay: 'cash', due: 'cal', sub: 'repeat', credit: 'gift' };
   return items.map((it) => `<div class="up ${it.kind}">
       <div class="d"><b>${parseISO(it.date).getDate()}</b><span>${esc(fmtDate(it.date, { month: 'short' }))}</span></div>
       <div class="w"><div>${icon(ic[it.kind], 'sm')}${esc(it.title)}</div><div>${esc(rel(it.date))}${it.detail ? ' · ' + esc(it.detail) : ''}</div></div>
       <div class="a">${esc(it.amount)}${it.sub ? `<div class="faint small">${esc(it.sub)}</div>` : ''}</div>
     </div>`).join('');
-}
-function insights() {
-  const out = [];
-  const act = activePlan(), subs = subscriptionTotals(S.data.subscriptions, S.data.debts);
-  const last = S.data.checkins[S.data.checkins.length - 1], bl = S.data.baseline;
-  if (last && bl && unpaid().length) {
-    const diff = r2(baselineAt(bl.points, last.date, 'debt') - last.totalDebt);
-    if (Math.abs(diff) >= 1) out.push(diff > 0 ? { kind: '', ic: 'rocket', text: `You're <b>${money0(diff)} ahead</b> of your debt plan as of your last check-in.` }
-      : { kind: 'warn', ic: 'alert', text: `You're <b>${money0(-diff)} behind</b> your debt plan. Your next check-in will show if you've caught up.` });
-  }
-  if (subs.yearly > 0 && unpaid().length && act.ok && act.monthlyBudget > 0) {
-    const days = Math.round(subs.yearly / (act.monthlyBudget * 12 / 365));
-    out.push({ kind: 'warn', ic: 'repeat', text: `Subscriptions cost <b>${money0(subs.yearly)}/yr</b>. That's ${plural(days, 'day')} of your debt plan.` });
-  }
-  const dr = driftInfo();
-  if (dr.excess > 0) out.push({ kind: 'bad', ic: 'alert', text: `New card spending is <b>${money0(dr.excess)} over</b> your allowance this month${dr.days ? `, adding about ${plural(dr.days, 'day')} to your plan` : ''}.` });
-  const ch = netWorthChange(S.data, new Date().toISOString());
-  if (ch && Math.abs(ch.change) >= 1) out.push({ kind: ch.change > 0 ? '' : 'warn', ic: 'trend', text: `Net worth is <b>${ch.change > 0 ? 'up' : 'down'} ${money0(Math.abs(ch.change))}</b> since ${esc(monthLabel(ch.month, { month: 'long' }))}.` });
-  const rev = activeSubs(S.data.subscriptions).filter((x) => x.review);
-  if (rev.length) out.push({ kind: 'warn', ic: 'flag', text: `${plural(rev.length, 'subscription')} flagged for review, worth <b>${money0(rev.reduce((t, x) => t + subYearly(x), 0))}/yr</b>.` });
-  const u = overallUtilization();
-  if (u && u.pct > 30) out.push({ kind: 'warn', ic: 'card', text: `Card utilization is <b>${u.pct.toFixed(0)}%</b>. Getting under 30% usually helps your credit score.` });
-  if (unpaid().length && act.ok) { const f = freedomStats(); if (f.monthly > 0) out.push({ kind: '', ic: 'spark', text: `In ${esc(fmtMonth(act.debtFree))} you free up <b>${money0(f.monthly)}/mo</b>, about ${money(f.perDay)} a day.` }); }
-  return out.slice(0, 3);
 }
 function renderHome() {
   const el = $('#view-home');
@@ -2030,14 +2457,20 @@ function renderHome() {
   const open = S.data.payChecklists.find((c) => !c.dismissed && !c.completedAt && c.items.length);
   const nextPay = firstPaycheckOnOrAfter(b.payAnchor, b.frequency, parseISO(today));
   const npISO = toISO(nextPay);
-  const week = [...upcomingItems(7, false), ...renewalItems(7)].sort((a, c) => (a.date < c.date ? -1 : a.date > c.date ? 1 : 0));
+  const week = [...upcomingItems(7, false), ...renewalItems(7), ...creditItems(7)].sort((a, c) => (a.date < c.date ? -1 : a.date > c.date ? 1 : 0));
   const dueSoon = week.filter((x) => x.kind === 'due').length;
   const pc = act.paychecks.find((p) => p.date === npISO);
   let payVal, paySub;
   if (open) { const d = open.items.filter((i) => i.done).length; payVal = open.date === today ? 'TODAY' : 'MISSED'; paySub = `${d} of ${open.items.length} payments done`; }
   else { payVal = npISO === today ? 'TODAY' : esc(fmtDate(npISO, { month: 'short', day: 'numeric' })).toUpperCase(); paySub = `${npISO === today ? '' : `${fmtDate(npISO, { weekday: 'long' })} · `}${pc ? `${money0(pc.toDebt)} to debt` : b.takeHome > 0 ? `${money0(b.takeHome)} take-home` : 'Set up your budget'}${dueSoon ? ` · ${plural(dueSoon, 'bill')} due this week` : ''}`; }
-  const ins = insights();
+  const ins = shownInsights().slice(0, 3);
+  const hc = S.data.home.priceMin > 0 ? homeContext() : null;
+  const credits = S.data.wallet.filter((c) => !c.archived && c.credits.length);
+  const unusedNow = credits.reduce((tot, c) => tot + c.credits.filter((cr) => !creditUsed(cr, today)).reduce((x, cr) => x + cr.amount, 0), 0);
   el.innerHTML = `
+    <div class="gsearch" role="search"><svg class="ic lead" aria-hidden="true"><use href="#i-list"/></svg>
+      <input class="input" id="gsearch" type="search" autocomplete="off" placeholder="Search cards, debts, accounts, screens…" aria-label="Search Money HQ" value="${esc(S.gq)}">
+      <div class="gs-out ${S.gq ? '' : 'hidden'}" id="gsOut" role="listbox"></div></div>
     <div class="page-head"><div><div class="eyebrow">${esc(fmtDate(today, { weekday: 'long', month: 'long', day: 'numeric' }))}</div><h2 class="section-title" style="margin:6px 0 0">${greeting()}</h2></div></div>
     ${payNowHTML()}
     ${recapCardHTML()}
@@ -2071,14 +2504,500 @@ function renderHome() {
         <div class="t-val">${payVal}</div>
         <div class="t-sub">${esc(paySub)}</div>
       </button>
+      <button class="tile" data-act="goto" data-tab="homebuy">
+        <div class="t-head"><span class="t-ico" style="color:var(--save)">${icon('house')}</span>Home buying</div>
+        <div class="t-val" style="font-size:${hc && hc.lo && hc.lo.ready ? '30px' : '26px'}">${!hc ? 'SET GOAL' : !hc.lo.ready ? 'SAVE MORE' : hc.lo.ready.date <= today ? 'READY' : esc(fmtMonth(hc.lo.ready.date)).toUpperCase()}</div>
+        <div class="t-sub">${hc ? `${money0(hc.lo.need.total)} cash for ${money0(hc.lo.price)}` : 'See when you can buy'}</div>
+      </button>
+      <button class="tile" data-act="goto" data-tab="cards">
+        <div class="t-head"><span class="t-ico" style="color:var(--accent)">${icon('bolt')}</span>Cards</div>
+        <div class="t-val">${credits.length ? countSpan('home-credits', unusedNow) : S.data.wallet.length || 'ADD'}</div>
+        <div class="t-sub">${credits.length ? 'in credits left this period' : S.data.wallet.length ? 'cards in your wallet' : 'Find the best card per store'}</div>
+      </button>
     </div>
-    ${ins.length ? `<div class="group-label">Insights</div><div class="insights" role="list">${ins.map((i) => `<div class="insight ${i.kind}" role="listitem"><span class="i-ico">${icon(i.ic)}</span><p>${i.text}</p></div>`).join('')}</div>` : ''}
+    ${ins.length ? `<div class="group-label"><span>Insights</span><button class="link-btn small" data-act="goto" data-tab="insights">See all</button></div><div class="insights" role="list">${ins.map((i) => insightHTML(i)).join('')}</div>` : ''}
     <div class="card">
       <div class="card-head"><h3>${icon('cal')} This week</h3><button class="btn sm ghost" data-act="export-ics">${icon('download', 'sm')} Calendar</button></div>
       ${week.length ? upcomingRows(week) : '<p class="muted small" style="margin:0">Nothing due in the next 7 days. Enjoy the quiet.</p>'}
     </div>
     ${hasAnything ? '' : emptyCard('rocket', 'Welcome to <span style="color:var(--accent)">Money HQ</span>', 'Start with your debts, then add accounts and subscriptions to see your whole picture.',
       `<button class="btn primary block" data-act="add-debt">${icon('plus')} Add a debt</button><button class="btn block" data-act="onboard">Guided setup</button>`)}`;
+  if (S.gq) updateSearch();
+}
+
+/* =====================================================================
+   PHASE 2 · number formats, insights, search
+   ===================================================================== */
+const CURRENCIES = ['USD', 'CAD', 'EUR', 'GBP', 'AUD', 'NZD', 'MXN', 'INR', 'JPY'];
+const LOCALES = { 'en-US': '1,234.56 (US)', 'en-GB': '1,234.56 (UK)', 'en-CA': '1,234.56 (Canada)', 'en-IN': '1,23,456.78 (India)', 'de-DE': '1.234,56 (Germany)', 'fr-FR': '1 234,56 (France)', 'es-ES': '1.234,56 (Spain)' };
+const NUMFMT = {};
+function numFmt(kind, dp) {
+  const st = (S.data && S.data.settings) || { currency: 'USD', locale: 'en-US' };
+  const key = `${st.locale}|${st.currency}|${kind}|${dp}`;
+  if (!NUMFMT[key]) {
+    try {
+      NUMFMT[key] = new Intl.NumberFormat(st.locale, kind === 'compact'
+        ? { style: 'currency', currency: st.currency, notation: 'compact', maximumFractionDigits: 1 }
+        : { style: 'currency', currency: st.currency, minimumFractionDigits: dp, maximumFractionDigits: dp });
+    } catch (e) { NUMFMT[key] = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: dp, maximumFractionDigits: dp }); }
+  }
+  return NUMFMT[key];
+}
+/** Currency symbol for input prefixes. */
+function cur() { const p = numFmt('money', 0).formatToParts(0).find((x) => x.type === 'currency'); return p ? p.value : '$'; }
+const moneyK = (v) => numFmt('compact', 0).format(toNum(v));
+
+const INSIGHT_ICONS = { credits: 'gift', spending: 'alert', cards: 'card', subscriptions: 'repeat', debt: 'rocket', home: 'house', networth: 'trend' };
+const INSIGHT_KIND = { credits: 'warn', spending: 'bad', subscriptions: 'warn' };
+let insightCache = { key: '' };
+function allInsights() {
+  const key = JSON.stringify([S.data, todayISO()]).length + ':' + S.meta.updatedAt + ':' + todayISO();
+  if (insightCache.key !== key) insightCache = { key, list: computeInsights(S.data, todayISO(), money0) };
+  return insightCache.list;
+}
+const shownInsights = () => visibleInsights(allInsights(), S.data.insightDismissals);
+const boldify = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+function insightHTML(i, wide) {
+  return `<div class="insight ${INSIGHT_KIND[i.type] || ''} ${wide ? 'wide' : ''}" role="listitem">
+    <span class="i-ico">${icon(INSIGHT_ICONS[i.type] || 'spark')}</span>
+    <button type="button" class="i-main" data-act="insight-go" data-id="${esc(i.id)}"><p>${boldify(i.text)}</p></button>
+    <button type="button" class="i-x" data-act="insight-dismiss" data-id="${esc(i.id)}" aria-label="Dismiss this insight">${icon('x', 'sm')}</button>
+  </div>`;
+}
+
+/* ---------- global search ---------- */
+const SCREENS = [
+  ['Home', 'home', 'home'], ['Debt overview', 'overview', 'card'], ['Debts', 'debts', 'card'], ['Monthly check-in', 'checkin', 'sync'], ['Paychecks & budget', 'paychecks', 'cash'],
+  ['Savings', 'savings', 'piggy'], ['Cards · Which card?', 'cards', 'card'], ['Card credits', 'cards', 'gift'], ['Merchants', 'cards', 'list'], ['Net worth', 'networth', 'trend'],
+  ['Accounts', 'networth', 'bank'], ['Subscriptions', 'spending', 'repeat'], ['Home buying', 'homebuy', 'house'], ['Insights', 'insights', 'spark'], ['Settings', 'settings', 'more']
+];
+function searchResults(q) {
+  q = normName(q);
+  if (!q) return [];
+  const hit = (s) => normName(s).includes(q);
+  const out = [];
+  SCREENS.filter(([l]) => hit(l)).forEach(([l, tab, ic]) => out.push({ kind: 'screen', id: tab, label: l, sub: 'Screen', ic }));
+  S.data.debts.filter((d) => hit(d.name)).forEach((d) => out.push({ kind: 'debt', id: d.id, label: d.name, sub: `Debt · ${money0(d.paid ? 0 : d.balance)}`, ic: 'card' }));
+  S.data.wallet.filter((c) => hit(c.name)).forEach((c) => out.push({ kind: 'wallet', id: c.id, label: c.name, sub: `Wallet · ${c.network}`, ic: 'card' }));
+  S.data.accounts.filter((a) => hit(a.name)).forEach((a) => out.push({ kind: 'account', id: a.id, label: a.name, sub: `${ACCOUNT_TYPES[a.type].label} · ${money0(a.balance)}`, ic: ACCOUNT_TYPES[a.type].icon }));
+  S.data.subscriptions.filter((x) => hit(x.name)).forEach((x) => out.push({ kind: 'sub', id: x.id, label: x.name, sub: `Subscription · ${money(x.amount)}/${CYCLES[x.cycle].short}`, ic: 'repeat' }));
+  allMerchants(S.data).filter((m) => hit(m.name)).slice(0, 4).forEach((m) => out.push({ kind: 'merchant', id: m.name, label: m.name, sub: `Which card? · ${SPEND_CATEGORIES[m.category]}`, ic: 'bolt' }));
+  return out.slice(0, 10);
+}
+function updateSearch() {
+  const out = $('#gsOut'); if (!out) return;
+  const res = searchResults(S.gq);
+  out.classList.toggle('hidden', !S.gq);
+  out.innerHTML = res.length ? `<ul class="list">${res.map((r, i) => `<li class="li tap" data-act="gs-go" data-kind="${r.kind}" data-id="${esc(r.id)}" role="option" tabindex="0" ${i === 0 ? 'aria-selected="true"' : ''}>
+      <span class="l-ico">${icon(r.ic)}</span><div class="l-main"><b>${esc(r.label)}</b><span>${esc(r.sub)}</span></div><div class="l-end">${icon('chev', 'sm')}</div></li>`).join('')}</ul>`
+    : `<p class="small muted" style="margin:4px 0">Nothing matches "${esc(S.gq)}".</p>`;
+}
+function searchGo(kind, id) {
+  S.gq = '';
+  if (kind === 'screen') { switchTab(id); return; }
+  if (kind === 'debt') { switchTab('debts'); const d = S.data.debts.find((x) => x.id === id); if (d) debtForm(d); return; }
+  if (kind === 'wallet') { switchTab('cards'); const c = S.data.wallet.find((x) => x.id === id); if (c) cardForm(c); return; }
+  if (kind === 'account') { switchTab('networth'); const a = S.data.accounts.find((x) => x.id === id); if (a) accountForm(a); return; }
+  if (kind === 'sub') { switchTab('spending'); const x = S.data.subscriptions.find((y) => y.id === id); if (x) subForm(x); return; }
+  if (kind === 'merchant') { S.wb.query = id; switchTab('cards'); }
+}
+
+/* =====================================================================
+   CARDS: which card?
+   ===================================================================== */
+const catOptions = (sel) => Object.entries(SPEND_CATEGORIES).map(([k, l]) => `<option value="${k}" ${k === sel ? 'selected' : ''}>${esc(l)}</option>`).join('');
+function ruleLabel(card, r) {
+  const unit = card.earnType === 'points' ? 'x' : '%';
+  const what = r.merchants.length ? r.merchants.slice(0, 3).join(', ') + (r.merchants.length > 3 ? '…' : '') : SPEND_CATEGORIES[r.category];
+  return `${r.rate}${unit} ${what}${r.cap ? ` (to ${moneyK(r.cap)} ${CAP_PERIODS[r.capPeriod].label.replace('per ', '/').replace('calendar year', 'yr')})` : ''}`;
+}
+function resolveWhere(q) {
+  const m = merchantCategory(S.data, q);
+  return m ? { category: m.category, merchant: m.name, label: m.name ? `${m.name} · ${SPEND_CATEGORIES[m.category]}` : SPEND_CATEGORIES[m.category], known: true } : null;
+}
+function whichCardHTML() {
+  const chips = ['supermarket', 'dining', 'gas', 'streaming', 'online', 'travel', 'superstore', 'everything'];
+  return `<div class="card" id="whichCard">
+    <div class="card-head"><h3>${icon('bolt')} Where are you buying?</h3></div>
+    <div class="grid-2" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)">
+      <label class="field"><span>Store or category</span><input class="input" id="wbQuery" list="wbList" autocomplete="off" value="${esc(S.wb.query)}" placeholder="e.g. Harris Teeter"></label>
+      <label class="field"><span>Amount</span><div class="prefix"><b>${cur()}</b><input class="input num" id="wbAmt" type="number" inputmode="decimal" min="0" step="1" value="${esc(S.wb.amount)}"></div></label>
+    </div>
+    <datalist id="wbList">${allMerchants(S.data).map((m) => `<option value="${esc(m.name)}">`).join('')}${Object.values(SPEND_CATEGORIES).map((l) => `<option value="${esc(l)}">`).join('')}</datalist>
+    <div class="chips-filter">${chips.map((c) => `<button type="button" data-act="wb-cat" data-v="${c}" class="${S.wb.query === SPEND_CATEGORIES[c] ? 'on' : ''}">${esc(SPEND_CATEGORIES[c])}</button>`).join('')}</div>
+    <div id="wbOut" aria-live="polite"></div>
+  </div>`;
+}
+function updateWhichCard() {
+  const out = $('#wbOut'); if (!out) return;
+  const q = S.wb.query.trim(), amt = Math.max(0, toNum(S.wb.amount));
+  if (!q) { out.innerHTML = '<p class="small muted" style="margin:0">Type a store (Harris Teeter, Walmart, Amazon…) or tap a category.</p>'; return; }
+  const w = resolveWhere(q);
+  if (!w) {
+    out.innerHTML = `<div class="alert" style="margin:0">"${esc(q)}" isn't in your merchant list yet. Pick a category above, or <button class="link-btn" data-act="add-merchant" data-name="${esc(q)}">add it as a merchant</button>.</div>`;
+    return;
+  }
+  const { ranked, best } = rankCards(S.data, { category: w.category, merchant: w.merchant, amount: amt, today: todayISO() });
+  const unit = (c) => (c.earnType === 'points' ? 'x' : '%');
+  out.innerHTML = `<div class="small muted" style="margin-bottom:6px">${icon('info', 'sm')} ${esc(w.label)}</div>
+    ${best ? `<div class="card flat" style="background:var(--accent-soft);border-color:var(--accent-line);margin-bottom:8px">
+      <div class="eyebrow" style="color:var(--accent)">Use this card</div>
+      <div class="row between" style="margin-top:4px"><b style="font-family:var(--font-head);font-size:28px;font-weight:400;line-height:1">${esc(best.card.name)}</b><span class="num" style="font-size:22px;color:var(--accent)">+${money(best.value)}</span></div>
+      <div class="small muted">${best.rate}${unit(best.card)}${best.card.earnType === 'points' ? ` · ${best.card.cpp}¢/pt` : ''} → ${best.effectivePct}% back${best.partial ? ` · only ${money0(best.capRemaining)} left under the cap` : ''}</div>
+    </div>` : '<div class="alert bad">Every card here has a balance you\'re paying down. Pay in full, or use a card with no balance.</div>'}
+    <ul class="list">${ranked.map((r, i) => `<li class="li"><span class="l-ico" style="font-family:var(--font-head);font-size:20px;color:${r === best ? 'var(--accent)' : 'var(--muted)'}">${i + 1}</span>
+      <div class="l-main"><b>${esc(r.card.name)}</b><span>${r.payingDown ? '⚠ Paying this off · ' : ''}${r.capHit ? 'cap reached · ' : r.partial ? 'partly over cap · ' : ''}${r.effectivePct}% back${r.rule && r.rule.note ? ` · ${esc(r.rule.note)}` : ''}</span></div>
+      <div class="l-end" style="color:${r.payingDown ? 'var(--debt)' : 'var(--text)'}">${money(r.value)}</div></li>`).join('')}</ul>
+    ${ranked.some((r) => r.payingDown) ? `<p class="small" style="color:#FFC2CE;margin:8px 0 0">${icon('alert', 'sm')} You're paying this off. Use a card with no balance, or pay it in full.</p>` : ''}`;
+}
+function capsHTML() {
+  const rows = [];
+  S.data.wallet.filter((c) => !c.archived).forEach((c) => c.rules.filter((r) => r.cap > 0).forEach((r) => {
+    const spent = spentTowardRule(S.data, c, r, todayISO()), pct = Math.min(100, (spent / r.cap) * 100);
+    rows.push(`<div style="padding:8px 0;border-top:1px solid var(--line)"><div class="row between small"><b>${esc(c.name)} · ${esc(SPEND_CATEGORIES[r.category])}</b><span class="num ${pct >= 100 ? '' : 'muted'}" style="${pct >= 100 ? 'color:var(--debt)' : ''}">${money0(spent)} / ${money0(r.cap)}</span></div>
+      <div class="progress ${pct >= 100 ? 'util hot' : ''}" style="height:8px;margin-top:6px"><div style="width:${pct}%"></div></div>
+      <div class="small faint" style="margin-top:4px">${pct >= 100 ? `Cap reached: now earning ${r.afterRate == null ? baseRate(c) : r.afterRate}${c.earnType === 'points' ? 'x' : '%'}. ` : `${money0(r.cap - spent)} left at ${r.rate}${c.earnType === 'points' ? 'x' : '%'}. `}Resets ${CAP_PERIODS[r.capPeriod].label.replace('per ', 'each ')}.</div></div>`);
+  }));
+  const recent = S.data.cardSpend.slice(-6).reverse();
+  return `<div class="card"><div class="card-head"><h3>${icon('target')} Spending toward caps</h3><button class="btn sm" data-act="log-spend">${icon('plus', 'sm')} Log spend</button></div>
+    ${rows.length ? rows.join('') : '<p class="small muted" style="margin:0">None of your cards have a spending cap. Caps you add to earn rules are tracked here.</p>'}
+    ${recent.length ? `<div class="ms-label" style="margin-top:12px">Recent</div><ul class="list">${recent.map((e) => { const c = S.data.wallet.find((x) => x.id === e.cardId); return `<li class="li"><span class="l-ico">${icon('receipt')}</span><div class="l-main"><b>${esc(e.merchant || SPEND_CATEGORIES[e.category])}</b><span>${esc(c ? c.name : 'Removed card')} · ${esc(fmtDate(e.date, { month: 'short', day: 'numeric' }))}</span></div><div class="l-end">${money0(e.amount)}<button class="link-btn small" data-act="del-spend" data-id="${esc(e.id)}" aria-label="Delete entry">${icon('trash', 'sm')}</button></div></li>`; }).join('')}</ul>` : ''}
+  </div>`;
+}
+function creditsHTML() {
+  const today = todayISO();
+  const cards = S.data.wallet.filter((c) => !c.archived && c.credits.length);
+  if (!cards.length) return '';
+  const tot = cards.reduce((t, c) => { const s = creditsSummary(c, today); t.cap += s.captured; t.fee += s.fee; t.pot += s.potential; return t; }, { cap: 0, fee: 0, pot: 0 });
+  return `<div class="card"><div class="card-head"><h3>${icon('gift')} Card credits</h3><span class="small muted num">${money0(tot.cap)} used this year · ${money0(tot.fee)} in fees</span></div>
+    <div class="progress save" style="height:8px"><div style="width:${tot.fee > 0 ? Math.min(100, (tot.cap / tot.fee) * 100) : 100}%"></div></div>
+    <p class="small faint" style="margin:6px 0 4px">${tot.cap >= tot.fee ? 'Your credits have covered your annual fees this year.' : `${money0(tot.fee - tot.cap)} more in credits to cover your fees · up to ${money0(tot.pot)}/yr available`}</p>
+    ${cards.map((c) => `<div class="ms-label" style="margin-top:12px">${esc(c.name)}</div><ul class="list">${c.credits.map((cr) => {
+      const p = creditPeriod(cr, today), used = !!cr.used[p.key];
+      return `<li class="li"><button type="button" class="cl-check" style="${used ? 'background:var(--accent)' : ''}" data-act="credit-toggle" data-card="${esc(c.id)}" data-id="${esc(cr.id)}" aria-pressed="${used}" aria-label="${used ? 'Mark unused' : 'Mark used'}: ${esc(cr.name)}">${used ? icon('check') : ''}</button>
+        <div class="l-main"><b>${esc(cr.name)}</b><span>${esc(CREDIT_PERIODS[cr.period].label)} · ${used ? 'used this period' : `resets in ${plural(p.daysLeft, 'day')}`}</span></div>
+        <div class="l-end" style="color:${!used && p.daysLeft <= 7 ? 'var(--warn)' : 'var(--text)'}">${money(cr.amount)}</div></li>`;
+    }).join('')}</ul>`).join('')}
+  </div>`;
+}
+function walletCardHTML(c) {
+  const debt = c.debtId && S.data.debts.find((d) => d.id === c.debtId);
+  const pd = payingDown(S.data, c), s = creditsSummary(c, todayISO());
+  return `<div class="card ${pd ? 'debt urgent' : ''}">
+    <div class="debt-top"><div style="min-width:0"><div class="debt-type">${esc(c.network)} · ${c.annualFee ? `${money0(c.annualFee)}/yr fee` : 'no annual fee'}${c.earnType === 'points' ? ` · points at ${c.cpp}¢` : ''}</div><div class="debt-name">${esc(c.name)}</div></div>
+      <button class="btn sm ghost" data-act="edit-card" data-id="${esc(c.id)}">${icon('edit', 'sm')} Edit</button></div>
+    <div class="chips">${c.rules.map((r) => `<span class="chip ${r.category === 'everything' && !r.merchants.length ? '' : 'ok'}">${esc(ruleLabel(c, r))}</span>`).join('')}</div>
+    ${pd ? `<div class="alert bad" style="margin:0 0 8px">${icon('alert', 'sm')} You're paying this off (${money0(debt.balance)} left). Use a card with no balance, or pay it in full.</div>` : debt ? `<p class="small faint" style="margin:0 0 8px">Linked to ${esc(debt.name)} in Debt${debt.paid ? ' · paid off' : ''}.</p>` : ''}
+    ${c.credits.length ? `<p class="small muted" style="margin:0">${icon('gift', 'sm')} ${money0(s.captured)} of credits used this year · ${money0(s.potential)}/yr available${c.annualFee ? ` vs ${money0(c.annualFee)} fee` : ''}</p>` : ''}
+    ${c.presetId ? '<p class="small faint" style="margin:6px 0 0">From a preset: verify with your card terms.</p>' : ''}
+    ${c.notes ? `<p class="small faint" style="margin:6px 0 0">${esc(c.notes)}</p>` : ''}
+  </div>`;
+}
+function spendProfileHTML() {
+  const cats = ['supermarket', 'dining', 'gas', 'streaming', 'online', 'transit', 'travel', 'superstore', 'everything'];
+  return `<details class="card"><summary class="row between" style="cursor:pointer;min-height:36px"><b>${icon('chart', 'sm')} Your monthly spending by category</b>${icon('chev', 'sm')}</summary>
+    <p class="small muted">Rough monthly amounts. Used to compare cards over a year and to find insights.</p>
+    <div class="grid-2">${cats.map((k) => `<label class="field"><span>${esc(SPEND_CATEGORIES[k])}</span><div class="prefix"><b>${cur()}</b><input class="input num" type="number" inputmode="decimal" min="0" step="10" data-sp="${k}" value="${S.data.spendProfile[k] || ''}" placeholder="0"></div></label>`).join('')}</div>
+  </details>`;
+}
+function merchantsHTML() {
+  const mine = S.data.merchants;
+  return `<details class="card" ${S.openMerchants ? 'open' : ''} id="merchantsCard"><summary class="row between" style="cursor:pointer;min-height:36px"><b>${icon('list', 'sm')} Merchants (${mine.length} yours · ${DEFAULT_MERCHANTS.length} built-in)</b>${icon('chev', 'sm')}</summary>
+    <p class="small muted">Your entries override the built-in list. Example: Walmart, Target and Costco aren't supermarkets for most cards.</p>
+    <button class="btn sm block" data-act="add-merchant">${icon('plus', 'sm')} Add merchant</button>
+    ${mine.length ? `<ul class="list" style="margin-top:8px">${mine.map((m) => `<li class="li tap" data-act="edit-merchant" data-id="${esc(m.id)}" role="button" tabindex="0"><span class="l-ico">${icon('bolt')}</span><div class="l-main"><b>${esc(m.name)}</b><span>${esc(SPEND_CATEGORIES[m.category])}</span></div><div class="l-end">${icon('chev', 'sm')}</div></li>`).join('')}</ul>` : ''}
+    <div class="ms-label" style="margin-top:12px">Built-in</div>
+    <p class="small muted" style="margin:0;line-height:1.7">${DEFAULT_MERCHANTS.filter(([n]) => !mine.some((m) => normName(m.name) === normName(n))).map(([n, c]) => `${esc(n)} <span class="faint">(${esc(SPEND_CATEGORIES[c])})</span>`).join(' · ')}</p>
+  </details>`;
+}
+function renderCards() {
+  const el = $('#view-cards');
+  if (loading()) { el.innerHTML = skeletonHTML(); return; }
+  const wallet = S.data.wallet.filter((c) => !c.archived);
+  const head = `<div class="page-head"><div><div class="eyebrow">Rewards optimizer</div><h2 class="section-title" style="margin:6px 0 0">Which <em>card?</em></h2></div>
+    <button class="btn primary sm" data-act="add-card">${icon('plus', 'sm')} Add card</button></div>`;
+  if (!wallet.length) {
+    el.innerHTML = head + emptyCard('card', 'Build your <span style="color:var(--accent)">wallet</span>', 'Add the cards you carry. Money HQ tells you which one to use at every store, tracks caps and credits, and warns you off cards you\'re paying down.',
+      `<button class="btn primary block" data-act="add-card">${icon('plus')} Add from presets</button>`) + merchantsHTML();
+    return;
+  }
+  el.innerHTML = `${head}${whichCardHTML()}${creditsHTML()}${capsHTML()}
+    <div class="group-label"><span>Wallet · ${wallet.length}</span></div>
+    ${wallet.map(walletCardHTML).join('')}
+    ${spendProfileHTML()}${merchantsHTML()}
+    <p class="disclaimer">Earn rates, caps and credits change. Presets show typical terms, so verify them against your card terms and edit anything that's different.</p>`;
+  updateWhichCard();
+  const mc = $('#merchantsCard'); if (mc) mc.addEventListener('toggle', () => { S.openMerchants = mc.open; });
+}
+function cardPresetPicker() {
+  openSheet(`<h2>Add a card</h2>
+    <p class="small muted" style="margin-top:-8px">Presets fill in typical earn rules and credits. Verify with your card terms, then edit anything.</p>
+    <ul class="list">${CARD_PRESETS.map((p) => `<li class="li tap" data-act="card-preset" data-id="${p.id}" role="button" tabindex="0"><span class="l-ico">${icon('card')}</span>
+      <div class="l-main"><b>${esc(p.name)}</b><span>${esc(p.network)} · ${p.annualFee ? `${money0(p.annualFee)}/yr` : 'no fee'} · ${p.rules.filter((r) => r.category !== 'everything' || r.merchants).length} bonus categories${p.credits.length ? ` · ${p.credits.length} credits` : ''}</span></div><div class="l-end">${icon('chev', 'sm')}</div></li>`).join('')}
+      <li class="li tap" data-act="card-preset" data-id="" role="button" tabindex="0"><span class="l-ico">${icon('plus')}</span><div class="l-main"><b>Custom card</b><span>Start from scratch</span></div><div class="l-end">${icon('chev', 'sm')}</div></li></ul>`);
+}
+/** Card editor: works on a draft so rule/credit rows can be added and removed before saving. */
+function cardForm(card, isNew) {
+  S.cardDraft = JSON.parse(JSON.stringify(card));
+  S.cardDraftNew = !!isNew;
+  renderCardForm();
+}
+function readCardForm() {
+  const f = $('#cardForm'); if (!f) return;
+  const d = S.cardDraft, v = (n) => (f.elements[n] ? f.elements[n].value : '');
+  Object.assign(d, { name: v('name').trim() || 'Card', network: v('network'), annualFee: toNum(v('annualFee')), earnType: v('earnType'), cpp: v('cpp') === '' ? 1 : toNum(v('cpp')), debtId: v('debtId') || null, notes: v('notes') });
+  d.rules.forEach((r, i) => Object.assign(r, { category: v(`r-cat-${i}`), merchants: v(`r-mer-${i}`).split(',').map((x) => x.trim()).filter(Boolean), rate: toNum(v(`r-rate-${i}`)), cap: toNum(v(`r-cap-${i}`)) > 0 ? toNum(v(`r-cap-${i}`)) : null, capPeriod: v(`r-capp-${i}`), afterRate: v(`r-after-${i}`) === '' ? null : toNum(v(`r-after-${i}`)) }));
+  d.credits.forEach((c, i) => Object.assign(c, { name: v(`c-name-${i}`) || 'Credit', amount: toNum(v(`c-amt-${i}`)), period: v(`c-per-${i}`), resetMonth: toNum(v(`c-rm-${i}`)) || 1 }));
+}
+function renderCardForm() {
+  const d = S.cardDraft, isNew = S.cardDraftNew;
+  const debts = S.data.debts.filter((x) => x.type !== 'loan');
+  const unit = d.earnType === 'points' ? 'x' : '%';
+  const months = Array.from({ length: 12 }, (_, i) => new Date(2026, i, 1).toLocaleDateString('en-US', { month: 'short' }));
+  const html = `<div id="cardSheet"><h2>${isNew ? 'Add card' : 'Edit card'}</h2>
+    ${d.presetId ? '<div class="alert" style="margin-top:-6px">Preset values: verify with your card terms.</div>' : ''}
+    <form id="cardForm">
+      <label class="field"><span>Name</span><input class="input" name="name" maxlength="60" required value="${esc(d.name)}"></label>
+      <div class="grid-2">
+        <label class="field"><span>Network</span><select class="input" name="network">${NETWORKS.map((n) => `<option ${n === d.network ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+        <label class="field"><span>Annual fee</span><div class="prefix"><b>${cur()}</b><input class="input num" name="annualFee" type="number" inputmode="decimal" min="0" step="1" value="${d.annualFee || ''}" placeholder="0"></div></label>
+      </div>
+      <div class="grid-2">
+        <label class="field"><span>Earns</span><select class="input" name="earnType" data-act-change="card-earntype"><option value="cash" ${d.earnType === 'cash' ? 'selected' : ''}>Cash back %</option><option value="points" ${d.earnType === 'points' ? 'selected' : ''}>Points per ${esc(cur())}</option></select></label>
+        <label class="field ${d.earnType === 'points' ? '' : 'hidden'}"><span>Value per point</span><div class="suffix"><input class="input num" name="cpp" type="number" inputmode="decimal" min="0" step="0.05" value="${d.cpp}"><b>¢</b></div></label>
+      </div>
+      <label class="field"><span>Linked debt (when you carry a balance)</span><select class="input" name="debtId"><option value="">None</option>${debts.map((x) => `<option value="${esc(x.id)}" ${x.id === d.debtId ? 'selected' : ''}>${esc(x.name)}${x.paid ? ' (paid off)' : ` · ${money0(x.balance)}`}</option>`).join('')}</select></label>
+      <div class="ms-label" style="margin-top:8px">Earn rules</div>
+      ${d.rules.map((r, i) => `<div class="card flat" style="background:var(--surface-2);padding:12px;margin-bottom:8px">
+        <div class="grid-2"><label class="field"><span>Category</span><select class="input" name="r-cat-${i}">${catOptions(r.category)}</select></label>
+          <label class="field"><span>Rate</span><div class="suffix"><input class="input num" name="r-rate-${i}" type="number" inputmode="decimal" min="0" step="0.5" value="${r.rate}"><b>${unit}</b></div></label></div>
+        <label class="field"><span>Only at these merchants <span class="faint">(optional, comma-separated)</span></span><input class="input" name="r-mer-${i}" value="${esc(r.merchants.join(', '))}" placeholder="e.g. Uber, Walgreens"></label>
+        <div class="grid-2"><label class="field"><span>Spend cap <span class="faint">(optional)</span></span><div class="prefix"><b>${cur()}</b><input class="input num" name="r-cap-${i}" type="number" inputmode="decimal" min="0" step="100" value="${r.cap || ''}" placeholder="None"></div></label>
+          <label class="field"><span>Cap resets</span><select class="input" name="r-capp-${i}">${Object.entries(CAP_PERIODS).map(([k, c]) => `<option value="${k}" ${k === r.capPeriod ? 'selected' : ''}>${esc(c.label.replace('per ', 'Each ').replace('no reset', 'Never'))}</option>`).join('')}</select></label></div>
+        <div class="row between"><label class="field" style="flex:1;margin:0"><span>Rate after cap</span><div class="suffix"><input class="input num" name="r-after-${i}" type="number" inputmode="decimal" min="0" step="0.5" value="${r.afterRate == null ? '' : r.afterRate}" placeholder="Base"><b>${unit}</b></div></label>
+          <button type="button" class="btn icon danger" style="align-self:flex-end" data-act="card-del-rule" data-i="${i}" aria-label="Remove rule">${icon('trash', 'sm')}</button></div>
+      </div>`).join('')}
+      <button type="button" class="btn sm block" data-act="card-add-rule">${icon('plus', 'sm')} Add earn rule</button>
+      <div class="ms-label" style="margin-top:14px">Credits</div>
+      ${d.credits.map((c, i) => `<div class="card flat" style="background:var(--surface-2);padding:12px;margin-bottom:8px">
+        <div class="grid-2"><label class="field"><span>Credit</span><input class="input" name="c-name-${i}" value="${esc(c.name)}"></label>
+          <label class="field"><span>Amount per period</span><div class="prefix"><b>${cur()}</b><input class="input num" name="c-amt-${i}" type="number" inputmode="decimal" min="0" step="0.01" value="${c.amount}"></div></label></div>
+        <div class="row" style="align-items:flex-end"><label class="field" style="flex:1;margin:0"><span>Resets</span><select class="input" name="c-per-${i}">${Object.entries(CREDIT_PERIODS).map(([k, p]) => `<option value="${k}" ${k === c.period ? 'selected' : ''}>${esc(p.label)}</option>`).join('')}</select></label>
+          <label class="field" style="flex:1;margin:0"><span>Card year starts</span><select class="input" name="c-rm-${i}">${months.map((m, j) => `<option value="${j + 1}" ${c.resetMonth === j + 1 ? 'selected' : ''}>${m}</option>`).join('')}</select></label>
+          <button type="button" class="btn icon danger" data-act="card-del-credit" data-i="${i}" aria-label="Remove credit">${icon('trash', 'sm')}</button></div>
+      </div>`).join('')}
+      <button type="button" class="btn sm block" data-act="card-add-credit">${icon('plus', 'sm')} Add credit</button>
+      <label class="field" style="margin-top:12px"><span>Notes</span><input class="input" name="notes" maxlength="200" value="${esc(d.notes || '')}"></label>
+      <div class="sheet-actions"><button type="button" class="btn" data-close>Cancel</button><button type="submit" class="btn primary">${isNew ? 'Add card' : 'Save'}</button></div>
+      ${isNew ? '' : `<button type="button" class="btn danger block" style="margin-top:12px" data-act="delete-card" data-id="${esc(d.id)}">${icon('trash', 'sm')} Remove card</button>`}
+    </form></div>`;
+  if ($('#cardSheet')) { const top = $('.sheet').scrollTop; $('#cardSheet').outerHTML = html; $('.sheet').scrollTop = top; } else openSheet(html);
+  const f = $('#cardForm');
+  f.earnType.addEventListener('change', () => { readCardForm(); renderCardForm(); });
+  f.addEventListener('submit', (e) => {
+    e.preventDefault();
+    readCardForm();
+    const card = normalizeWalletCard(S.cardDraft);
+    const i = S.data.wallet.findIndex((x) => x.id === card.id);
+    if (i >= 0) S.data.wallet[i] = card; else S.data.wallet.push(card);
+    S.cardDraft = null;
+    closeSheet(); commit();
+    toast(i >= 0 ? 'SAVED' : 'CARD ADDED', card.name, 'info');
+  });
+}
+function spendForm() {
+  const cards = S.data.wallet.filter((c) => !c.archived);
+  if (!cards.length) { toast('ADD A CARD FIRST', 'Spending is logged per card.', 'info'); return; }
+  openSheet(`<h2>Log spending</h2>
+    <p class="small muted" style="margin-top:-8px">One purchase, or a monthly total. It counts toward the card's caps.</p>
+    <form id="spendForm">
+      <label class="field"><span>Card</span><select class="input" name="cardId">${cards.map((c) => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('')}</select></label>
+      <label class="field"><span>Where</span><input class="input" name="where" list="wbList2" placeholder="Store or category" autocomplete="off"></label>
+      <datalist id="wbList2">${allMerchants(S.data).map((m) => `<option value="${esc(m.name)}">`).join('')}</datalist>
+      <label class="field"><span>Category</span><select class="input" name="category">${catOptions('supermarket')}</select></label>
+      <div class="grid-2"><label class="field"><span>Amount</span><div class="prefix"><b>${cur()}</b><input class="input num" name="amount" type="number" inputmode="decimal" min="0" step="0.01" required></div></label>
+        <label class="field"><span>Date</span><input class="input num" name="date" type="date" value="${todayISO()}"></label></div>
+      <div class="sheet-actions"><button type="button" class="btn" data-close>Cancel</button><button type="submit" class="btn primary">Log it</button></div>
+    </form>`, (root) => {
+    const f = $('#spendForm', root);
+    f.where.addEventListener('input', () => { const m = merchantCategory(S.data, f.where.value); if (m) f.category.value = m.category; });
+    f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const m = merchantCategory(S.data, f.where.value);
+      S.data.cardSpend.push({ id: uid(), cardId: f.cardId.value, category: f.category.value, merchant: m && m.name ? m.name : f.where.value.trim().slice(0, 60), amount: r2(Math.max(0, toNum(f.amount.value))), date: parseISO(f.date.value) ? f.date.value : todayISO() });
+      closeSheet(); commit(); toast('LOGGED', `${money0(toNum(f.amount.value))} on ${cards.find((c) => c.id === f.cardId.value).name}`, 'info');
+    });
+  });
+}
+function merchantForm(m, name) {
+  const isNew = !m;
+  const guess = name ? merchantCategory(S.data, name) : null;
+  m = m || { name: name || '', category: guess ? guess.category : 'supermarket' };
+  openSheet(`<h2>${isNew ? 'Add merchant' : 'Edit merchant'}</h2>
+    <form id="merForm"><label class="field"><span>Store</span><input class="input" name="name" required maxlength="60" value="${esc(m.name)}" placeholder="e.g. Harris Teeter"></label>
+      <label class="field"><span>Counts as</span><select class="input" name="category">${catOptions(m.category)}</select></label>
+      <p class="hint">Card issuers decide how a store is coded. If a statement shows a different category, change it here.</p>
+      <div class="sheet-actions"><button type="button" class="btn" data-close>Cancel</button><button type="submit" class="btn primary">${isNew ? 'Add' : 'Save'}</button></div>
+      ${isNew ? '' : `<button type="button" class="btn danger block" style="margin-top:12px" data-act="delete-merchant" data-id="${esc(m.id)}">${icon('trash', 'sm')} Delete</button>`}</form>`, (root) => {
+    const f = $('#merForm', root);
+    f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const vals = { name: f.name.value.trim().slice(0, 60), category: f.category.value };
+      if (!vals.name) return;
+      const existing = S.data.merchants.find((x) => (isNew ? normName(x.name) === normName(vals.name) : x.id === m.id));
+      if (existing) Object.assign(existing, vals); else S.data.merchants.push(Object.assign({ id: uid() }, vals));
+      closeSheet(); S.wb.query = vals.name; commit(); toast('MERCHANT SAVED', `${vals.name} → ${SPEND_CATEGORIES[vals.category]}`, 'info');
+    });
+  });
+}
+
+/* =====================================================================
+   MORE › HOME BUYING
+   ===================================================================== */
+function homeContext() {
+  const h = S.data.home, act = activePlan(), proj = plans().proj;
+  const expenses = h.monthlyExpenses == null ? defaultMonthlyExpenses(S.data) : h.monthlyExpenses;
+  const otherDebt = r2(unpaid().reduce((t, d) => t + Math.min(d.minPayment, d.balance), 0));
+  const hasPlan = unpaid().length && act.ok && S.data.budget.debtPerPaycheck > 0;
+  const points = hasPlan ? proj : [{ date: todayISO(), debt: 0, hysa: S.data.savings.balance }];
+  const debtFree = hasPlan ? act.debtFree : todayISO();
+  const at = (price) => {
+    if (!(price > 0)) return null;
+    const need = cashToClose(price, h, expenses);
+    const ready = homeReadyDate({ points, debtFree, apy: S.data.savings.apy, monthlyContribution: monthlySavingsContribution(), freedMonthly: hasPlan ? freedMonthlyFrom(S.data) : 0, target: need.total });
+    return { price, need, ready, pay: housingPayment(price, h) };
+  };
+  const lo = at(h.priceMin), hi = at(h.priceMax && h.priceMax !== h.priceMin ? h.priceMax : null);
+  const gross = toNum(h.grossIncomeYr) / 12;
+  const dti = lo && gross > 0 && h.ratePct != null ? ((lo.pay.total + otherDebt) / gross) * 100 : null;
+  return { h, expenses, otherDebt, hasPlan, debtFree, lo, hi, dti, need: lo ? lo.need : null, now: gross > 0 && h.ratePct != null ? affordability(h, otherDebt) : null, after: gross > 0 && h.ratePct != null ? affordability(h, 0) : null };
+}
+function homeField(label, key, val, opts = {}) {
+  const pre = opts.pct ? '' : opts.plain ? '' : `<b>${cur()}</b>`;
+  return `<label class="field"><span>${label}</span><div class="${opts.pct ? 'suffix' : opts.plain ? '' : 'prefix'}">${pre}<input class="input num" type="number" inputmode="decimal" min="0" step="${opts.step || 1}" data-bind="home.${key}" value="${val == null ? '' : val}" placeholder="${esc(opts.ph || '')}">${opts.pct ? '<b>%</b>' : ''}</div></label>`;
+}
+function renderHomeBuy(el) {
+  const c = homeContext(), h = c.h;
+  const readyLine = (x) => (!x ? '' : !x.ready ? `<span class="muted">Not within 50 years at your current savings rate.</span>`
+    : x.ready.date <= todayISO() ? `<b style="color:var(--accent)">You have it now.</b>`
+      : `<b>${esc(fmtMonth(x.ready.date))}</b>${c.hasPlan ? ` <span class="muted">· ${x.ready.monthsAfterDebtFree > 0 ? `${plural(x.ready.monthsAfterDebtFree, 'month')} after` : x.ready.monthsAfterDebtFree === 0 ? 'the month of' : `${plural(-x.ready.monthsAfterDebtFree, 'month')} before`} debt-free day</span>` : ''}`);
+  const cl = homeChecklist(S.data, { dti: c.dti, need: c.need });
+  const pay = c.lo && h.ratePct != null ? c.lo.pay : null;
+  const payRows = pay ? [['Principal & interest', pay.pi, 'var(--b-debt)'], ['Property tax', pay.tax, 'var(--b-rent)'], ['Insurance', pay.ins, 'var(--b-hysa)'], ['PMI', pay.pmi, 'var(--b-custom)'], ['HOA', pay.hoa, 'var(--b-spend)']].filter((r) => r[1] > 0) : [];
+  const affRow = (label, v, now) => `<div class="hbar"><span class="hb-label">${label}</span><span class="hb-val">${money0(v)}</span><div class="hb-track"><div class="hb-fill" style="width:${Math.max(2, Math.min(100, (v / Math.max(1, c.after.back43)) * 100))}%;background:${now ? 'var(--s-hysa)' : 'var(--accent)'}"></div></div></div>`;
+  el.innerHTML = `
+    <div class="page-head"><div><button class="link-btn small" data-act="more-back">${icon('chev', 'sm')} More</button><div class="eyebrow" style="margin-top:6px">Home buying readiness</div><h2 class="section-title" style="margin:6px 0 0">Road to <em>home</em></h2></div></div>
+    <div class="card hero">
+      <div class="label">Cash to buy${c.lo ? ` at ${money0(c.lo.price)}` : ''}</div>
+      ${c.lo ? `<div class="big" style="margin-top:6px">${countSpan('home-need', c.lo.need.total)}</div>
+        <p class="small muted" style="margin:6px 0 10px">${money0(c.lo.need.down)} down (${h.downPct}%) + ${money0(c.lo.need.closing)} closing (${h.closingPct}%) + ${money0(c.lo.need.emergency)} emergency fund (${h.emergencyMonths} mo)</p>
+        <div class="progress save"><div style="width:${Math.min(100, (S.data.savings.balance / Math.max(1, c.lo.need.total)) * 100)}%"></div></div>
+        <div class="row between small" style="margin-top:6px"><span class="muted">HYSA ${money0(S.data.savings.balance)}</span><span class="muted">${Math.min(100, (S.data.savings.balance / Math.max(1, c.lo.need.total)) * 100).toFixed(0)}%</span></div>
+        <div class="stat" style="margin-top:12px"><div class="k">Ready</div><div class="v" style="font-size:16px">${readyLine(c.lo)}</div></div>
+        ${c.hi ? `<div class="stat" style="margin-top:8px"><div class="k">At ${money0(c.hi.price)} (${money0(c.hi.need.total)})</div><div class="v" style="font-size:16px">${readyLine(c.hi)}</div></div>` : ''}
+        <p class="small faint" style="margin:10px 0 0">Uses your Debt plan${c.hasPlan ? ` (debt-free ${esc(fmtMonth(c.debtFree))})` : ''}, your HYSA and monthly savings, and puts the ${money0(freedMonthlyFrom(S.data))}/mo freed up after debt-free day into savings.</p>`
+        : `<p class="muted" style="margin:8px 0 0">Set a target price range below to see how much cash you need and when you'll have it.</p>`}
+    </div>
+    <div class="card"><div class="card-head"><h3>${icon('check')} Readiness checklist</h3><b class="num">${cl.done} of ${cl.total}</b></div>
+      <div class="progress" style="height:8px;margin-bottom:6px"><div style="width:${(cl.done / cl.total) * 100}%"></div></div>
+      <ul class="list">${cl.items.map((i) => `<li class="li ${i.manual ? 'tap' : ''}" ${i.manual ? 'data-act="home-preapproved" role="button" tabindex="0"' : ''}><span class="cl-check" style="${i.done ? 'background:var(--accent)' : ''};pointer-events:none">${i.done ? icon('check') : ''}</span>
+        <div class="l-main"><b>${esc(i.label)}</b><span>${esc(i.detail)}</span></div><div class="l-end"></div></li>`).join('')}</ul>
+    </div>
+    <div class="card"><div class="card-head"><h3>${icon('house')} Your target</h3></div>
+      <div class="grid-2">${homeField('Price from', 'priceMin', h.priceMin, { step: 5000, ph: 'e.g. 250000' })}${homeField('Price to', 'priceMax', h.priceMax, { step: 5000 })}</div>
+      <div class="field"><span class="small muted" style="display:block;margin-bottom:6px">Down payment</span><div class="seg">${[3, 5, 10, 20].map((p) => `<button type="button" data-act="home-down" data-v="${p}" class="${h.downPct === p ? 'on' : ''}">${p}%</button>`).join('')}</div></div>
+      <div class="grid-2">${homeField('Closing costs', 'closingPct', h.closingPct, { pct: true, step: 0.5 })}${homeField('Emergency fund (months)', 'emergencyMonths', h.emergencyMonths, { plain: true })}</div>
+      ${homeField('Monthly expenses (for the emergency fund)', 'monthlyExpenses', h.monthlyExpenses, { step: 50, ph: String(defaultMonthlyExpenses(S.data)) })}
+    </div>
+    <div class="card"><div class="card-head"><h3>${icon('bank')} Mortgage</h3></div>
+      <div class="grid-2">${homeField('Interest rate', 'ratePct', h.ratePct, { pct: true, step: 0.125, ph: 'Enter a rate' })}
+        <label class="field"><span>Term</span><select class="input" data-bind="home.termYears">${[15, 20, 30].map((y) => `<option value="${y}" ${h.termYears === y ? 'selected' : ''}>${y} years</option>`).join('')}</select></label></div>
+      <div class="grid-2">${homeField('Property tax rate', 'taxRatePct', h.taxRatePct, { pct: true, step: 0.05, ph: 'e.g. 1.0' })}${homeField('Insurance / yr', 'insuranceYr', h.insuranceYr, { step: 50 })}</div>
+      <div class="grid-2">${homeField('PMI rate', 'pmiRatePct', h.pmiRatePct, { pct: true, step: 0.05 })}${homeField('HOA / mo', 'hoaMonthly', h.hoaMonthly || null, { step: 10, ph: '0' })}</div>
+      ${homeField('Gross income / yr (for qualifying)', 'grossIncomeYr', h.grossIncomeYr, { step: 1000 })}
+      ${h.ratePct == null ? '<p class="hint">Enter the rate a lender quoted you. Money HQ never assumes a "current" rate.</p>' : ''}
+    </div>
+    ${pay ? `<div class="card"><div class="card-head"><h3>${icon('receipt')} Monthly payment</h3><span class="small muted">at ${money0(pay.price)}</span></div>
+      <div class="big num" style="font-family:var(--font-head);font-size:44px;line-height:1">${money0(pay.total)}<span class="small muted" style="font-family:var(--font-body)">/mo</span></div>
+      <div class="flowbar" style="margin-top:12px" role="img" aria-label="Monthly payment breakdown">${payRows.map((r) => `<div style="width:${(r[1] / pay.total) * 100}%;background:${r[2]}" title="${esc(r[0])} ${money(r[1])}"></div>`).join('')}</div>
+      <table class="flow-table"><colgroup><col style="width:60%"><col></colgroup><tbody>${payRows.map((r) => `<tr><td><span class="sw" style="background:${r[2]}"></span>${esc(r[0])}</td><td>${money(r[1])}</td></tr>`).join('')}
+        <tr><td><b>Loan</b></td><td>${money0(pay.loan)}</td></tr></tbody></table>
+      ${h.downPct < 20 ? '<p class="small faint" style="margin:8px 0 0">PMI applies until you reach 20% equity.</p>' : ''}</div>` : ''}
+    ${c.now ? `<div class="card"><div class="card-head"><h3>${icon('target')} What you can afford</h3></div>
+      <div class="grid-2" style="margin-bottom:10px">
+        <div class="stat"><div class="k">Now</div><div class="v">${money0(c.now.max)}</div><div class="small muted">with ${money0(c.otherDebt)}/mo in debt payments</div></div>
+        <div class="stat"><div class="k">After debt-free day</div><div class="v" style="color:var(--accent)">${money0(c.after.max)}</div><div class="small muted">${c.hasPlan ? esc(fmtMonth(c.debtFree)) : 'no debt payments'}</div></div>
+      </div>
+      ${affRow('28% front-end · now', c.now.front28, true)}${affRow('36% back-end · now', c.now.back36, true)}${affRow('43% back-end · now', c.now.back43, true)}
+      ${affRow('36% back-end · after debt-free', c.after.back36, false)}
+      <p class="small faint" style="margin:8px 0 0">The max price is the lower of the 28% housing and 36% total-debt limits. Many lenders allow up to 43%, but it's a stretch.${c.dti != null ? ` At ${money0(h.priceMin)} today your debt-to-income would be <b>${c.dti.toFixed(1)}%</b>.` : ''}</p></div>` : ''}
+    <div class="card"><div class="card-head"><h3>${icon('user')} Credit</h3></div>
+      <div class="grid-2">${homeField('Your credit score', 'creditScore', h.creditScore, { plain: true })}${homeField('Target score', 'creditTarget', h.creditTarget, { plain: true })}</div>
+      ${homeField('Debt-to-income target', 'dtiTarget', h.dtiTarget, { pct: true })}
+    </div>
+    <div class="group-label"><span>Assistance programs</span><button class="btn sm" data-act="add-program">${icon('plus', 'sm')} Add</button></div>
+    <div class="card">${h.programs.length ? `<ul class="list">${h.programs.map((p) => `<li class="li tap" data-act="edit-program" data-id="${esc(p.id)}" role="button" tabindex="0"><span class="l-ico">${icon('gift')}</span>
+      <div class="l-main"><b>${esc(p.name)}</b><span>${esc(p.amount || 'Add details')}${p.verify ? ' · verify current terms' : ''}</span></div><div class="l-end">${icon('chev', 'sm')}</div></li>`).join('')}</ul>` : '<p class="small muted" style="margin:0">No programs saved.</p>'}</div>
+    <p class="disclaimer">Estimates only, not financial or lending advice. Lenders set their own limits. Program amounts and rules change: verify current terms with each program.</p>`;
+}
+function programForm(p) {
+  const isNew = !p;
+  p = p || { name: '', amount: '', terms: '', link: '', verify: true };
+  openSheet(`<h2>${isNew ? 'Add program' : 'Edit program'}</h2>
+    <form id="progForm"><label class="field"><span>Name</span><input class="input" name="name" required maxlength="80" value="${esc(p.name)}"></label>
+      <label class="field"><span>Amount</span><input class="input" name="amount" maxlength="120" value="${esc(p.amount)}" placeholder="e.g. Up to $15,000"></label>
+      <label class="field"><span>Terms</span><textarea class="input" name="terms" rows="4" style="padding:12px 16px;min-height:96px;resize:vertical">${esc(p.terms)}</textarea></label>
+      <label class="field"><span>Link</span><input class="input" name="link" type="url" inputmode="url" maxlength="300" value="${esc(p.link)}" placeholder="https://"></label>
+      ${p.link && /^https?:\/\//.test(p.link) ? `<p class="small"><a href="${esc(p.link)}" target="_blank" rel="noopener" style="color:var(--accent)">Open link ${icon('chev', 'sm')}</a></p>` : ''}
+      <label class="check"><input type="checkbox" name="verify" ${p.verify ? 'checked' : ''}> Show "verify current terms"</label>
+      <div class="sheet-actions"><button type="button" class="btn" data-close>Cancel</button><button type="submit" class="btn primary">${isNew ? 'Add' : 'Save'}</button></div>
+      ${isNew ? '' : `<button type="button" class="btn danger block" style="margin-top:12px" data-act="delete-program" data-id="${esc(p.id)}">${icon('trash', 'sm')} Delete</button>`}</form>`, (root) => {
+    const f = $('#progForm', root);
+    f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const vals = { name: f.name.value.trim() || 'Program', amount: f.amount.value.trim(), terms: f.terms.value.trim(), link: f.link.value.trim(), verify: f.verify.checked };
+      if (isNew) S.data.home.programs.push(Object.assign({ id: uid() }, vals)); else Object.assign(S.data.home.programs.find((x) => x.id === p.id) || {}, vals);
+      closeSheet(); commit();
+    });
+  });
+}
+
+/* =====================================================================
+   MORE › INSIGHTS, SETTINGS
+   ===================================================================== */
+function renderInsightsPage(el) {
+  const all = allInsights(), vis = visibleInsights(all, S.data.insightDismissals);
+  const hidden = all.filter((i) => !vis.includes(i));
+  el.innerHTML = `<div class="page-head"><div><button class="link-btn small" data-act="more-back">${icon('chev', 'sm')} More</button><div class="eyebrow" style="margin-top:6px">From all your data</div><h2 class="section-title" style="margin:6px 0 0">Insights</h2></div></div>
+    ${vis.length ? `<div role="list" class="stack">${vis.map((i) => insightHTML(i, true)).join('')}</div>` : emptyCard('spark', 'All caught up', 'Nothing needs your attention right now. Insights update as your numbers change.', '')}
+    ${hidden.length ? `<div class="group-label">Dismissed · ${hidden.length}</div><div class="card"><ul class="list">${hidden.map((i) => `<li class="li"><span class="l-ico">${icon(INSIGHT_ICONS[i.type] || 'spark')}</span><div class="l-main"><b style="white-space:normal;font-weight:500">${boldify(i.text)}</b></div><div class="l-end"><button class="btn sm ghost" data-act="insight-restore" data-id="${esc(i.id)}">Restore</button></div></li>`).join('')}</ul></div>` : ''}
+    <p class="small faint" style="text-align:center">Dismissed insights come back when their numbers change meaningfully.</p>`;
+}
+function renderSettingsPage(el) {
+  const st = S.data.settings;
+  const counts = [['debts', S.data.debts.length], ['accounts', S.data.accounts.length], ['subscriptions', S.data.subscriptions.length], ['wallet cards', S.data.wallet.length], ['merchants', S.data.merchants.length], ['check-ins', S.data.checkins.length], ['history entries', S.data.history.length]];
+  el.innerHTML = `<div class="page-head"><div><button class="link-btn small" data-act="more-back">${icon('chev', 'sm')} More</button><div class="eyebrow" style="margin-top:6px">Preferences</div><h2 class="section-title" style="margin:6px 0 0">Settings</h2></div></div>
+    <div class="card"><div class="card-head"><h3>Numbers</h3><span class="small muted num">${esc(money(1234.56))}</span></div>
+      <label class="field"><span>Currency</span><select class="input" data-setting="currency">${CURRENCIES.map((c) => `<option ${c === st.currency ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
+      <label class="field"><span>Number format</span><select class="input" data-setting="locale">${Object.entries(LOCALES).map(([k, l]) => `<option value="${k}" ${k === st.locale ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></label>
+      <p class="hint">Only changes how amounts are shown. Nothing is converted.</p>
+    </div>
+    <div class="card"><div class="card-head"><h3>Calendar &amp; motion</h3></div>
+      <div class="field"><span class="small muted" style="display:block;margin-bottom:6px">Week starts on</span><div class="seg"><button type="button" data-act="set-week" data-v="0" class="${st.weekStart === 0 ? 'on' : ''}">Sunday</button><button type="button" data-act="set-week" data-v="1" class="${st.weekStart === 1 ? 'on' : ''}">Monday</button></div></div>
+      <label class="check"><input type="checkbox" data-setting="reduceMotion" ${st.reduceMotion ? 'checked' : ''}> Reduce motion (no transitions, count-ups or confetti)</label>
+    </div>
+    <div class="card"><div class="card-head"><h3>${icon('download')} Your data</h3></div>
+      <p class="small muted" style="margin-top:0">The export includes everything: ${counts.map(([n, v]) => `${v} ${n}`).join(', ')}, plus budget, savings, home buying, spending log, credits, insights and settings. Importing replaces all of it, including the cloud copy.</p>
+      <div class="stack"><button class="btn block" data-act="export">${icon('download', 'sm')} Export JSON</button><button class="btn block" data-act="import">${icon('upload', 'sm')} Import JSON</button>
+        <button class="btn block" data-act="export-ics">${icon('cal', 'sm')} Export calendar (.ics)</button></div>
+    </div>`;
+}
+/** Unused credits whose period ends within `days`, one row per card and last day. */
+function creditItems(days) {
+  const groups = {};
+  expiringCredits(S.data, todayISO(), days).forEach((e) => { const k = e.card.id + '|' + e.lastDay; (groups[k] = groups[k] || { card: e.card, lastDay: e.lastDay, list: [] }).list.push(e.credit); });
+  return Object.values(groups).map((g) => ({ kind: 'credit', date: g.lastDay, title: g.list.length === 1 ? `${g.card.name}: ${g.list[0].name}` : `${g.card.name}: ${g.list.length} credits`,
+    detail: `unused · last day${g.list.length > 1 ? ` · ${g.list.map((c) => c.name).join(', ')}` : ''}`, amount: money(g.list.reduce((t, c) => t + c.amount, 0)), sub: g.list.length > 1 ? 'credits' : 'credit' }));
 }
 
 /* =====================================================================
@@ -2091,7 +3010,7 @@ function assetLiabChart(id, rows) {
   const maxA = Math.max(1, ...rows.map((r) => r.assets)), maxL = Math.max(1, ...rows.map((r) => r.liabilities));
   const span = maxA + maxL, y0 = T + (maxA / span) * (H - T - B), scale = (H - T - B) / span;
   const n = rows.length, slot = (W - L - R) / n, bw = Math.max(6, Math.min(28, slot * 0.6));
-  const fmtY = (v) => (Math.abs(v) >= 1000 ? '$' + (v / 1000).toFixed(Math.abs(v) >= 10000 ? 0 : 1) + 'k' : money0(v));
+  const fmtY = (v) => (Math.abs(v) >= 1000 ? moneyK(v) : money0(v));
   const cols = rows.map((r, i) => {
     const x = L + slot * i + (slot - bw) / 2, ha = r.assets * scale, hl = r.liabilities * scale;
     return `<rect x="${x.toFixed(1)}" y="${(y0 - ha).toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0, ha - 1).toFixed(1)}" rx="3" fill="var(--s-asset)"/>
@@ -2187,7 +3106,7 @@ function accountForm(a, kind) {
     <form id="acctForm">
       <label class="field"><span>Name</span><input class="input" name="name" required maxlength="60" value="${esc(a.name)}" placeholder="e.g. Chase checking"></label>
       <label class="field"><span>Type</span><select class="input" name="type"><optgroup label="Assets">${assetTypes.map(opt).join('')}</optgroup><optgroup label="Liabilities">${liabTypes.map(opt).join('')}</optgroup></select></label>
-      <label class="field"><span>Balance</span><div class="prefix"><b>$</b><input class="input num" name="balance" type="number" inputmode="decimal" min="0" step="0.01" required value="${a.balance === '' ? '' : esc(a.balance)}"></div></label>
+      <label class="field"><span>Balance</span><div class="prefix"><b>${cur()}</b><input class="input num" name="balance" type="number" inputmode="decimal" min="0" step="0.01" required value="${a.balance === '' ? '' : esc(a.balance)}"></div></label>
       <p class="hint">Your HYSA is linked to Savings and your cards and loans come from the Debt tab automatically. Don't add them here too.</p>
       <div class="sheet-actions"><button type="button" class="btn" data-close>Cancel</button><button type="submit" class="btn primary">${isNew ? 'Add account' : 'Save'}</button></div>
       ${isNew ? '' : `<div class="sheet-actions" style="margin-top:12px">
@@ -2232,12 +3151,13 @@ function barList(rows, total, color) {
 function calendarHTML() {
   const month = S.cal.month || todayISO().slice(0, 7);
   const [y, m] = month.split('-').map(Number);
-  const first = new Date(y, m - 1, 1, 12), dim = daysInMonth(y, m - 1), offset = first.getDay();
+  const ws = S.data.settings.weekStart, first = new Date(y, m - 1, 1, 12), dim = daysInMonth(y, m - 1), offset = (first.getDay() - ws + 7) % 7;
   const from = `${month}-01`, to = `${month}-${String(dim).padStart(2, '0')}`;
   const byDay = {};
   activeSubs(S.data.subscriptions).forEach((x) => renewalsBetween(x, from, to).forEach((d) => { (byDay[d] = byDay[d] || []).push(x); }));
   const today = todayISO();
-  let cells = ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d) => `<div class="dow">${d}</div>`).join('');
+  const dows = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  let cells = [...dows.slice(ws), ...dows.slice(0, ws)].map((d) => `<div class="dow">${d}</div>`).join('');
   for (let i = 0; i < offset; i++) cells += '<div class="day out" aria-hidden="true"></div>';
   for (let d = 1; d <= dim; d++) {
     const iso = `${month}-${String(d).padStart(2, '0')}`, list = byDay[iso] || [];
@@ -2303,7 +3223,7 @@ function subForm(x) {
     <form id="subForm">
       <label class="field"><span>Name</span><input class="input" name="name" required maxlength="60" value="${esc(x.name)}" placeholder="e.g. Netflix"></label>
       <div class="grid-2">
-        <label class="field"><span>Amount</span><div class="prefix"><b>$</b><input class="input num" name="amount" type="number" inputmode="decimal" min="0" step="0.01" required value="${x.amount === '' ? '' : esc(x.amount)}"></div></label>
+        <label class="field"><span>Amount</span><div class="prefix"><b>${cur()}</b><input class="input num" name="amount" type="number" inputmode="decimal" min="0" step="0.01" required value="${x.amount === '' ? '' : esc(x.amount)}"></div></label>
         <label class="field"><span>Billed</span><select class="input" name="cycle">${Object.entries(CYCLES).map(([k, c]) => `<option value="${k}" ${x.cycle === k ? 'selected' : ''}>${c.label}</option>`).join('')}</select></label>
       </div>
       <div class="grid-2">
@@ -2354,29 +3274,28 @@ function cutItSheet(x) {
    ===================================================================== */
 function renderMore() {
   const el = $('#view-more');
+  if (S.moreView === 'homebuy') return renderHomeBuy(el);
+  if (S.moreView === 'insights') return renderInsightsPage(el);
+  if (S.moreView === 'settings') return renderSettingsPage(el);
   const row = (ic, label, sub, act, extra = '') => `<li class="li tap" data-act="${act}" ${extra} role="button" tabindex="0"><span class="l-ico">${icon(ic)}</span><div class="l-main"><b>${label}</b>${sub ? `<span>${sub}</span>` : ''}</div><div class="l-end">${icon('chev', 'sm')}</div></li>`;
+  const nIns = shownInsights().length;
   el.innerHTML = `
-    <div class="page-head"><div><div class="eyebrow">Settings &amp; tools</div><h2 class="section-title" style="margin:6px 0 0">More</h2></div></div>
-    <div class="card">
-      <ul class="list">
-        <li class="li"><span class="l-ico">${icon('user')}</span><div class="l-main"><b>${esc(S.user && S.user.email)}</b><span>Last synced ${S.meta.syncedAt ? esc(fmtStamp(S.meta.syncedAt)) : 'never'}</span></div><div class="l-end"></div></li>
-        ${row('sync', 'Sync now', 'Pull the latest from the cloud', 'sync-now')}
-      </ul>
-    </div>
-    <div class="group-label">Tools</div>
+    <div class="page-head"><div><div class="eyebrow">Tools &amp; settings</div><h2 class="section-title" style="margin:6px 0 0">More</h2></div></div>
     <div class="card"><ul class="list">
+      ${row('house', 'Home buying', 'Readiness, affordability and assistance programs', 'goto', 'data-tab="homebuy"')}
+      ${row('spark', 'Insights', nIns ? `${plural(nIns, 'insight')} for you` : 'All caught up', 'goto', 'data-tab="insights"')}
       ${row('rocket', 'Guided setup', 'Add accounts and subscriptions step by step', 'onboard')}
-      ${row('cal', 'Export reminders (.ics)', 'Paydays, due dates and renewals for your calendar', 'export-ics')}
-      ${row('sync', 'Monthly check-in', 'Update debts, HYSA and every account', 'goto', 'data-tab="checkin"')}
+      ${row('cal', 'Export reminders (.ics)', 'Paydays, due dates, renewals and credit resets', 'export-ics')}
     </ul></div>
-    <div class="group-label">Your data</div>
+    <div class="group-label">Account</div>
     <div class="card"><ul class="list">
-      ${row('download', 'Export backup', 'Everything as a JSON file', 'export')}
-      ${row('upload', 'Import backup', 'Replaces everything, including the cloud copy', 'import')}
+      <li class="li"><span class="l-ico">${icon('user')}</span><div class="l-main"><b>${esc(S.user && S.user.email)}</b><span>Last synced ${S.meta.syncedAt ? esc(fmtStamp(S.meta.syncedAt)) : 'never'}</span></div><div class="l-end"></div></li>
+      ${row('sync', 'Sync now', 'Pull the latest from the cloud', 'sync-now')}
+      ${row('more', 'Settings', 'Currency, number format, week start, motion, export & import', 'goto', 'data-tab="settings"')}
     </ul></div>
     <div class="card">
       <div class="card-head"><h3>${icon('info')} How the math works</h3></div>
-      <p class="small muted" style="margin:0">Interest is charged monthly at APR ÷ 12 (0% or the promo APR while a promo is active). Each paycheck pays this month's minimums first, then whatever brings any card back under its buffer line (limit minus keep-open), then every extra dollar goes to the ${esc(S.data.strategy)} target and rolls over when a debt is paid off. Net worth counts your HYSA from Savings and your debts from the Debt tab once each. All projections are estimates, not financial advice.</p>
+      <p class="small muted" style="margin:0">Interest is charged monthly at APR ÷ 12 (0% or the promo APR while a promo is active). Each paycheck pays this month's minimums first, then whatever brings any card back under its buffer line, then every extra dollar goes to the ${esc(S.data.strategy)} target. Net worth counts your HYSA and debts once each. Card rewards, mortgage math and all projections are estimates, not financial advice.</p>
     </div>
     <div class="card"><ul class="list">${row('logout', '<span style="color:var(--debt)">Sign out</span>', 'Your data stays saved in the cloud', 'sign-out')}</ul></div>
     <p class="faint small" style="text-align:center">Money HQ · private to you · data stored in your Supabase account</p>`;
@@ -2421,7 +3340,7 @@ function renderOnboarding() {
       <p class="small muted" style="margin-top:-8px">Checking, brokerage, retirement, a car. Rough balances are fine. Your HYSA and debts are already linked.</p>
       <div class="grid-2"><label class="field"><span>Name</span><input class="input" id="obAName" maxlength="60" placeholder="e.g. Checking"></label>
         <label class="field"><span>Type</span><select class="input" id="obAType">${Object.keys(ACCOUNT_TYPES).filter((k) => k !== 'hysa').map((k) => `<option value="${k}">${ACCOUNT_TYPES[k].label}</option>`).join('')}</select></label></div>
-      <div class="row" style="align-items:flex-end"><label class="field" style="flex:1"><span>Balance</span><div class="prefix"><b>$</b><input class="input num" id="obABal" type="number" inputmode="decimal" min="0" step="0.01"></div></label>
+      <div class="row" style="align-items:flex-end"><label class="field" style="flex:1"><span>Balance</span><div class="prefix"><b>${cur()}</b><input class="input num" id="obABal" type="number" inputmode="decimal" min="0" step="0.01"></div></label>
         <button type="button" class="btn" style="margin-bottom:12px" data-act="ob-add-account">${icon('plus', 'sm')} Add</button></div>
       <ul class="list ob-added">${list.map((a) => `<li class="li"><span class="l-ico">${icon(ACCOUNT_TYPES[a.type].icon)}</span><div class="l-main"><b>${esc(a.name)}</b><span>${esc(ACCOUNT_TYPES[a.type].label)}</span></div><div class="l-end">${money0(a.balance)}</div></li>`).join('')}</ul>
       ${nav('ob-next', list.length ? 'Next' : 'Next without accounts')}`;
@@ -2430,7 +3349,7 @@ function renderOnboarding() {
     body = `<div class="eyebrow">Step ${o.i} · Subscriptions</div><h2 style="margin-top:6px">Add your subscriptions</h2>
       <p class="small muted" style="margin-top:-8px">Streaming, music, apps, gym. You can add renewal dates and cards later.</p>
       <label class="field"><span>Name</span><input class="input" id="obSName" maxlength="60" placeholder="e.g. Spotify"></label>
-      <div class="grid-2"><label class="field"><span>Amount</span><div class="prefix"><b>$</b><input class="input num" id="obSAmt" type="number" inputmode="decimal" min="0" step="0.01"></div></label>
+      <div class="grid-2"><label class="field"><span>Amount</span><div class="prefix"><b>${cur()}</b><input class="input num" id="obSAmt" type="number" inputmode="decimal" min="0" step="0.01"></div></label>
         <label class="field"><span>Billed</span><select class="input" id="obSCycle">${Object.entries(CYCLES).map(([k, c]) => `<option value="${k}" ${k === 'monthly' ? 'selected' : ''}>${c.label}</option>`).join('')}</select></label></div>
       <button type="button" class="btn block" data-act="ob-add-sub">${icon('plus', 'sm')} Add subscription</button>
       <ul class="list ob-added">${list.map((x) => `<li class="li"><span class="l-ico">${icon('repeat')}</span><div class="l-main"><b>${esc(x.name)}</b><span>${money(x.amount)} ${esc(CYCLES[x.cycle].label.toLowerCase())}</span></div><div class="l-end">${money0(subYearly(x))}/yr</div></li>`).join('')}</ul>
@@ -2500,7 +3419,7 @@ function payNowHTML() {
       const v = S.clDraft[k] != null ? S.clDraft[k] : i.planned;
       return `<div class="cl-row"><button class="cl-check" data-act="cl-check" data-date="${esc(c.date)}" data-key="${esc(i.key)}" aria-label="Mark ${esc(i.label)} done"></button>
         <div class="nm"><b>${esc(i.label)}</b><span>${hint}</span></div>
-        <div class="prefix"><b>$</b><input class="input num" type="number" inputmode="decimal" min="0" step="0.01" data-cl-amt="${esc(k)}" value="${esc(v)}" aria-label="${esc(i.label)} amount"></div></div>`;
+        <div class="prefix"><b>${cur()}</b><input class="input num" type="number" inputmode="decimal" min="0" step="0.01" data-cl-amt="${esc(k)}" value="${esc(v)}" aria-label="${esc(i.label)} amount"></div></div>`;
     }).join('');
     return `<div class="card paynow ${isToday ? '' : 'missed'}">
       <div class="card-head"><h3>${isToday ? `${icon('cash')} PAYDAY · PAY NOW` : `${icon('clock')} MISSED · ${esc(fmtDate(c.date, { weekday: 'short', month: 'short', day: 'numeric' })).toUpperCase()}`}</h3><b class="num" style="color:${done === n ? 'var(--accent)' : 'var(--text)'}">${done} of ${n} done</b></div>
@@ -2630,7 +3549,7 @@ function afterPlanHTML() {
   const start = hasDebt && act.ok ? act.debtFree : todayISO();
   const hysaStart = hasDebt && act.ok ? proj[proj.length - 1].hysa : S.data.savings.balance;
   const pts = projectInvesting({ startISO: start, months: 120, monthly, rothPct: a.rothPct, rothLimit: a.rothLimit, annualReturn: a.annualReturn, hysaStart, hysaMonthly: monthlySavingsContribution(), hysaApy: S.data.savings.apy });
-  const k = (v) => (Math.abs(v) >= 1e6 ? '$' + (v / 1e6).toFixed(2) + 'M' : Math.abs(v) >= 1e4 ? '$' + (v / 1000).toFixed(0) + 'k' : money0(v));
+  const k = (v) => (Math.abs(v) >= 1e4 ? moneyK(v) : money0(v));
   const rows = [12, 36, 60, 120].map((m, i) => { const p = pts[m]; return `<tr class="${i === 3 ? 'hl' : ''}"><td>${m / 12} yr</td><td>${k(p.roth)}</td><td>${k(p.brokerage)}</td><td>${k(p.hysa)}</td><td>${k(p.total)}</td></tr>`; }).join('');
   const chart = lineChart('invest', [
     { label: 'Invested', color: 'var(--s-invest)', points: pts.map((p) => ({ date: p.date, v: p.invested })) },
@@ -2639,13 +3558,13 @@ function afterPlanHTML() {
   ], { height: 170, endLabels: true, aria: 'Projected invested balance, HYSA and total for 10 years after debt-free day' });
   return `<div class="card">
     <div class="card-head"><h3>After debt-free plan</h3><span class="small muted">from ${esc(fmtMonth(start))}</span></div>
-    <label class="field"><span>Invest per month</span><div class="prefix"><b>$</b><input class="input num" type="number" inputmode="decimal" min="0" step="1" data-bind="afterPlan.monthly" value="${a.monthly === null ? '' : a.monthly}" placeholder="${r2(f.monthly)}"></div></label>
+    <label class="field"><span>Invest per month</span><div class="prefix"><b>${cur()}</b><input class="input num" type="number" inputmode="decimal" min="0" step="1" data-bind="afterPlan.monthly" value="${a.monthly === null ? '' : a.monthly}" placeholder="${r2(f.monthly)}"></div></label>
     <p class="hint">Leave blank to use the money you free up: ${f.parts.map((x) => esc(x.name)).join(' + ')} (${money0(f.monthly)}/mo).</p>
     <div class="grid-2">
       <label class="field"><span>Share to Roth IRA</span><div class="suffix"><input class="input num" type="number" inputmode="numeric" min="0" max="100" step="5" data-bind="afterPlan.rothPct" value="${a.rothPct}"><b>%</b></div></label>
       <label class="field"><span>Expected return</span><div class="suffix"><input class="input num" type="number" inputmode="decimal" step="0.1" data-bind="afterPlan.annualReturn" value="${a.annualReturn}"><b>%</b></div></label>
     </div>
-    <label class="field"><span>Roth annual limit</span><div class="prefix"><b>$</b><input class="input num" type="number" inputmode="decimal" min="0" step="100" data-bind="afterPlan.rothLimit" value="${a.rothLimit || ''}" placeholder="No limit"></div></label>
+    <label class="field"><span>Roth annual limit</span><div class="prefix"><b>${cur()}</b><input class="input num" type="number" inputmode="decimal" min="0" step="100" data-bind="afterPlan.rothLimit" value="${a.rothLimit || ''}" placeholder="No limit"></div></label>
     <p class="hint">${a.rothPct}% of each month goes to the Roth IRA until the yearly limit is reached. Everything else goes to brokerage.</p>
     ${chart}
     <table class="mini-table"><colgroup><col style="width:15%"><col><col><col><col></colgroup>
@@ -2935,7 +3854,7 @@ function renderOverview() {
       <div class="card-head"><h3>Plan A vs Plan B</h3><span class="small muted">${money0(b.debtPerPaycheck)}/paycheck</span></div>
       <div class="plans">${planCard('A', A, B)}${planCard('B', B, A)}</div>
       <label class="field" style="margin:14px 0 0"><span>Plan B lump sum (applied day 1)</span>
-        <div class="prefix"><b>$</b><input class="input num" type="number" inputmode="decimal" min="0" step="0.01" data-bind="budget.lumpSum" value="${b.lumpSum || ''}" placeholder="0"></div></label>
+        <div class="prefix"><b>${cur()}</b><input class="input num" type="number" inputmode="decimal" min="0" step="0.01" data-bind="budget.lumpSum" value="${b.lumpSum || ''}" placeholder="0"></div></label>
       <label class="check"><input type="checkbox" data-bind-check="budget.lumpFromSavings" ${b.lumpFromSavings ? 'checked' : ''}> Plan B's lump sum comes out of my HYSA</label>
       <p class="small muted" style="margin:4px 0 0">Tap a plan to use it for the timeline, autopilot, projection and savings.</p>
     </div>
@@ -3074,11 +3993,11 @@ function renderCheckin() {
       <form id="ciForm">
         <label class="field"><span>Check-in date</span><input class="input num" type="date" value="${esc(dr.date)}" data-ci="date"></label>
         ${debts.map((d) => `<div class="ci-row"><div class="nm"><b>${esc(d.name)}</b><span>was ${money(d.balance)}</span></div>
-          <div class="prefix"><b>$</b><input class="input num" type="number" inputmode="decimal" min="0" step="0.01" data-ci="debt" data-id="${esc(d.id)}" value="${val(d.id, d.balance)}" aria-label="${esc(d.name)} balance"></div></div>`).join('')}
+          <div class="prefix"><b>${cur()}</b><input class="input num" type="number" inputmode="decimal" min="0" step="0.01" data-ci="debt" data-id="${esc(d.id)}" value="${val(d.id, d.balance)}" aria-label="${esc(d.name)} balance"></div></div>`).join('')}
         <div class="ci-row"><div class="nm"><b style="color:var(--save)">HYSA</b><span>was ${money(S.data.savings.balance)}</span></div>
-          <div class="prefix"><b>$</b><input class="input num" type="number" inputmode="decimal" min="0" step="0.01" data-ci="hysa" value="${esc(dr.hysa != null ? dr.hysa : S.data.savings.balance)}" aria-label="HYSA balance"></div></div>
+          <div class="prefix"><b>${cur()}</b><input class="input num" type="number" inputmode="decimal" min="0" step="0.01" data-ci="hysa" value="${esc(dr.hysa != null ? dr.hysa : S.data.savings.balance)}" aria-label="HYSA balance"></div></div>
         ${S.data.accounts.filter((a) => !a.archived).length ? `<div class="ci-group">Accounts</div>${S.data.accounts.filter((a) => !a.archived).map((a) => `<div class="ci-row"><div class="nm"><b>${esc(a.name)}</b><span>${esc(ACCOUNT_TYPES[a.type].label)} · was ${money(a.balance)}</span></div>
-          <div class="prefix"><b>$</b><input class="input num" type="number" inputmode="decimal" min="0" step="0.01" data-ci="acct" data-id="${esc(a.id)}" value="${esc(dr.accounts[a.id] != null ? dr.accounts[a.id] : a.balance)}" aria-label="${esc(a.name)} balance"></div></div>`).join('')}` : `<p class="small faint" style="margin:12px 0 0">Add accounts in Net Worth and they'll show up here too.</p>`}
+          <div class="prefix"><b>${cur()}</b><input class="input num" type="number" inputmode="decimal" min="0" step="0.01" data-ci="acct" data-id="${esc(a.id)}" value="${esc(dr.accounts[a.id] != null ? dr.accounts[a.id] : a.balance)}" aria-label="${esc(a.name)} balance"></div></div>`).join('')}` : `<p class="small faint" style="margin:12px 0 0">Add accounts in Net Worth and they'll show up here too.</p>`}
         <button class="btn primary block" type="submit" style="margin-top:12px">Save check-in</button>
       </form>
     </div>
@@ -3208,7 +4127,7 @@ function renderPaychecks() {
       <p class="hint">Per <b>month</b>, not per paycheck, and not counted in the split above. Card balances rising by more than this (after estimated interest) get flagged.</p>
       ${b.customItems.map((c) => `<div class="item-row">
           <input class="input" data-item="${esc(c.id)}" data-field="name" value="${esc(c.name)}" maxlength="40" aria-label="Item name">
-          <div class="prefix"><b>$</b><input class="input num" type="number" inputmode="decimal" min="0" step="0.01" data-item="${esc(c.id)}" data-field="amount" value="${c.amount || ''}" placeholder="0" aria-label="${esc(c.name)} amount"></div>
+          <div class="prefix"><b>${cur()}</b><input class="input num" type="number" inputmode="decimal" min="0" step="0.01" data-item="${esc(c.id)}" data-field="amount" value="${c.amount || ''}" placeholder="0" aria-label="${esc(c.name)} amount"></div>
           <button class="btn icon danger" data-act="del-item" data-id="${esc(c.id)}" aria-label="Remove ${esc(c.name)}">✕</button>
         </div>${freeable(c.id)}`).join('')}
       <button class="btn block" data-act="add-item">+ Add line item</button>
@@ -3250,7 +4169,7 @@ function renderSavings() {
       ${moneyField('Current balance', 'savings.balance', s.balance)}
       ${moneyField('Goal', 'savings.goal', s.goal)}
       <label class="field"><span>APY</span><div class="suffix"><input class="input num" type="number" inputmode="decimal" min="0" step="0.01" data-bind="savings.apy" value="${s.apy || ''}" placeholder="0.00"><b>%</b></div></label>
-      <label class="field"><span>Monthly contribution</span><div class="prefix"><b>$</b><input class="input num" type="number" inputmode="decimal" min="0" step="0.01" data-bind="savings.monthlyContribution" value="${s.monthlyContribution === null ? '' : s.monthlyContribution}" placeholder="${r2(S.data.budget.savingsPerPaycheck * FREQUENCIES[S.data.budget.frequency].perMonth)}"></div></label>
+      <label class="field"><span>Monthly contribution</span><div class="prefix"><b>${cur()}</b><input class="input num" type="number" inputmode="decimal" min="0" step="0.01" data-bind="savings.monthlyContribution" value="${s.monthlyContribution === null ? '' : s.monthlyContribution}" placeholder="${r2(S.data.budget.savingsPerPaycheck * FREQUENCIES[S.data.budget.frequency].perMonth)}"></div></label>
       <p class="hint">Leave blank to use your per-paycheck HYSA amount (${money(S.data.budget.savingsPerPaycheck)} × ${FREQUENCIES[S.data.budget.frequency].perMonth.toFixed(2)} paychecks/mo).</p>
       <div class="grid-2">
         <div class="stat"><div class="k">In 12 months</div><div class="v">${money0(yearOut)}</div></div>
@@ -3312,6 +4231,14 @@ function buildICS() {
     const card = S.data.debts.find((d) => d.id === x.cardId);
     add(`sub-${x.id}`, x.nextRenewal, `🔁 ${x.name} renews`, `${money(x.amount)} ${CYCLES[x.cycle].label.toLowerCase()} (${money0(subYearly(x))}/yr) · ${x.category}${card ? ` · billed to ${card.name}` : ''}\n${SITE_URL}`, rule, 1);
   }
+  for (const c of S.data.wallet.filter((x) => !x.archived)) {
+    for (const cr of c.credits) {
+      if (!(cr.amount > 0)) continue;
+      const p = creditPeriod(cr, todayISO());
+      const rule = { monthly: 'FREQ=MONTHLY;BYMONTHDAY=1', quarterly: 'FREQ=MONTHLY;INTERVAL=3;BYMONTHDAY=1', semiannual: 'FREQ=MONTHLY;INTERVAL=6;BYMONTHDAY=1', annual: 'FREQ=YEARLY', calendarYear: 'FREQ=YEARLY' }[cr.period];
+      add(`credit-${c.id}-${cr.id}`, p.reset, `🎁 ${c.name}: ${cr.name} credit resets`, `A new ${money(cr.amount)} ${CREDIT_PERIODS[cr.period].label.toLowerCase()} credit starts today. Use the last one before this date.\n${SITE_URL}`, rule, 3);
+    }
+  }
   const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Money HQ//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'X-WR-CALNAME:Money HQ', ...events.flat(), 'END:VCALENDAR'];
   return lines.map(icsFold).join('\r\n') + '\r\n';
 }
@@ -3354,11 +4281,11 @@ function debtForm(d) {
       </div>
       <input type="hidden" name="type" value="${d.type === 'loan' ? 'loan' : 'card'}">
       <div class="grid-2">
-        <label class="field"><span>Balance</span><div class="prefix"><b>$</b><input class="input num" name="balance" type="number" inputmode="decimal" min="0" step="0.01" required value="${d.balance === '' ? '' : esc(d.balance)}"></div></label>
+        <label class="field"><span>Balance</span><div class="prefix"><b>${cur()}</b><input class="input num" name="balance" type="number" inputmode="decimal" min="0" step="0.01" required value="${d.balance === '' ? '' : esc(d.balance)}"></div></label>
         <label class="field"><span>APR</span><div class="suffix"><input class="input num" name="apr" type="number" inputmode="decimal" min="0" step="0.01" value="${v(d.apr)}"><b>%</b></div></label>
       </div>
       <div class="grid-2">
-        <label class="field"><span>Minimum payment</span><div class="prefix"><b>$</b><input class="input num" name="minPayment" type="number" inputmode="decimal" min="0" step="0.01" value="${v(d.minPayment)}"></div></label>
+        <label class="field"><span>Minimum payment</span><div class="prefix"><b>${cur()}</b><input class="input num" name="minPayment" type="number" inputmode="decimal" min="0" step="0.01" value="${v(d.minPayment)}"></div></label>
         <label class="field"><span>Due day (1–31)</span><input class="input num" name="dueDay" type="number" inputmode="numeric" min="1" max="31" step="1" value="${v(d.dueDay)}" placeholder="e.g. 15"></label>
       </div>
       <div class="grid-2">
@@ -3367,12 +4294,12 @@ function debtForm(d) {
       </div>
       <div id="limitFields" class="${d.type === 'loan' ? 'hidden' : ''}">
         <div class="grid-2">
-          <label class="field"><span>Credit limit <span class="faint">(optional)</span></span><div class="prefix"><b>$</b><input class="input num" name="creditLimit" type="number" inputmode="decimal" min="0" step="0.01" value="${v(d.creditLimit)}"></div></label>
-          <label class="field"><span>Keep open</span><div class="prefix"><b>$</b><input class="input num" name="keepOpen" type="number" inputmode="decimal" min="0" step="0.01" value="${v(d.keepOpen)}" placeholder="0"></div></label>
+          <label class="field"><span>Credit limit <span class="faint">(optional)</span></span><div class="prefix"><b>${cur()}</b><input class="input num" name="creditLimit" type="number" inputmode="decimal" min="0" step="0.01" value="${v(d.creditLimit)}"></div></label>
+          <label class="field"><span>Keep open</span><div class="prefix"><b>${cur()}</b><input class="input num" name="keepOpen" type="number" inputmode="decimal" min="0" step="0.01" value="${v(d.keepOpen)}" placeholder="0"></div></label>
         </div>
         <p class="hint">If the balance goes above limit − keep-open, the plan pays it back under that line first and flags it as urgent.</p>
       </div>
-      ${isNew ? '' : `<label class="field"><span>Starting balance (for % paid)</span><div class="prefix"><b>$</b><input class="input num" name="startBalance" type="number" inputmode="decimal" min="0" step="0.01" value="${esc(d.startBalance)}"></div></label>`}
+      ${isNew ? '' : `<label class="field"><span>Starting balance (for % paid)</span><div class="prefix"><b>${cur()}</b><input class="input num" name="startBalance" type="number" inputmode="decimal" min="0" step="0.01" value="${esc(d.startBalance)}"></div></label>`}
       <div class="grid-2" style="margin-top:6px">
         <button type="button" class="btn" data-close>Cancel</button>
         <button type="submit" class="btn primary">${isNew ? 'Add debt' : 'Save'}</button>
@@ -3425,7 +4352,7 @@ function amountSheet(d, mode) {
     <p class="muted" style="margin:0 0 14px">${esc(d.name)} · current <span class="num">${money(d.balance)}</span></p>
     <form id="amtForm">
       <label class="field"><span>${mode === 'payment' ? 'Payment amount' : 'New balance (from your statement or app)'}</span>
-        <div class="prefix"><b>$</b><input class="input num" name="amt" type="number" inputmode="decimal" min="0" step="0.01" required></div></label>
+        <div class="prefix"><b>${cur()}</b><input class="input num" name="amt" type="number" inputmode="decimal" min="0" step="0.01" required></div></label>
       <div class="grid-2"><button type="button" class="btn" data-close>Cancel</button><button type="submit" class="btn primary">Save</button></div>
     </form>`, (root) => {
     const f = $('#amtForm', root);
@@ -3525,6 +4452,12 @@ function setPath(path, raw) {
   else if (key === 'monthlyContribution' || (obj === 'afterPlan' && key === 'monthly')) target[key] = raw === '' ? null : Math.max(0, toNum(raw));
   else if (obj === 'afterPlan' && key === 'rothPct') target[key] = Math.min(100, Math.max(0, toNum(raw)));
   else if (obj === 'afterPlan' && key === 'annualReturn') target[key] = raw === '' ? 7 : Math.min(30, Math.max(-20, toNum(raw)));
+  else if (obj === 'home') {
+    const nullable = ['priceMin', 'priceMax', 'ratePct', 'taxRatePct', 'insuranceYr', 'grossIncomeYr', 'monthlyExpenses', 'creditScore'];
+    if (raw === '' && nullable.includes(key)) target[key] = null;
+    else if (key === 'termYears') target[key] = Math.max(1, Math.round(toNum(raw)) || 30);
+    else target[key] = Math.max(0, toNum(raw));
+  }
   else target[key] = Math.max(0, key === 'apy' ? toNum(raw) : r2(toNum(raw)));
 }
 
@@ -3532,6 +4465,13 @@ document.addEventListener('change', (e) => {
   const t = e.target;
   if (t.matches('[data-bind]')) { setPath(t.dataset.bind, t.value); commit(); return; }
   if (t.matches('[data-bind-check]')) { const [o, k] = t.dataset.bindCheck.split('.'); S.data[o][k] = t.checked; commit(); return; }
+  if (t.matches('[data-setting]')) {
+    const k = t.dataset.setting;
+    S.data.settings[k] = k === 'reduceMotion' ? t.checked : t.value;
+    Object.keys(NUMFMT).forEach((x) => delete NUMFMT[x]);
+    commit(); return;
+  }
+  if (t.matches('[data-sp]')) { S.data.spendProfile[t.dataset.sp] = r2(Math.max(0, toNum(t.value))); commit(); return; }
   if (t.matches('[data-freed]')) {
     const key = t.dataset.freed, ci = S.data.budget.customItems.find((i) => i.id === key);
     if (ci) ci.freedLater = t.checked; else S.data.budget.freedLater[key] = t.checked;
@@ -3548,6 +4488,9 @@ document.addEventListener('change', (e) => {
 document.addEventListener('input', (e) => {
   const t = e.target;
   if (t.id === 'wiRange') { S.whatIf = toNum(t.value); updateWhatIf(); return; }
+  if (t.id === 'wbQuery') { S.wb.query = t.value; updateWhichCard(); document.querySelectorAll('#whichCard [data-act="wb-cat"]').forEach((x) => x.classList.toggle('on', SPEND_CATEGORIES[x.dataset.v] === t.value)); return; }
+  if (t.id === 'wbAmt') { S.wb.amount = t.value; updateWhichCard(); return; }
+  if (t.id === 'gsearch') { S.gq = t.value; updateSearch(); return; }
   if (t.matches('[data-cl-amt]')) { S.clDraft[t.dataset.clAmt] = t.value; return; }
   if (t.matches('[data-bt]')) { S.bt[t.dataset.bt] = t.dataset.bt === 'debtId' ? t.value : toNum(t.value); updateBT(); return; }
   if (t.matches('[data-ci]')) {
@@ -3560,7 +4503,12 @@ document.addEventListener('input', (e) => {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && e.target.matches('[data-bind], [data-item]')) e.target.blur();
   if (e.key === 'Escape' && $('#sheetRoot').firstChild) closeSheet();
-  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"][data-act], [role="link"][data-act]')) { e.preventDefault(); e.target.click(); }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"][data-act], [role="link"][data-act], [role="option"][data-act]')) { e.preventDefault(); e.target.click(); }
+  if (e.target.id === 'gsearch') {
+    if (e.key === 'Enter') { const r = searchResults(S.gq)[0]; if (r) { e.preventDefault(); searchGo(r.kind, r.id); } }
+    if (e.key === 'Escape') { S.gq = ''; e.target.value = ''; updateSearch(); }
+    if (e.key === 'ArrowDown') { const f = $('#gsOut [role="option"]'); if (f) { e.preventDefault(); f.focus(); } }
+  }
 });
 
 document.addEventListener('click', (e) => {
@@ -3642,6 +4590,42 @@ document.addEventListener('click', (e) => {
     case 'reactivate-sub': { const x = S.data.subscriptions.find((y) => y.id === b.dataset.id); if (x) { x.cancelledAt = null; if (x.nextRenewal < todayISO()) rollRenewals(S.data, todayISO()); closeSheet(); commit(); } break; }
     case 'delete-sub': { const x = S.data.subscriptions.find((y) => y.id === b.dataset.id); if (x) { closeSheet(); undoable('SUBSCRIPTION DELETED', x.name, () => { S.data.subscriptions = S.data.subscriptions.filter((y) => y !== x); }); } break; }
     case 'sub-filter': S.subFilter = b.dataset.v; render(); break;
+    case 'more-back': switchTab('more'); break;
+    case 'gs-go': searchGo(b.dataset.kind, b.dataset.id); break;
+    case 'insight-go': { const i = allInsights().find((x) => x.id === b.dataset.id); if (i) switchTab(i.action.sub || i.action.tab); break; }
+    case 'insight-dismiss': { const i = allInsights().find((x) => x.id === b.dataset.id); if (i) { const snapBefore = S.data.insightDismissals[i.id]; dismissInsight(S.data, i); commit(); toast('DISMISSED', 'It comes back if the numbers change.', 'info', { label: 'Undo', fn: () => { if (snapBefore) S.data.insightDismissals[i.id] = snapBefore; else delete S.data.insightDismissals[i.id]; commit(); } }); } break; }
+    case 'insight-restore': delete S.data.insightDismissals[b.dataset.id]; commit(); break;
+    case 'wb-cat': S.wb.query = SPEND_CATEGORIES[b.dataset.v]; render(); break;
+    case 'add-card': cardPresetPicker(); break;
+    case 'card-preset': {
+      const pre = CARD_PRESETS.find((x) => x.id === b.dataset.id);
+      const card = pre ? cardFromPreset(pre, new Date().toISOString()) : normalizeWalletCard({ name: 'New card', rules: [{ category: 'everything', rate: 1 }] });
+      const guess = S.data.debts.find((d) => d.type !== 'loan' && normName(d.name).split(' ').some((w) => w.length > 3 && normName(card.name).includes(w)));
+      if (guess) card.debtId = guess.id;
+      $('#sheetRoot').innerHTML = ''; cardForm(card, true); break;
+    }
+    case 'edit-card': { const c = S.data.wallet.find((x) => x.id === b.dataset.id); if (c) cardForm(c, false); break; }
+    case 'card-add-rule': readCardForm(); S.cardDraft.rules.push({ id: uid(), category: 'dining', merchants: [], rate: 1, cap: null, capPeriod: 'calendarYear', afterRate: null }); renderCardForm(); break;
+    case 'card-del-rule': readCardForm(); S.cardDraft.rules.splice(+b.dataset.i, 1); renderCardForm(); break;
+    case 'card-add-credit': readCardForm(); S.cardDraft.credits.push({ id: uid(), name: 'Credit', amount: 0, period: 'monthly', resetMonth: 1, used: {} }); renderCardForm(); break;
+    case 'card-del-credit': readCardForm(); S.cardDraft.credits.splice(+b.dataset.i, 1); renderCardForm(); break;
+    case 'delete-card': { const c = S.data.wallet.find((x) => x.id === b.dataset.id); if (c) { $('#sheetRoot').innerHTML = ''; undoable('CARD REMOVED', c.name, () => { S.data.wallet = S.data.wallet.filter((x) => x !== c); }); } break; }
+    case 'credit-toggle': {
+      const c = S.data.wallet.find((x) => x.id === b.dataset.card), cr = c && c.credits.find((x) => x.id === b.dataset.id);
+      if (cr) { const on = toggleCreditUsed(cr, todayISO()); commit(); if (on) toast(`+${money0(cr.amount)} CAPTURED`, `${c.name}: ${cr.name}`, 'info'); }
+      break;
+    }
+    case 'log-spend': spendForm(); break;
+    case 'del-spend': { const e2 = S.data.cardSpend.find((x) => x.id === b.dataset.id); if (e2) undoable('ENTRY DELETED', money0(e2.amount), () => { S.data.cardSpend = S.data.cardSpend.filter((x) => x !== e2); }); break; }
+    case 'add-merchant': merchantForm(null, b.dataset.name || ''); break;
+    case 'edit-merchant': { const m = S.data.merchants.find((x) => x.id === b.dataset.id); if (m) merchantForm(m); break; }
+    case 'delete-merchant': { const m = S.data.merchants.find((x) => x.id === b.dataset.id); if (m) { $('#sheetRoot').innerHTML = ''; undoable('MERCHANT DELETED', m.name, () => { S.data.merchants = S.data.merchants.filter((x) => x !== m); }); } break; }
+    case 'home-down': S.data.home.downPct = toNum(b.dataset.v); commit(); break;
+    case 'home-preapproved': S.data.home.preapproved = !S.data.home.preapproved; commit(); break;
+    case 'add-program': programForm(null); break;
+    case 'edit-program': { const pr = S.data.home.programs.find((x) => x.id === b.dataset.id); if (pr) programForm(pr); break; }
+    case 'delete-program': { const pr = S.data.home.programs.find((x) => x.id === b.dataset.id); if (pr) { $('#sheetRoot').innerHTML = ''; undoable('PROGRAM DELETED', pr.name, () => { S.data.home.programs = S.data.home.programs.filter((x) => x !== pr); }); } break; }
+    case 'set-week': S.data.settings.weekStart = +b.dataset.v === 1 ? 1 : 0; commit(); break;
     case 'cal-day': S.cal.sel = S.cal.sel === b.dataset.date ? null : b.dataset.date; render(); break;
     case 'cal-prev': case 'cal-next': S.cal.month = shiftMonth(S.cal.month || todayISO().slice(0, 7), act === 'cal-prev' ? -1 : 1); S.cal.sel = null; render(); break;
     case 'add-milestone': milestoneForm(null); break;
@@ -3651,7 +4635,7 @@ document.addEventListener('click', (e) => {
       break;
     case 'export-ics':
       downloadFile('money-hq-reminders.ics', buildICS(), 'text/calendar');
-      toast('CALENDAR FILE READY', 'Open it to add paydays, due dates and renewals to your calendar.', 'info');
+      toast('CALENDAR FILE READY', 'Paydays, due dates, renewals and credit resets.', 'info');
       break;
     case 'sync-now': pull(); break;
     case 'sign-out': signOut(); break;
@@ -3759,7 +4743,7 @@ function startApp(user) {
     loadCache();
     try {
       const saved = JSON.parse(storageGet('money-hq:tab') || 'null');
-      if (saved && TABS.includes(saved.tab)) { S.tab = saved.tab; if (DEBT_SUBS.includes(saved.sub)) S.debtTab = saved.sub; }
+      if (saved && TABS.includes(saved.tab)) { S.tab = saved.tab; if (DEBT_SUBS.includes(saved.sub)) S.debtTab = saved.sub; if (MORE_PAGES.includes(saved.more)) S.moreView = saved.more; }
     } catch (_) { /* first run on this device */ }
     if (!navigator.onLine) S.synced = true;
   }
