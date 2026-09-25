@@ -1,6 +1,6 @@
 // Offline shell for Money HQ. Network-first for the page so updates show up
 // immediately; cached copies are used only when offline. Supabase API calls are never cached.
-const CACHE = 'money-hq-v4';
+const CACHE = 'money-hq-v5';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
