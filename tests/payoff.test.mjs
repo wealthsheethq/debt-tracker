@@ -1225,7 +1225,7 @@ const creditScenario = (extra = {}) => normalize(Object.assign({
     const snap = JSON.parse(JSON.stringify(src));
     const m = normalize(src, '2026-09-25');
     assert.deepEqual(src, snap, `${label}: not mutated`);
-    assert.equal(m.version, 6, `${label} → v6`);
+    assert.equal(m.version, engine.DATA_VERSION, `${label} → current version`);
     same(src, m, label);
     assert.deepEqual(m.credit, engine.defaultCredit(), `${label}: credit defaults (29% / 9%, nothing logged)`);
     assert.equal(m.credit.targetCard, 29); assert.equal(m.credit.targetOverall, 9);
