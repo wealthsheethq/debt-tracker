@@ -565,6 +565,73 @@ details.recap[open] summary { margin-bottom: 10px; }
 .tier-table tr.me td { color: var(--accent); }
 .tier-table tr.me td:first-child { font-weight: 700; }
 
+/* ---------- statement snap ---------- */
+.sheet.wide { max-width: 980px; }
+.dropzone { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; padding: var(--sp-5) var(--sp-4); margin-top: var(--sp-3);
+  border: 2px dashed var(--line-strong); border-radius: var(--r-lg); background: var(--bg); cursor: pointer; transition: border-color var(--dur-1), background var(--dur-1); }
+.dropzone.compact { padding: var(--sp-4); }
+.dropzone:hover, .dropzone.over { border-color: var(--accent); background: var(--accent-soft); }
+.dropzone:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.dropzone .dz-ico { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); }
+.dropzone .dz-ico .ic { vertical-align: 0; }
+.dropzone b { font-size: var(--fs-md); }
+.snap-privacy { display: flex; gap: var(--sp-2); align-items: flex-start; font-size: var(--fs-xs); color: var(--muted); margin: var(--sp-3) 0; }
+.snap-privacy .ic { color: var(--accent); margin-top: 1px; }
+.snapq { list-style: none; margin: 0 0 var(--sp-3); padding: 0; }
+.snapq li { display: grid; grid-template-columns: 40px minmax(0,1fr); gap: var(--sp-3); align-items: center; padding: var(--sp-3) 0; border-top: 1px solid var(--line); }
+.snapq li:first-child { border-top: 0; }
+.snapq .l-ico { width: 40px; height: 40px; border-radius: 12px; background: var(--surface-2); display: grid; place-items: center; color: var(--muted); }
+.snapq .l-ico .ic { vertical-align: 0; }
+.snapq b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.snapq .sq-stage { display: block; font-size: var(--fs-xs); color: var(--muted); margin-bottom: 6px; font-family: var(--font-num); }
+.snapq li.ready .l-ico { color: var(--accent); background: var(--accent-soft); }
+.snapq li.error .l-ico { color: var(--debt); background: var(--debt-soft); }
+.progress.thin { height: 6px; }
+.snap-grid { display: grid; grid-template-columns: minmax(0,1fr); gap: var(--sp-4); align-items: start; margin-top: var(--sp-3); }
+@media (min-width: 900px) { .snap-grid { grid-template-columns: minmax(0,1fr) minmax(0,1fr); } .snap-grid > div:last-child { position: sticky; top: 0; } }
+.sf { border: 1px solid var(--line); border-radius: var(--r-md); padding: var(--sp-3); margin-bottom: var(--sp-2); background: var(--surface); transition: border-color var(--dur-2), box-shadow var(--dur-2); }
+.sf.low { border-color: rgba(255,181,71,.55); background: var(--warn-soft); }
+.sf.sel, .sf.flash { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.sf-top { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-2); margin-bottom: 6px; }
+.sf-top label { font-size: var(--fs-sm); color: var(--muted); font-weight: 700; min-width: 0; }
+.sf-in { display: grid; grid-template-columns: minmax(0,1fr) 44px; gap: var(--sp-2); }
+.sf-in .input { min-height: 44px; font-size: 16px; }
+.sf-in .btn { min-height: 44px; padding: 0; }
+.snip { font-family: var(--font-num); font-size: var(--fs-xs); color: var(--muted); margin-top: 6px; overflow-wrap: anywhere; }
+.snip mark { background: var(--accent-soft); color: var(--accent); border-radius: 4px; padding: 0 2px; }
+.snap-text { background: var(--surface-2); border-radius: var(--r-md); padding: 0 var(--sp-3) var(--sp-3); }
+.snap-text summary { cursor: pointer; font-weight: 700; min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); list-style: none; flex-wrap: wrap; }
+.snap-text summary::-webkit-details-marker { display: none; }
+.stmt-text { font-family: var(--font-num); font-size: 12.5px; line-height: 2; color: var(--muted); background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-md); padding: var(--sp-3); max-height: 55vh; overflow-y: auto; overflow-wrap: anywhere; }
+.stmt-text .sl { min-height: 1em; }
+.tok { font: inherit; color: var(--text); background: var(--surface-3); border: 1px solid transparent; border-radius: 5px; padding: 1px 3px; margin: 0; cursor: pointer; line-height: 1.4; }
+.tok:hover { border-color: var(--faint); }
+.tok.used { background: var(--accent-soft); color: var(--accent); }
+.tok.on { background: var(--accent); color: var(--accent-ink); }
+.assign-bar { background: var(--bg); border: 1px solid var(--accent-line); border-radius: var(--r-md); padding: 8px 10px; font-size: var(--fs-sm); margin-bottom: 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.chip-btn { border: 1px solid var(--line-strong); cursor: pointer; min-height: 32px; font-family: var(--font-body); color: var(--text); }
+.chip-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ba tr.hl td b { color: var(--accent); font-weight: 500; }
+.ba tr.same td { color: var(--faint); }
+.ba td { overflow-wrap: anywhere; }
+textarea.input { min-height: 120px; padding: 12px 16px; font-family: var(--font-num); font-size: 14px; line-height: 1.5; resize: vertical; }
+details.paste { margin-top: var(--sp-3); }
+details.paste summary { cursor: pointer; color: var(--accent); font-weight: 700; font-size: var(--fs-sm); min-height: 44px; display: flex; align-items: center; }
+.sd-count { margin: 10px 0 2px; font-size: var(--fs-sm); color: var(--muted); }
+.sd-count b { color: var(--text); }
+.li.sd.in .l-ico { color: var(--accent); background: var(--accent-soft); }
+.li.sd.due .l-ico { color: var(--warn); background: var(--warn-soft); }
+.li .sd-act { display: flex; gap: 6px; }
+.sd-link { display: block; width: 100%; grid-column: 1 / -1; border: 0; text-align: left; color: inherit; font: inherit; cursor: pointer; }
+.sd-link .k .ic { vertical-align: -3px; }
+.mini-chart .k { font-size: var(--fs-xs); color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin: var(--sp-2) 0 2px; }
+.mini-chart .legend { display: none; }
+.sheet-actions.one { grid-template-columns: minmax(0,1fr); }
+.snap-head { display: flex; justify-content: space-between; gap: var(--sp-3); align-items: flex-end; }
+.snap-head h2 em { font-style: normal; color: var(--accent); }
+.sheet h2 em { font-style: normal; color: var(--accent); }
+.debt-actions.two { grid-template-columns: repeat(3, minmax(0,1fr)); }
+
 /* ---------- sheet (modal) ---------- */
 .sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.62); z-index: 50; display: flex; align-items: flex-end; justify-content: center; animation: fadeIn var(--dur-1) ease-out; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -680,6 +747,7 @@ details.recap[open] summary { margin-bottom: 10px; }
   <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></symbol>
   <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></symbol>
   <symbol id="i-gauge" viewBox="0 0 24 24"><path d="M4 17a8 8 0 1116 0"/><path d="M12 17l4-5"/><path d="M12 17h.01"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1z"/><circle cx="12" cy="13.5" r="3.5"/></symbol>
   <symbol id="i-rocket" viewBox="0 0 24 24"><path d="M5 15c-1 1-2 4-2 6 2 0 5-1 6-2M9 13l2 2"/><path d="M14 4c3-1 6-1 6-1s0 3-1 6l-7 7-5-5z"/><circle cx="15" cy="9" r="1.5"/></symbol>
 </svg>
 
@@ -1353,6 +1421,7 @@ function normalizeWalletCard(c) {
     creditLimit: toNum(c.creditLimit) > 0 ? r2(toNum(c.creditLimit)) : null, keepOpen: r2(nonNeg(c.keepOpen)), currentBalance: r2(nonNeg(c.currentBalance)),
     closingDay: dayOrNull(c.closingDay), dueDay: dayOrNull(c.dueDay), cardKind: c.cardKind === 'charge' ? 'charge' : 'revolving',
     openDate: isoOrEmpty(c.openDate), utilInclude: c.utilInclude !== false, monthlySpend: c.monthlySpend == null || c.monthlySpend === '' ? null : r2(nonNeg(c.monthlySpend)),
+    last4: last4Or(c.last4),   // v7
     rules: arr(c.rules).filter(isObj).map((r) => Object.assign({}, r, {
       id: String(r.id || newId()), category: SPEND_CATEGORIES[r.category] ? r.category : 'everything',
       merchants: arr(r.merchants).map((m) => String(m).trim()).filter(Boolean), rate: nonNeg(r.rate),
@@ -1452,7 +1521,7 @@ function homeChecklist(data, ctx) {
 }
 
 /* ---------- credit: statements, utilization, "pay before it reports" ---------- */
-const DATA_VERSION = 6;
+const DATA_VERSION = 7;
 const CARD_KINDS = { revolving: 'Credit card', charge: 'Charge card' };
 const SCORE_MODELS = ['FICO 8', 'FICO 9', 'FICO 10T', 'FICO 2/4/5 (mortgage)', 'VantageScore 3.0', 'VantageScore 4.0', 'Other'];
 const INQUIRY_TYPES = { card: 'Credit card', mortgage: 'Mortgage', auto: 'Auto loan', loan: 'Personal loan', other: 'Other' };
@@ -2117,6 +2186,8 @@ function computeInsights(data, today, fmt) {
   }
   // credit: pay before it reports, when utilization crosses a band, oldest account, mortgage timing
   creditInsights(data, today, fmt, plan).forEach(add);
+  // statements: changes on the newest statement, statements waiting to be snapped
+  statementInsights(data, today, fmt).forEach(add);
   // freedom money
   if (plan && plan.ok && data.budget.debtPerPaycheck > 0) {
     const f = freedMonthlyFrom(data);
@@ -2166,7 +2237,8 @@ function defaultData(todayISO) {
     home: defaultHome(),
     insightDismissals: {},
     settings: { currency: 'USD', locale: 'en-US', weekStart: 0, reduceMotion: false },
-    credit: defaultCredit()
+    credit: defaultCredit(),
+    statements: []
   };
 }
 const nonNeg = (v) => Math.max(0, toNum(v));
@@ -2208,7 +2280,9 @@ function normalize(raw, todayISO) {
       cardKind: x.cardKind === 'charge' ? 'charge' : 'revolving',
       openDate: isoOrEmpty(x.openDate),
       utilInclude: x.utilInclude !== false,
-      monthlySpend: x.monthlySpend == null || x.monthlySpend === '' ? null : r2(nonNeg(x.monthlySpend))
+      monthlySpend: x.monthlySpend == null || x.monthlySpend === '' ? null : r2(nonNeg(x.monthlySpend)),
+      // v7: last 4 digits, remembered from statements (never the full account number)
+      last4: last4Or(x.last4)
     });
   }) : [];
 
@@ -2341,6 +2415,8 @@ function normalize(raw, todayISO) {
       id: String(x.id || newId()), date: String(x.date).slice(0, 10), lender: String(x.lender || '').slice(0, 60), type: INQUIRY_TYPES[x.type] ? x.type : 'other', note: String(x.note || '').slice(0, 120)
     })).sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0)) : []
   });
+  // v7: statement snap (extracted numbers only; see normalizeStatement)
+  d.statements = Array.isArray(src.statements) ? src.statements.map(normalizeStatement).filter(Boolean).sort(byClosing).slice(-600) : [];
   return d;
 }
 
@@ -2629,6 +2705,605 @@ function balanceTransferCheck(debts, opts, debtId, t) {
     payoffDate: po ? po.date : null, paidBeforePromoEnd: !!(po && po.date <= promoEnd), ok: keep.ok && tr.ok
   };
 }
+/* ---------- statement snap: read card statements on this device ---------- */
+/*
+ * Privacy: statement files and their text only live in memory while you review them. What's saved is the numbers in
+ * STMT_NUMS / STMT_DATES and a card's last 4 digits. Full account numbers, addresses and transactions are never saved.
+ */
+const STMT_FIELDS = [
+  { key: 'balance', label: 'Statement balance', type: 'money', main: true },
+  { key: 'minPayment', label: 'Minimum payment', type: 'money', main: true },
+  { key: 'dueDate', label: 'Payment due date', type: 'date', main: true },
+  { key: 'closingDate', label: 'Closing date', type: 'date', main: true },
+  { key: 'apr', label: 'Purchase APR', type: 'pct', main: true },
+  { key: 'creditLimit', label: 'Credit limit', type: 'money', main: true },
+  { key: 'available', label: 'Available credit', type: 'money', main: true },
+  { key: 'interest', label: 'Interest charged', type: 'money', main: true },
+  { key: 'fees', label: 'Fees charged', type: 'money', main: true },
+  { key: 'prevBalance', label: 'Previous balance', type: 'money', main: true },
+  { key: 'last4', label: 'Last 4 digits', type: 'last4', main: true },
+  { key: 'promoApr', label: 'Promo APR', type: 'pct' },
+  { key: 'promoEnd', label: 'Promo ends', type: 'date' },
+  { key: 'cashApr', label: 'Cash advance APR', type: 'pct' },
+  { key: 'potBalance', label: 'Pay Over Time balance', type: 'money' }
+];
+const STMT_LOW = 0.7;   // fields under this confidence are highlighted for review
+const STMT_NUMS = ['balance', 'prevBalance', 'minPayment', 'apr', 'cashApr', 'promoApr', 'creditLimit', 'available', 'interest', 'fees', 'potBalance'];
+const STMT_DATES = ['closingDate', 'periodStart', 'dueDate', 'promoEnd'];
+const STMT_SOURCES = ['pdf', 'ocr', 'text'];
+const STMT_ISSUERS = {
+  amex: { name: 'American Express', detect: /american\s*express|\bamex\b|americanexpress\.com/i, card: /\bamex\b|american\s*express|blue\s*cash|platinum/i,
+    products: [{ id: 'amex-plat', name: 'Platinum Card', re: /platinum\s*card|the\s*platinum/i, card: /platinum/i }, { id: 'amex-bcp', name: 'Blue Cash Preferred', re: /blue\s*cash\s*preferred/i, card: /blue\s*cash/i }] },
+  capitalone: { name: 'Capital One', detect: /capital\s*one/i, card: /capital\s*one|\bc1\b|savor|quicksilver|venture/i,
+    products: [{ id: 'c1-savor', name: 'Savor', re: /savor/i, card: /savor/i }] },
+  apple: { name: 'Apple Card', detect: /apple\s*card|goldman\s*sachs/i, card: /apple/i, products: [{ id: 'apple', name: 'Apple Card', re: /apple\s*card/i, card: /apple/i }] },
+  robinhood: { name: 'Robinhood', detect: /robinhood/i, card: /robinhood|\brh\b/i, products: [{ id: 'rh-gold', name: 'Gold Card', re: /gold\s*card/i, card: /gold|robinhood/i }] }
+};
+
+/* Label patterns: a space means "any spaces, or none" (OCR often drops them). Earlier patterns rank a little higher. */
+const STMT_NO_PROMO = /promo|intro|special|expire/i;
+const STMT_NO_WARN = /warning|if you make|only the minimum|only minimum|late fee/i;   // the minimum-payment warning box
+const STMT_NO_YTD = /\bin\s*(19|20)\d{2}\b|year[\s-]*to[\s-]*date|\bytd\b/i;        // year-to-date totals
+const STMT_GENERIC = {
+  balance: ['new balance', 'new statement balance', '(?<!previous )statement balance', 'total new balance', '(?<!previous )total balance'],
+  minPayment: [{ s: 'minimum payment due', skip: STMT_NO_WARN }, { s: 'total minimum payment due', skip: STMT_NO_WARN }, { s: 'minimum amount due', skip: STMT_NO_WARN },
+    { s: 'minimum payment', skip: STMT_NO_WARN }, { s: 'minimum due', skip: STMT_NO_WARN }, { s: 'min\\.? payment due', skip: STMT_NO_WARN }],
+  dueDate: ['payment due date', 'minimum payment due date', 'payment due by', 'due date', 'please pay by', 'payment due'],
+  closingDate: [{ s: 'statement closing date' }, { s: 'closing date of billing cycle' }, { s: '(?<!next )closing date', range: true }, { s: 'statement period', range: true },
+    { s: 'billing period', range: true }, { s: 'billing cycle', range: true }, { s: 'statement date' }, { s: 'days in billing cycle', line: true, range: true }, { s: 'balance as of', conf: -0.1 }],
+  apr: [{ s: 'purchase apr', skip: STMT_NO_PROMO }, { s: 'apr\\)? for purchases', skip: STMT_NO_PROMO }, { s: 'standard purchase apr', skip: STMT_NO_PROMO }, { s: '\\bpurchases?\\b', skip: STMT_NO_PROMO }, { s: 'annual percentage rate', skip: STMT_NO_PROMO, conf: -0.2 }],
+  cashApr: [{ s: 'cash advance apr', skip: STMT_NO_PROMO }, { s: 'apr\\)? for cash advances', skip: STMT_NO_PROMO }, { s: '\\bcash advances?\\b', skip: STMT_NO_PROMO }],
+  creditLimit: ['(?<!(cash (advance )?|available ))credit limit', '(?<!(cash (advance )?|available ))credit line', 'total credit line', { s: '(?<!available )pay over time limit', conf: -0.1 }],
+  available: ['(?<!cash )available credit', 'credit available', { s: 'available pay over time limit', conf: -0.1 }],
+  interest: ['total interest charged for this period', 'total interest for this period', 'interest charged', 'total interest charged', 'interest charge(?! calculation)', '^interest\\b'].map((x) => ({ s: x, skip: STMT_NO_YTD })),
+  fees: ['total fees charged', 'total fees for this period', 'fees charged', '^fees\\b'].map((x) => ({ s: x, skip: STMT_NO_YTD })),
+  prevBalance: ['previous balance', 'previous statement balance', 'previous total balance', 'last statement balance', 'balance from last statement'],
+  potBalance: ['pay over time balance']
+};
+/* Issuer-aware labels: the wording each issuer typically uses, tried first with a higher base confidence. */
+const STMT_ISSUER_LABELS = {
+  amex: {
+    balance: ['new balance'], minPayment: [{ s: 'minimum payment due', skip: STMT_NO_WARN }], dueDate: ['payment due date'], closingDate: [{ s: '(?<!next )closing date', range: true }],
+    interest: [{ s: 'total interest charged for this period', skip: STMT_NO_YTD }, { s: 'interest charged', skip: STMT_NO_YTD }], fees: [{ s: 'total fees for this period', skip: STMT_NO_YTD }, { s: '^fees\\b', skip: STMT_NO_YTD }],
+    apr: [{ s: '^purchases\\b', skip: STMT_NO_PROMO }, { s: '^pay over time\\b', skip: STMT_NO_PROMO }], cashApr: [{ s: '^cash advances\\b', skip: STMT_NO_PROMO }],
+    creditLimit: ['(?<!(cash (advance )?|available ))credit limit', { s: '(?<!available )pay over time limit', conf: -0.1 }],
+    available: ['(?<!cash )available credit', { s: 'available pay over time limit', conf: -0.1 }], prevBalance: ['previous balance'], potBalance: ['pay over time balance']
+  },
+  capitalone: {
+    balance: ['new balance'], minPayment: [{ s: 'minimum payment due', skip: STMT_NO_WARN }], dueDate: ['payment due date'], closingDate: [{ s: 'days in billing cycle', line: true, range: true }],
+    creditLimit: ['(?<!cash advance )credit limit'], available: ['(?<!cash advance )available credit'], interest: [{ s: 'total interest for this period', skip: STMT_NO_YTD }, { s: 'interest charged', skip: STMT_NO_YTD }],
+    fees: [{ s: 'total fees for this period', skip: STMT_NO_YTD }, { s: 'fees charged', skip: STMT_NO_YTD }], apr: [{ s: '^purchases\\b', skip: STMT_NO_PROMO }], cashApr: [{ s: '^cash advances\\b', skip: STMT_NO_PROMO }], prevBalance: ['previous balance']
+  },
+  apple: {
+    balance: ['(?<!previous )total balance'], minPayment: [{ s: 'minimum payment due', skip: STMT_NO_WARN }, { s: 'minimum payment', skip: STMT_NO_WARN }], dueDate: ['payment due by', 'payment due date'],
+    closingDate: [{ s: '^statement\\b(?! balance)', range: true }, { s: 'total balance as of' }], apr: [{ s: '\\bpurchases\\b', skip: STMT_NO_PROMO }],
+    interest: [{ s: 'interest charged', skip: STMT_NO_YTD }, { s: 'total interest', skip: STMT_NO_YTD }], creditLimit: ['credit limit'], available: ['available credit'], prevBalance: ['previous total balance', 'previous balance']
+  },
+  robinhood: {
+    balance: ['(?<!previous )statement balance', 'new balance'], minPayment: [{ s: 'minimum payment due', skip: STMT_NO_WARN }], dueDate: ['payment due date'], closingDate: [{ s: 'statement period', range: true }, { s: '(?<!next )closing date' }],
+    apr: [{ s: 'purchase apr', skip: STMT_NO_PROMO }], cashApr: [{ s: 'cash advance apr', skip: STMT_NO_PROMO }], creditLimit: ['credit limit'], available: ['available credit'],
+    interest: [{ s: 'interest charged', skip: STMT_NO_YTD }], fees: [{ s: 'fees charged', skip: STMT_NO_YTD }], prevBalance: ['previous balance']
+  }
+};
+const STMT_TYPE = Object.fromEntries(STMT_FIELDS.map((f) => [f.key, f.type]));
+function stmtPatterns(list, conf) {
+  return (list || []).map((p, rank) => {
+    const o = typeof p === 'string' ? { s: p } : p;
+    return { re: new RegExp(o.s.replace(/ /g, '\\s*'), 'i'), conf: conf + (o.conf || 0) - rank * 0.01, range: !!o.range, line: !!o.line, skip: o.skip || null };
+  });
+}
+
+/** Statement text → trimmed lines (dashes and odd spaces normalized). */
+function stmtLines(text) {
+  return String(text || '').replace(/\r\n?/g, '\n').replace(/[‐-―−]/g, '-').replace(/[    ]/g, ' ').replace(/[‘’]/g, "'")
+    .split('\n').map((l) => l.replace(/[ \t]+/g, ' ').trim()).filter(Boolean);
+}
+/** OCR slips inside numbers: O/o → 0 and l/I/| → 1, only when they touch digits (so words are left alone). Same length in and out. */
+function fixOcrDigits(s) {
+  const re = /(?<=[\d$]|\d[,.])[OolI|](?!(?![OolI|])[A-Za-z])|(?<![A-Za-z])[OolI|](?=\d|[,.]\d)/g;
+  let prev;
+  do { prev = s; s = s.replace(re, (c) => (c === 'O' || c === 'o' ? '0' : '1')); } while (s !== prev);
+  return s;
+}
+/** The reverse slip inside words ("Avai1able", "Ba1ance", "C0sing"): used only for finding labels, same length in and out. */
+function fixOcrLetters(s) { return s.replace(/(?<=[A-Za-z])[01](?=[A-Za-z])/g, (c) => (c === '0' ? 'o' : 'l')); }
+const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const MONTH_ALT = [...new Set(MONTH_NAMES.flatMap((n) => [n, n.slice(0, 3), n.toUpperCase(), n.slice(0, 3).toUpperCase()]).concat(['Sept', 'SEPT']))].sort((a, b) => b.length - a.length).join('|');
+const monthNum = (s) => MONTH_NAMES.findIndex((n) => n.slice(0, 3).toLowerCase() === String(s).slice(0, 3).toLowerCase()) + 1;
+function stmtISO(y, m, d) {
+  y = +y; m = +m; d = +d;
+  if (y < 100) y += 2000;
+  if (!(y >= 1990 && y <= 2100) || !(m >= 1 && m <= 12) || !(d >= 1) || d > daysInMonth(y, m - 1)) return null;
+  return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+}
+/** Parse one date as written on a statement: 09/18/26, 9/18/2026, 2026-09-18, Sep 18, 2026, 18 Sep 2026. No year → nearest to `today`. */
+function parseStmtDate(s, today) {
+  const toks = stmtTokens(String(s || ''), today).filter((t) => t.type === 'date');
+  if (toks.length) return toks[0].value;
+  const iso = String(s || '').match(/(\d{4})-(\d{2})-(\d{2})/);
+  return iso ? stmtISO(iso[1], iso[2], iso[3]) : null;
+}
+/** Nearest year for a month/day with no year: within about six months of `today`. */
+function guessYear(m, d, today) {
+  const t = parseISO(today) || new Date();
+  let best = null;
+  for (const y of [t.getFullYear() - 1, t.getFullYear(), t.getFullYear() + 1]) {
+    const iso = stmtISO(y, m, d);
+    if (iso && (!best || Math.abs(daysBetween(today, iso)) < Math.abs(daysBetween(today, best)))) best = iso;
+  }
+  return best;
+}
+/**
+ * Every date, percent and amount in one line, left to right: { type: 'date'|'pct'|'money'|'int', value, index, end }.
+ * Dates are found first so their digits never read as amounts. Money: "$1,234.56", "1,234.56", "-$5.00", "($5.00)", "5.00 CR".
+ */
+function stmtTokens(line, today) {
+  const toks = [], taken = new Uint8Array(line.length);
+  const free = (i, j) => { for (let k = i; k < j; k++) if (taken[k]) return false; return true; };
+  const take = (m, tok) => {
+    if (!free(m.index, m.index + m[0].length)) return false;
+    taken.fill(1, m.index, m.index + m[0].length);
+    const t = Object.assign({ index: m.index, end: m.index + m[0].length }, tok);
+    toks.push(t);
+    return t;
+  };
+  const each = (re, fn) => { let m; re.lastIndex = 0; while ((m = re.exec(line))) { fn(m); if (!m[0].length) re.lastIndex++; } };
+  const dates = [];
+  each(new RegExp(`(?<![A-Z])(${MONTH_ALT})\\.?\\s*(\\d{1,2})(?:st|nd|rd|th)?(?!\\d|\\.\\d|\\s*%)(?:\\s*,?\\s*(\\d{4})(?!\\d))?`, 'g'), (m) => {
+    if (!m[3] && /^apr$/i.test(m[1])) return;   // "APR 24" is a rate, not April 24
+    const t = take(m, { type: 'date', m: monthNum(m[1]), d: +m[2], y: m[3] ? +m[3] : null });
+    if (t) dates.push(t);
+  });
+  each(new RegExp(`(?<![\\d.,$])(\\d{1,2})\\s*(${MONTH_ALT})\\.?,?\\s*(\\d{4})(?!\\d)`, 'g'), (m) => { const t = take(m, { type: 'date', m: monthNum(m[2]), d: +m[1], y: +m[3] }); if (t) dates.push(t); });
+  each(/(?<![\d/.$,])(\d{4})-(\d{2})-(\d{2})(?!\d)/g, (m) => { const t = take(m, { type: 'date', m: +m[2], d: +m[3], y: +m[1] }); if (t) dates.push(t); });
+  each(/(?<![\d/.$,])(\d{1,2})([/.-])(\d{1,2})\2(\d{4}|\d{2})(?![\d/%]|\.\d)/g, (m) => { const t = take(m, { type: 'date', m: +m[1], d: +m[3], y: +m[4] }); if (t) dates.push(t); });
+  each(/(?<![\d/.$,])(\d{1,2})\/(\d{4})(?![\d/])/g, (m) => { const y = +m[2], mo = +m[1]; if (mo >= 1 && mo <= 12) { const t = take(m, { type: 'date', m: mo, d: daysInMonth(y, mo - 1), y, monthOnly: true }); if (t) dates.push(t); } });
+  // years missing ("Aug 19 - Sep 18, 2026"): borrow from the next date on the line, else the nearest year to today
+  dates.sort((a, b) => a.index - b.index).forEach((t, i) => {
+    if (t.y == null) {
+      const nx = dates.slice(i + 1).find((x) => x.y != null);
+      t.value = nx ? stmtISO(t.m > nx.m ? nx.y - 1 : nx.y, t.m, t.d) : guessYear(t.m, t.d, today);
+    } else t.value = stmtISO(t.y, t.m, t.d);
+  });
+  for (let i = toks.length - 1; i >= 0; i--) if (toks[i].type === 'date' && !toks[i].value) { taken.fill(0, toks[i].index, toks[i].end); toks.splice(i, 1); }
+  each(/(?<![\d.,])(\d{1,2}(?:\.\d{1,3})?)\s*%/g, (m) => take(m, { type: 'pct', value: parseFloat(m[1]) }));
+  each(/(\(\s*)?([+-]\s*)?(\$\s*)?(\d{1,3}(?:,\d{3})+|\d+)(\.\d{2})?(?![\d.,]\d)(\s*\))?(\s*CR\b)?/g, (m) => {
+    if (!free(m.index, m.index + m[0].length)) return;
+    const money = !!(m[3] || m[5] || m[4].includes(','));
+    let v = parseFloat(m[4].replace(/,/g, '') + (m[5] || ''));
+    if ((m[1] && m[6]) || (m[2] && m[2][0] === '-') || m[7]) v = -v;
+    take(m, { type: money ? 'money' : 'int', value: r2(v), digits: m[4].replace(/,/g, '') });
+  });
+  return toks.sort((a, b) => a.index - b.index);
+}
+
+function detectIssuer(text) {
+  let best = null, n = 0;
+  for (const [k, iss] of Object.entries(STMT_ISSUERS)) {
+    const c = (text.match(new RegExp(iss.detect.source, 'gi')) || []).length;
+    if (c > n) { n = c; best = k; }
+  }
+  return best;
+}
+const typeOk = (t, type, allowInt) => (type === 'money' ? t.type === 'money' || (allowInt && t.type === 'int') : t.type === type);
+const letters = (s) => (s.match(/[A-Za-z]/g) || []).length;
+
+/** All candidates for one field: label on a line, the value right after it (or on the next line when the label stands alone). */
+function stmtCandidates(ctx, key, pats) {
+  const type = STMT_TYPE[key] || 'date', out = [];
+  ctx.labels.forEach((line, i) => {
+    for (const p of pats) {
+      if (p.skip && p.skip.test(line)) continue;
+      const re = new RegExp(p.re.source, 'gi');
+      let m;
+      while ((m = re.exec(line))) {
+        if (!m[0].length) { re.lastIndex++; continue; }
+        const from = p.line ? 0 : m.index + m[0].length;
+        const own = ctx.toks[i].filter((t) => t.index >= from && typeOk(t, type));
+        let li = i, list = own, next = false;
+        if (!own.length) {
+          // header-style: the label is alone on its line, the value is on the next one
+          const alone = !/[A-Za-z0-9]/.test(line.slice(0, m.index)) && !/[A-Za-z0-9]/.test(line.slice(from));
+          if (!alone || i + 1 >= ctx.lines.length) continue;
+          li = i + 1; next = true; list = ctx.toks[li].filter((t) => typeOk(t, type));
+          if (!list.length) continue;
+        }
+        let t = list[0], start = null;
+        if (type === 'date' && p.range && list.length >= 2 && /^\s*(-|to|through|thru)?\s*$/i.test(ctx.lines[li].slice(list[0].end, list[1].index))) { start = list[0]; t = list[1]; }
+        const gapFrom = next ? 0 : from;
+        const gapText = ctx.lines[li].slice(gapFrom, t.index);
+        const inToks = ctx.toks[li].filter((x) => x.index >= gapFrom && x.end <= t.index).reduce((s, x) => s + letters(ctx.lines[li].slice(x.index, x.end)), 0);
+        const gap = letters(gapText) - inToks;
+        if (gap > 16) continue;
+        const ocrFixed = ctx.raw[li].slice(t.index, t.end) !== ctx.lines[li].slice(t.index, t.end);
+        const conf = p.conf - (next ? 0.1 : 0) - Math.min(0.12, gap * 0.008) - (ocrFixed ? 0.15 : 0) - (ctx.source === 'ocr' ? 0.05 : 0);
+        out.push({ value: t.value, conf, line: li, start: t.index, end: t.end, periodStart: start ? start.value : null, periodLine: start ? li : null, pStart: start ? start.index : null, pEnd: start ? start.end : null });
+      }
+    }
+  });
+  return out;
+}
+/** Best candidate; the same value found twice adds confidence, a close runner-up with a different value takes it away. */
+function stmtPick(cands) {
+  if (!cands.length) return null;
+  cands.sort((a, b) => b.conf - a.conf || a.line - b.line);
+  const best = Object.assign({}, cands[0]);
+  const same = cands.slice(1).some((c) => c.value === best.value);
+  const rival = cands.slice(1).filter((c) => c.value !== best.value && c.conf >= best.conf - 0.06);
+  if (same) best.conf += 0.03;
+  if (rival.length) { best.conf -= 0.2; best.alts = [...new Set(rival.map((c) => c.value))]; }
+  return best;
+}
+function stmtLast4(ctx) {
+  const pats = [
+    [/(?:account|card|acct)[^\n]{0,24}?end(?:ing|s)\s*(?:in|with)?\s*[:#]?\s*([\dXx*•·\- ]{4,16})/i, 0.95],
+    [/\bend(?:ing|s)\s*(?:in|with)\s*[:#]?\s*([\dXx*•·\- ]{4,16})/i, 0.85],
+    [/(?:account|card)\s*(?:number|no\.?|#)\s*[:#]?\s*([\dXx*•·\- ]{8,28})/i, 0.85],
+    [/((?:[Xx*•·]{2,}[\s-]?){1,4}\d{4,5})(?!\d)/, 0.8]
+  ];
+  for (const [re, conf] of pats) {
+    for (let i = 0; i < ctx.lines.length; i++) {
+      const m = ctx.labels[i].match(re);
+      if (!m) continue;
+      const run = m[1].replace(/\s+$/, ''), digits = run.replace(/\D/g, '');
+      if (digits.length < 4) continue;
+      const start = m.index + m[0].indexOf(m[1]);
+      const ocrFixed = ctx.raw[i].slice(start, start + run.length) !== ctx.lines[i].slice(start, start + run.length);
+      return { value: digits.slice(-4), conf: conf - (ocrFixed ? 0.15 : 0) - (ctx.source === 'ocr' ? 0.05 : 0), line: i, start, end: start + run.length };
+    }
+  }
+  return null;
+}
+/** Promo APR and its end date: a line mentioning a promo/intro rate, or a rate that "expires"/"ends" on a date. */
+function stmtPromo(ctx) {
+  for (let i = 0; i < ctx.lines.length; i++) {
+    const line = ctx.lines[i];
+    const promo = /\b(promo(tional)?|intro(ductory)?|special)\b/i.test(line);
+    const em = line.match(/\b(expires?|expiration|ends?|until|through|thru|end\s*date)\b/i);
+    if (!promo && !em) continue;
+    const pct = ctx.toks[i].find((t) => t.type === 'pct');
+    const dates = ctx.toks[i].filter((t) => t.type === 'date');
+    let dt = em ? dates.find((t) => t.index > em.index) : null;
+    if (!dt && promo && dates.length) dt = dates[dates.length - 1];
+    if (!pct || (!promo && !dt)) continue;
+    const base = (promo ? 0.88 : 0.75) - (ctx.source === 'ocr' ? 0.05 : 0);
+    return {
+      promoApr: { value: pct.value, conf: base, line: i, start: pct.index, end: pct.end },
+      promoEnd: dt ? { value: dt.value, conf: base - (dt.monthOnly ? 0.1 : 0), line: i, start: dt.index, end: dt.end } : null
+    };
+  }
+  return null;
+}
+/** Cross-checks between fields nudge confidence up or down. */
+function stmtCheck(f, today, charge) {
+  const val = (k) => (f[k] ? f[k].value : null);
+  const bump = (k, d) => { if (f[k]) f[k].conf += d; };
+  const bal = val('balance'), lim = val('creditLimit'), av = val('available');
+  if (bal != null && lim != null && av != null && !charge) { const ok = Math.abs(lim - Math.max(0, bal) - av) <= 1; ['balance', 'creditLimit', 'available'].forEach((k) => bump(k, ok ? 0.04 : -0.06)); }
+  if (av != null && lim != null && av > lim + 0.5) bump('available', -0.25);
+  if (val('minPayment') != null && bal != null && val('minPayment') > Math.max(0, bal) + 0.01) bump('minPayment', -0.3);
+  const cl = val('closingDate'), du = val('dueDate');
+  if (cl && du) {
+    const g = daysBetween(cl, du);
+    if (g >= 18 && g <= 35) { bump('closingDate', 0.03); bump('dueDate', 0.03); } else { bump('closingDate', -0.2); bump('dueDate', -0.2); }
+  }
+  if (cl && today && cl > addDaysISO(today, 3)) bump('closingDate', -0.3);
+  ['apr', 'cashApr', 'promoApr'].forEach((k) => { const v = val(k); if (v != null && (v > 40 || v < 0)) bump(k, -0.4); });
+  if (val('promoApr') != null && val('apr') != null && val('promoApr') >= val('apr')) bump('promoApr', -0.25);
+  if (val('interest') != null && val('interest') > Math.max(0, bal || 0) * 0.1 + 50) bump('interest', -0.2);
+  Object.values(f).forEach((x) => { if (x) x.conf = r2(Math.min(0.99, Math.max(0.05, x.conf))); });
+}
+
+/**
+ * Read one statement's text. opts: { source: 'pdf'|'ocr'|'text', today }.
+ * Returns { issuer, issuerName, product, productName, fields: { key: { value, conf, line, start, end } | null },
+ *   noPresetLimit, payOverTime, monthEnd, lines (as read, for the review screen only), toks }.
+ */
+function parseStatement(text, opts = {}) {
+  const today = opts.today || toISO(new Date());
+  const source = STMT_SOURCES.includes(opts.source) ? opts.source : 'text';
+  const raw = stmtLines(text);
+  const lines = raw.map(fixOcrDigits);
+  const ctx = { raw, lines, labels: lines.map(fixOcrLetters), source, toks: lines.map((l) => stmtTokens(l, today)) };
+  const all = lines.join('\n');
+  const issuer = detectIssuer(all);
+  const iss = issuer ? STMT_ISSUERS[issuer] : null;
+  const product = iss ? iss.products.find((p) => p.re.test(all)) || null : null;
+  const fields = {};
+  const keys = Object.keys(STMT_GENERIC);
+  for (const key of keys) {
+    const pats = [...stmtPatterns(issuer && STMT_ISSUER_LABELS[issuer][key], 0.95), ...stmtPatterns(STMT_GENERIC[key], 0.85)];
+    fields[key] = stmtPick(stmtCandidates(ctx, key, pats));
+  }
+  const cl = fields.closingDate;
+  fields.periodStart = cl && cl.periodStart ? { value: cl.periodStart, conf: cl.conf, line: cl.periodLine, start: cl.pStart, end: cl.pEnd } : null;
+  if (cl) ['periodStart', 'periodLine', 'pStart', 'pEnd'].forEach((k) => delete cl[k]);
+  fields.last4 = stmtLast4(ctx);
+  const promo = stmtPromo(ctx);
+  fields.promoApr = promo ? promo.promoApr : null;
+  fields.promoEnd = promo ? promo.promoEnd : null;
+  const noPresetLimit = /no\s*pre-?set\s*spending\s*limit/i.test(all);
+  const payOverTime = /pay\s*over\s*time/i.test(all);
+  if (noPresetLimit && fields.creditLimit && !/pay\s*over\s*time/i.test(lines[fields.creditLimit.line])) fields.creditLimit = null;
+  // calendar-month cycles (Apple Card, or any statement running from the 1st to the last day) close "on the last day"
+  const clv = cl ? parseISO(cl.value) : null;
+  const lastDay = !!clv && clv.getDate() === daysInMonth(clv.getFullYear(), clv.getMonth());
+  const monthEnd = lastDay && (issuer === 'apple' || (!!fields.periodStart && fields.periodStart.value.slice(8) === '01'));
+  stmtCheck(fields, today, noPresetLimit);
+  return { issuer, issuerName: iss ? iss.name : null, product: product ? product.id : null, productName: product ? product.name : null,
+    fields, noPresetLimit, payOverTime, monthEnd, source, lines: raw, toks: ctx.toks };
+}
+/** Plain values from a parse (what the review screen edits and the apply step uses). */
+function stmtValues(parsed) {
+  const v = {};
+  STMT_FIELDS.forEach((f) => { v[f.key] = parsed.fields[f.key] ? parsed.fields[f.key].value : null; });
+  v.periodStart = parsed.fields.periodStart ? parsed.fields.periodStart.value : null;
+  v.noPresetLimit = !!parsed.noPresetLimit; v.payOverTime = !!parsed.payOverTime; v.monthEnd = !!parsed.monthEnd;
+  return v;
+}
+
+/* ---------- statement snap: which card, what changes, apply ---------- */
+function stmtWalletOf(data, a) { return a.walletId ? data.wallet.find((c) => c.id === a.walletId) || null : null; }
+function acctLast4(data, a) {
+  const d = a.debtId ? data.debts.find((x) => x.id === a.debtId) : null, w = stmtWalletOf(data, a);
+  return (d && d.last4) || (w && w.last4) || '';
+}
+function acctIssuer(data, a) {
+  const w = stmtWalletOf(data, a), text = `${a.name} ${w ? w.name : ''}`;
+  for (const [k, iss] of Object.entries(STMT_ISSUERS)) if ((w && iss.products.some((p) => p.id === w.presetId)) || iss.card.test(text)) return k;
+  return null;
+}
+function acctProduct(data, a, issuer) {
+  const w = stmtWalletOf(data, a), iss = STMT_ISSUERS[issuer];
+  if (!iss) return null;
+  const p = iss.products.find((x) => (w && x.id === w.presetId) || x.card.test(`${a.name} ${w ? w.name : ''}`));
+  return p ? p.id : null;
+}
+/**
+ * Match a statement to a card: last 4 digits decide; otherwise issuer (and product, e.g. Platinum vs Blue Cash).
+ * Returns { acctId, sure, candidates: [{ id, name, score, why, last4 }] }. Not sure → ask which card.
+ */
+function matchStatementCard(data, parsed) {
+  const l4 = parsed.fields.last4 ? parsed.fields.last4.value : null;
+  const rows = creditAccounts(data).filter((a) => a.kind !== 'loan').map((a) => {
+    let score = 0; const why = [];
+    const mine = acctLast4(data, a);
+    if (l4 && mine) { if (mine === l4) { score += 100; why.push('last4'); } else { score -= 100; why.push('other-last4'); } }
+    const iss = acctIssuer(data, a);
+    if (parsed.issuer && iss) { if (iss === parsed.issuer) { score += 30; why.push('issuer'); } else score -= 40; }
+    if (parsed.product && iss === parsed.issuer && acctProduct(data, a, iss) === parsed.product) { score += 20; why.push('product'); }
+    if (a.paid) score -= 5;
+    return { id: a.id, name: a.name, score, why, last4: mine };
+  }).sort((x, y) => y.score - x.score);
+  const best = rows[0] && rows[0].score > 0 ? rows[0] : null, second = rows[1];
+  const sure = !!best && (best.why.includes('last4') || (best.score >= 30 && (!second || best.score - second.score >= 20)));
+  return { acctId: best ? best.id : null, sure, candidates: rows };
+}
+/** The card a statement applies to: a debt (with its linked wallet card) or a wallet-only card ('w:' + id). */
+function stmtTarget(data, acctId) {
+  acctId = String(acctId || '');
+  if (acctId.startsWith('w:')) { const w = data.wallet.find((c) => 'w:' + c.id === acctId); return w ? { id: acctId, debt: null, wallet: w, debtId: null, walletId: w.id, name: w.name } : null; }
+  const d = data.debts.find((x) => x.id === acctId);
+  if (!d) return null;
+  const w = data.wallet.find((c) => c.debtId === d.id && !c.archived) || null;
+  return { id: d.id, debt: d, wallet: w, debtId: d.id, walletId: w ? w.id : null, name: d.name };
+}
+const byClosing = (a, b) => (a.closingDate < b.closingDate ? -1 : a.closingDate > b.closingDate ? 1 : 0);
+const stmtOf = (s, a) => s.acctId === a.id || (!!a.debtId && s.debtId === a.debtId) || (!!a.walletId && s.walletId === a.walletId);
+/** Saved statements for a card (oldest first). `a` is a credit account or statement target. */
+function statementsFor(data, a) { return data.statements.filter((s) => stmtOf(s, a)).sort(byClosing); }
+function latestStatementForDebt(data, d) {
+  const w = data.wallet.find((c) => c.debtId === d.id && !c.archived);
+  const list = statementsFor(data, { id: d.id, debtId: d.id, walletId: w ? w.id : null });
+  return list[list.length - 1] || null;
+}
+/** Statement closing day from a closing date; calendar-month cycles keep "31" so short months close on their last day. */
+function closeDayFrom(closingISO, monthEnd) {
+  const d = parseISO(closingISO);
+  if (!d) return null;
+  return monthEnd && d.getDate() === daysInMonth(d.getFullYear(), d.getMonth()) ? 31 : d.getDate();
+}
+const stmtDay = (at) => toISO(new Date(at));
+/** Payments you logged after the statement closed (they come off the statement balance). */
+function stmtPaidSince(data, t, closingISO) {
+  return r2(data.history.filter((h) => h.at && stmtDay(h.at) > closingISO && ((t.debt && h.debtId === t.debt.id && h.kind === 'payment') || (t.wallet && !t.debt && h.walletId === t.wallet.id && h.kind === 'cardpay')))
+    .reduce((s, h) => s + toNum(h.amount), 0));
+}
+/** A balance you set yourself after the statement closed is newer than the statement: keep it. */
+function stmtBalanceSetSince(data, t, closingISO) {
+  return data.history.find((h) => h.at && stmtDay(h.at) > closingISO && h.source !== 'statement' && ((t.debt && h.debtId === t.debt.id && h.kind === 'balance') || (t.wallet && !t.debt && h.walletId === t.wallet.id && h.kind === 'cardbal'))) || null;
+}
+function stmtSame(a, b) {
+  if (a == null || a === '') return b == null || b === '';
+  if (typeof a === 'number' || typeof b === 'number') return Math.abs(toNum(a) - toNum(b)) < 0.005 && b != null && b !== '';
+  return String(a) === String(b);
+}
+/**
+ * Before → after for applying statement values `v` to a card. Only the newest statement changes the card;
+ * an older one is kept for history only. rows: [{ key, label, type, before, after, changed }].
+ * balance: the statement balance minus payments you logged after it closed, unless you set the balance yourself since.
+ */
+function statementPlan(data, acctId, v) {
+  const t = stmtTarget(data, acctId);
+  if (!t || !parseISO(v.closingDate)) return null;
+  const newer = statementsFor(data, t).find((s) => s.closingDate > v.closingDate) || null;
+  const out = { target: t, latest: !newer, newer: newer ? newer.closingDate : null, rows: [], paidSince: 0, keptSince: null, statementBalance: v.balance };
+  const add = (key, label, type, before, after) => { if (after == null || after === '') return; out.rows.push({ key, label, type, before: before == null || before === '' ? null : before, after, changed: !stmtSame(before, after) }); };
+  if (out.latest) {
+    const o = t.debt || t.wallet;
+    if (v.balance != null) {
+      const set = stmtBalanceSetSince(data, t, v.closingDate);
+      out.paidSince = set ? 0 : stmtPaidSince(data, t, v.closingDate);
+      if (set) out.keptSince = stmtDay(set.at);
+      else add('balance', 'Balance', 'money', t.debt ? (t.debt.paid ? 0 : t.debt.balance) : r2(toNum(t.wallet.currentBalance)), r2(Math.max(0, toNum(v.balance) - out.paidSince)));
+    }
+    if (t.debt) {
+      if (v.apr != null) add('apr', 'APR', 'pct', t.debt.apr, r2(nonNeg(v.apr)));
+      if (v.minPayment != null) add('minPayment', 'Minimum payment', 'money', t.debt.minPayment, r2(nonNeg(v.minPayment)));
+    }
+    if (parseISO(v.dueDate)) add('dueDay', 'Due day', 'day', o.dueDay, parseISO(v.dueDate).getDate());
+    add('closingDay', 'Statement closes', 'day', o.closingDay, closeDayFrom(v.closingDate, v.monthEnd));
+    if (toNum(v.creditLimit) > 0) add('creditLimit', v.noPresetLimit ? 'Limit (Pay Over Time)' : 'Credit limit', 'money', o.creditLimit, r2(toNum(v.creditLimit)));
+    if (v.noPresetLimit) add('cardKind', 'Card type', 'kind', o.cardKind, 'charge');
+    if (t.debt && parseISO(v.promoEnd) && v.promoEnd >= v.closingDate) {
+      add('promoApr', 'Promo APR', 'pct', t.debt.promoApr, r2(nonNeg(v.promoApr)));
+      add('promoEnd', 'Promo ends', 'date', t.debt.promoEnd, String(v.promoEnd).slice(0, 10));
+    }
+  }
+  if (/^\d{4}$/.test(String(v.last4 || ''))) add('last4', 'Last 4 digits', 'last4', (t.debt && t.debt.last4) || (t.wallet && t.wallet.last4) || '', String(v.last4));
+  return out;
+}
+/**
+ * Apply statement values to a card: balance (logged to history like a check-in), APR, minimum, due day, closing day,
+ * limit, promo, last 4. Saves the statement's numbers to data.statements. meta: { issuer, source }.
+ * Returns { stmt, plan, paidOff, drift } or null.
+ */
+function applyStatement(data, acctId, v, nowISO, meta = {}) {
+  nowISO = nowISO || new Date().toISOString();
+  const plan = statementPlan(data, acctId, v);
+  if (!plan) return null;
+  const t = plan.target;
+  let paidOff = null, drift = null;
+  plan.rows.filter((r) => r.changed).forEach((r) => {
+    if (r.key === 'balance') {
+      if (t.debt) {
+        const d = t.debt;
+        if (d.paid && r.after > 0.004) { d.paid = false; d.paidAt = null; }
+        drift = recordBalance(data, d, r.after, nowISO, 'statement');
+        if (d.balance <= 0.004 && !d.paid) { d.paid = true; d.paidAt = nowISO; paidOff = d; pushHistory(data, { kind: 'paid', debtId: d.id, debtName: d.name, amount: 0, before: 0, after: 0, source: 'statement' }, nowISO); }
+      } else {
+        const w = t.wallet, before = r2(toNum(w.currentBalance));
+        w.currentBalance = r.after;
+        pushHistory(data, { kind: 'cardbal', walletId: w.id, name: w.name, before, after: r.after, source: 'statement' }, nowISO);
+      }
+    } else if (r.key === 'last4') { if (t.debt) t.debt.last4 = r.after; if (t.wallet) t.wallet.last4 = r.after; }
+    else if (r.key === 'apr' || r.key === 'minPayment' || r.key === 'promoApr' || r.key === 'promoEnd') t.debt[r.key] = r.after;
+    else (t.debt || t.wallet)[r.key] = r.after;
+  });
+  const rec = normalizeStatement(Object.assign({}, v, { id: newId(), acctId: t.id, debtId: t.debtId, walletId: t.walletId, issuer: meta.issuer || null, source: meta.source || null, appliedAt: nowISO }));
+  data.statements = data.statements.filter((s) => !(s.closingDate === rec.closingDate && stmtOf(s, t)));
+  data.statements.push(rec);
+  data.statements.sort(byClosing);
+  if (data.statements.length > 600) data.statements.splice(0, data.statements.length - 600);
+  return { stmt: rec, plan, paidOff, drift };
+}
+/**
+ * One saved statement: extracted numbers, dates, the last 4 digits and a few ids/flags. Nothing else is kept;
+ * fields added by a newer version survive only if they're numbers, booleans or dates (never text).
+ */
+function normalizeStatement(s) {
+  if (!isObj(s) || !parseISO(s.closingDate)) return null;
+  const idOrNull = (x) => (typeof x === 'string' && x && x.length <= 80 && !/\s/.test(x) ? x : null);
+  const out = {};
+  Object.keys(s).forEach((k) => {
+    const x = s[k];
+    if (!/^[A-Za-z]\w{0,39}$/.test(k)) return;
+    if (x === null || typeof x === 'boolean' || (typeof x === 'number' && Number.isFinite(x)) || (typeof x === 'string' && /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?(Z|[+-]\d{2}:\d{2})?)?$/.test(x))) out[k] = x;
+  });
+  STMT_NUMS.forEach((k) => { out[k] = s[k] == null || s[k] === '' || !Number.isFinite(parseFloat(s[k])) ? null : r2(parseFloat(s[k])); });
+  STMT_DATES.forEach((k) => { out[k] = parseISO(s[k]) ? String(s[k]).slice(0, 10) : null; });
+  Object.assign(out, {
+    id: idOrNull(s.id) || newId(), acctId: idOrNull(s.acctId), debtId: idOrNull(s.debtId), walletId: idOrNull(s.walletId),
+    issuer: STMT_ISSUERS[s.issuer] ? s.issuer : null, source: STMT_SOURCES.includes(s.source) ? s.source : null,
+    last4: /^\d{4}$/.test(String(s.last4 == null ? '' : s.last4)) ? String(s.last4) : '',
+    appliedAt: typeof s.appliedAt === 'string' && s.appliedAt.length <= 40 && !isNaN(Date.parse(s.appliedAt)) ? s.appliedAt : null,
+    noPresetLimit: !!s.noPresetLimit, payOverTime: !!s.payOverTime, monthEnd: !!s.monthEnd
+  });
+  return out.acctId ? out : null;
+}
+const last4Or = (v) => (/^\d{4}$/.test(String(v == null ? '' : v)) ? String(v) : '');
+
+/* ---------- statement snap: history, alerts, statement day ---------- */
+/** Per-statement series for the history charts: balance, interest charged, utilization. */
+function statementSeries(data, a) {
+  return statementsFor(data, a).map((s) => {
+    const lim = s.creditLimit > 0 ? s.creditLimit : a.limit > 0 ? a.limit : null;
+    return { date: s.closingDate, balance: s.balance, interest: s.interest, fees: s.fees, util: lim && s.balance != null ? r2((Math.max(0, s.balance) / lim) * 100) : null };
+  });
+}
+/**
+ * Changes worth knowing about on each card's newest statement (vs. the one before): APR up/down, promo ending within
+ * 60 days, minimum payment jump, a new fee, limit change, interest you didn't expect, balance up. fmt formats money.
+ */
+function statementAlerts(data, today, fmt) {
+  fmt = fmt || ((v) => '$' + Math.round(v).toLocaleString('en-US'));
+  const out = [];
+  creditAccounts(data).filter((a) => a.kind !== 'loan').forEach((a) => {
+    const list = statementsFor(data, a);
+    if (!list.length) return;
+    const s1 = list[list.length - 1], s0 = list.length > 1 ? list[list.length - 2] : null;
+    const add = (kind, level, text, extra) => out.push(Object.assign({ id: `stmt:${kind}:${a.id}:${s1.closingDate}`, kind, level, acctId: a.id, name: a.name, closing: s1.closingDate, text }, extra));
+    if (s1.promoEnd && s1.promoEnd >= today && daysBetween(today, s1.promoEnd) <= 60) {
+      const days = daysBetween(today, s1.promoEnd);
+      add('promo', 'warn', `The ${toNum(s1.promoApr).toFixed(2).replace(/\.00$/, '')}% promo on ${a.name} ends **${fmtMD(s1.promoEnd)}** (${days === 0 ? 'today' : `in ${plural_(days, 'day')}`}). After that it's ${s1.apr != null ? `${s1.apr}%` : 'the regular APR'}.`, { days });
+    }
+    if (daysBetween(s1.closingDate, today) > 45) return;   // only fresh statements raise alerts
+    if (s0 && s0.apr != null && s1.apr != null && Math.abs(s1.apr - s0.apr) >= 0.01) {
+      const up = s1.apr > s0.apr;
+      add(up ? 'apr-up' : 'apr-down', up ? 'bad' : 'good', `${a.name}'s APR went **${up ? 'up' : 'down'}** from ${s0.apr}% to **${s1.apr}%**.`);
+    }
+    if (s0 && s0.minPayment > 0 && s1.minPayment != null && s1.minPayment - s0.minPayment >= 10 && s1.minPayment >= s0.minPayment * 1.25) add('min-jump', 'warn', `${a.name}'s minimum payment jumped from ${fmt(s0.minPayment)} to **${fmt(s1.minPayment)}**.`);
+    if (s1.fees > 0 && !(s0 && s0.fees > 0)) add('fee', 'bad', `A **${fmt(s1.fees)} fee** showed up on ${a.name}'s ${fmtMD(s1.closingDate)} statement.`);
+    if (s0 && s0.creditLimit > 0 && s1.creditLimit > 0 && Math.abs(s1.creditLimit - s0.creditLimit) >= 1) {
+      const up = s1.creditLimit > s0.creditLimit;
+      add('limit', up ? 'good' : 'bad', `${a.name}'s credit limit went **${up ? 'up' : 'down'}** from ${fmt(s0.creditLimit)} to **${fmt(s1.creditLimit)}**.${up ? '' : ' That raises your utilization.'}`);
+    }
+    const prevBal = s0 ? s0.balance : s1.prevBalance;
+    // no interest expected: last statement was paid off (grace period), a card you pay in full, or a charge card without Pay Over Time
+    const expectNone = (prevBal != null && prevBal <= 0.5) || a.source === 'wallet' || (a.kind === 'charge' && !s1.payOverTime);
+    if (s1.interest > 0 && expectNone) add('interest', 'bad', `${a.name} charged **${fmt(s1.interest)} interest** when you expected none. Check for a missed payment or a promo that ended.`);
+    if (prevBal != null && s1.balance != null && s1.balance - prevBal >= 1) add('balance-up', 'warn', `${a.name}'s balance went **up ${fmt(s1.balance - prevBal)}** since the last statement, to ${fmt(s1.balance)}.`);
+  });
+  return out;
+}
+/**
+ * The monthly "statement day" checklist: each card's statement for `month` (this month once any card has closed,
+ * otherwise last month): 'in' (snapped), 'due' (closed, not snapped), 'upcoming', or 'nodate' (no closing day yet).
+ */
+function statementDay(data, today) {
+  const accts = creditAccounts(data).filter((a) => a.kind !== 'loan' && !a.paid);
+  const cur = today.slice(0, 7);
+  const month = accts.some((a) => a.closeDay && closingIn(a.closeDay, cur) <= today) || !accts.some((a) => a.closeDay) ? cur : shiftMonth(cur, -1);
+  const rows = accts.map((a) => {
+    const list = statementsFor(data, a), last = list[list.length - 1] || null;
+    if (!a.closeDay) {
+      const got = list.find((s) => s.closingDate.slice(0, 7) === month) || null;
+      return { id: a.id, name: a.name, closing: got ? got.closingDate : null, status: got ? 'in' : 'nodate', stmt: got, last, est: false };
+    }
+    const closing = closingIn(a.closeDay, month);
+    const got = list.find((s) => Math.abs(daysBetween(s.closingDate, closing)) <= 5) || null;
+    return { id: a.id, name: a.name, closing, status: got ? 'in' : closing <= today ? 'due' : 'upcoming', stmt: got, last, est: a.closeEst };
+  });
+  const order = { due: 0, nodate: 1, upcoming: 2, in: 3 };
+  rows.sort((x, y) => order[x.status] - order[y.status] || String(x.closing || '').localeCompare(String(y.closing || '')));
+  return { month, rows, total: rows.length, inCount: rows.filter((r) => r.status === 'in').length, due: rows.filter((r) => r.status === 'due') };
+}
+/**
+ * Unpaid debts whose projection is missing an APR or a minimum. A 0% APR or $0 minimum that came from an
+ * applied statement is real (a charge card, a $0 balance), so it no longer counts as missing.
+ */
+function missingPlanInfo(data) {
+  return data.debts.filter((d) => !d.paid).map((d) => {
+    const st = latestStatementForDebt(data, d);
+    return { debt: d, apr: !(d.apr > 0) && !(st && st.apr != null), min: !(d.minPayment > 0) && !(st && st.minPayment != null) };
+  }).filter((x) => x.apr || x.min);
+}
+const STMT_ALERT_PRIORITY = { interest: 84, fee: 83, 'apr-up': 82, promo: 81, 'min-jump': 76, limit: 60, 'balance-up': 58, 'apr-down': 45 };
+/** Statement alerts and "statements waiting" for the insights engine. */
+function statementInsights(data, today, fmt) {
+  const out = statementAlerts(data, today, fmt).map((al) => ({
+    id: al.id, type: al.level === 'good' ? 'statement' : 'statementwarn',
+    priority: al.kind === 'limit' && al.level === 'bad' ? 72 : al.kind === 'promo' ? STMT_ALERT_PRIORITY.promo + Math.max(0, 60 - al.days) / 100 : STMT_ALERT_PRIORITY[al.kind],
+    text: al.text, action: { tab: 'credit' }, sig: sigOf(al.kind === 'promo' ? al.days > 14 ? 'far' : 'near' : al.closing)
+  }));
+  if (data.statements.length) {
+    const sd = statementDay(data, today);
+    if (sd.due.length) out.push({ id: `stmt-due:${sd.month}`, type: 'statement', priority: 64,
+      text: `**${plural_(sd.due.length, 'statement')} closed** since your last snap (${sd.due.map((r) => r.name).join(', ')}). Snap ${sd.due.length === 1 ? 'it' : 'them'} to keep your plan exact.`,
+      action: { tab: 'credit' }, sig: sigOf(sd.due.length) });
+  }
+  return out;
+}
 /* ENGINE END */
 </script>
 
@@ -2848,7 +3523,7 @@ function freedomStats() {
   const monthly = r2(perPaycheck * perMonth);
   return { parts, perPaycheck, monthly, perDay: r2(monthly * 12 / 365) };
 }
-function missingInfo() { return unpaid().filter((d) => !(d.apr > 0) || !(d.minPayment > 0)); }
+function missingInfo() { return missingPlanInfo(S.data).map((x) => x.debt); }
 
 /* ---------- history & celebrations ---------- */
 function logHistory(entry) { return pushHistory(S.data, entry); }
@@ -3244,8 +3919,8 @@ function numFmt(kind, dp) {
 function cur() { const p = numFmt('money', 0).formatToParts(0).find((x) => x.type === 'currency'); return p ? p.value : '$'; }
 const moneyK = (v) => numFmt('compact', 0).format(toNum(v));
 
-const INSIGHT_ICONS = { credits: 'gift', spending: 'alert', cards: 'card', subscriptions: 'repeat', debt: 'rocket', home: 'house', networth: 'trend', credit: 'gauge', creditwarn: 'alert' };
-const INSIGHT_KIND = { credits: 'warn', spending: 'bad', subscriptions: 'warn', creditwarn: 'warn' };
+const INSIGHT_ICONS = { credits: 'gift', spending: 'alert', cards: 'card', subscriptions: 'repeat', debt: 'rocket', home: 'house', networth: 'trend', credit: 'gauge', creditwarn: 'alert', statement: 'receipt', statementwarn: 'receipt' };
+const INSIGHT_KIND = { credits: 'warn', spending: 'bad', subscriptions: 'warn', creditwarn: 'warn', statementwarn: 'warn' };
 let insightCache = { key: '' };
 function allInsights() {
   const key = JSON.stringify([S.data, todayISO()]).length + ':' + S.meta.updatedAt + ':' + todayISO();
@@ -3264,7 +3939,7 @@ function insightHTML(i, wide) {
 
 /* ---------- global search ---------- */
 const SCREENS = [
-  ['Home', 'home', 'home'], ['Debt overview', 'overview', 'card'], ['Debts', 'debts', 'card'], ['Credit score & utilization', 'credit', 'gauge'], ['Monthly check-in', 'checkin', 'sync'], ['Paychecks & budget', 'paychecks', 'cash'],
+  ['Home', 'home', 'home'], ['Debt overview', 'overview', 'card'], ['Debts', 'debts', 'card'], ['Credit score & utilization', 'credit', 'gauge'], ['Statement day · snap a statement', 'credit', 'receipt'], ['Monthly check-in', 'checkin', 'sync'], ['Paychecks & budget', 'paychecks', 'cash'],
   ['Savings', 'savings', 'piggy'], ['Cards · Which card?', 'cards', 'card'], ['Card credits', 'cards', 'gift'], ['Merchants', 'cards', 'list'], ['Net worth', 'networth', 'trend'],
   ['Accounts', 'networth', 'bank'], ['Subscriptions', 'spending', 'repeat'], ['Home buying', 'homebuy', 'house'], ['Insights', 'insights', 'spark'], ['Settings', 'settings', 'more']
 ];
@@ -3389,6 +4064,8 @@ function walletCardHTML(c) {
     ${!debt && (c.creditLimit || c.closingDay) ? `<div class="chips" style="margin:8px 0 0">${c.creditLimit ? `<span class="chip">${money0(c.currentBalance || 0)} of ${money0(c.creditLimit)} · ${pctTxt(((c.currentBalance || 0) / c.creditLimit) * 100)}</span>` : ''}${c.closingDay ? `<span class="chip">closes on the ${ordinal(c.closingDay)}</span>` : ''}${c.cardKind === 'charge' ? `<span class="chip">charge card${c.utilInclude === false ? ' · not in utilization' : ''}</span>` : ''}</div>` : ''}
     ${c.presetId ? '<p class="small faint" style="margin:6px 0 0">From a preset: verify with your card terms.</p>' : ''}
     ${c.notes ? `<p class="small faint" style="margin:6px 0 0">${esc(c.notes)}</p>` : ''}
+    ${(() => { const aid = debt ? debt.id : 'w:' + c.id; const has = statementsFor(S.data, { id: aid, debtId: debt ? debt.id : null, walletId: c.id }).length;
+      return `<div class="row" style="gap:8px;margin-top:10px"><button class="btn sm ghost" style="flex:1" data-act="snap" data-id="${esc(aid)}">${icon('receipt', 'sm')} Snap a statement</button>${has ? `<button class="btn sm ghost" style="flex:1" data-act="stmt-history" data-id="${esc(aid)}">Statement history</button>` : ''}</div>`; })()}
   </div>`;
 }
 function spendProfileHTML() {
@@ -4331,13 +5008,14 @@ function afterPlanHTML() {
 
 function nudgesHTML() {
   let html = '';
-  const miss = missingInfo();
+  const miss = missingPlanInfo(S.data);
   if (miss.length) {
-    const what = (d) => [!(d.apr > 0) ? 'APR' : '', !(d.minPayment > 0) ? 'minimum payment' : ''].filter(Boolean).join(' and ');
+    const what = (x) => [x.apr ? 'APR' : '', x.min ? 'minimum payment' : ''].filter(Boolean).join(' and ');
+    const first = miss[0].debt;
     html += `<div class="alert"><b>Projection is optimistic.</b> ${miss.length === 1
-      ? `${esc(miss[0].name)} is missing its ${what(miss[0])}.`
-      : `${miss.length} debts are missing an APR or minimum payment (${miss.map((d) => esc(d.name)).join(', ')}).`} Until you fill ${miss.length === 1 ? 'it' : 'them'} in, the debt-free date is too rosy.
-      <div><button class="btn sm" data-act="edit-debt" data-id="${esc(miss[0].id)}">Fix ${esc(miss[0].name)}</button></div></div>`;
+      ? `${esc(first.name)} is missing its ${what(miss[0])}.`
+      : `${miss.length} debts are missing an APR or minimum payment (${miss.map((x) => esc(x.debt.name)).join(', ')}).`} Until you fill ${miss.length === 1 ? 'it' : 'them'} in, the debt-free date is too rosy.
+      <div class="row wrap" style="gap:8px"><button class="btn sm" data-act="edit-debt" data-id="${esc(first.id)}">Fix ${esc(first.name)}</button>${first.type !== 'loan' ? `<button class="btn sm" data-act="snap" data-id="${esc(first.id)}">${icon('receipt', 'sm')} Snap its statement</button>` : ''}</div></div>`;
   }
   const over = unpaid().map((d) => [d, utilization(d)]).filter(([, u]) => u && u.over > 0);
   if (over.length) {
@@ -4535,11 +5213,12 @@ function historyHTML(limit) {
   const items = (limit ? h.slice(0, limit) : h).map((e) => {
     let what = '', amt = '', sub = '';
     if (e.kind === 'payment') { what = `Payment · ${esc(e.debtName)}${e.source === 'payday' ? ' · payday' : ''}`; amt = `<span class="amt pos">−${money(e.amount)}</span>`; }
-    else if (e.kind === 'balance') { const diff = r2(e.after - e.before); what = `Balance update · ${esc(e.debtName)}`; amt = `<span class="amt ${diff <= 0 ? 'pos' : 'neg'}">${diff <= 0 ? '−' : '+'}${money(Math.abs(diff))}</span>`; }
+    else if (e.kind === 'balance') { const diff = r2(e.after - e.before); what = `Balance update · ${esc(e.debtName)}${e.source === 'statement' ? ' · statement' : ''}`; amt = `<span class="amt ${diff <= 0 ? 'pos' : 'neg'}">${diff <= 0 ? '−' : '+'}${money(Math.abs(diff))}</span>`; }
     else if (e.kind === 'paid') { what = `PAID OFF · ${esc(e.debtName)}`; amt = `<span class="amt pos">${money(e.amount || 0)}</span>`; }
     else if (e.kind === 'added') { what = `Added · ${esc(e.debtName)}`; amt = `<span class="amt">${money(e.after)}</span>`; }
     else if (e.kind === 'removed') { what = `Removed · ${esc(e.debtName)}`; }
     else if (e.kind === 'savings') { what = `HYSA deposit${e.source === 'payday' ? ' · payday' : ''}`; amt = `<span class="amt" style="color:var(--save)">+${money(e.amount)}</span>`; sub = `<div class="when num">now ${money(e.after)}</div>`; }
+    else if (e.kind === 'cardbal') { const diff = r2(e.after - e.before); what = `Card balance · ${esc(e.name)}${e.source === 'statement' ? ' · statement' : ''}`; amt = `<span class="amt ${diff <= 0 ? 'pos' : 'neg'}">${diff <= 0 ? '−' : '+'}${money(Math.abs(diff))}</span>`; }
     else if (e.kind === 'cardpay') { what = `Card payment · ${esc(e.name)}${e.source === 'payday' ? ' · payday' : ''}`; amt = `<span class="amt pos">−${money(e.amount)}</span>`; }
     else if (e.kind === 'account') { const diff = r2(e.after - e.before); what = `Account · ${esc(e.name)}`; amt = `<span class="amt">${diff >= 0 ? '+' : '−'}${money(Math.abs(diff))}</span>`; }
     else if (e.kind === 'checkin') { what = 'Monthly check-in'; amt = `<span class="amt">${money(e.after)}</span>`; sub = `<div class="when num">HYSA ${money(e.hysa)}</div>`; }
@@ -4647,8 +5326,10 @@ function renderDebts() {
   const active = unpaid();
   const paid = S.data.debts.filter((d) => d.paid);
   const act = activePlan();
+  const missing = Object.fromEntries(missingPlanInfo(S.data).map((x) => [x.debt.id, x]));
   const card = (d) => {
     const po = act.payoffs.find((p) => p.id === d.id);
+    const mi = missing[d.id], hasStmt = d.type !== 'loan' && !!latestStatementForDebt(S.data, d);
     const u = utilization(d);
     const promoActive = d.promoEnd && parseISO(d.promoEnd) >= parseISO(todayISO());
     const prog = d.startBalance > 0 ? Math.min(100, Math.max(0, (1 - d.balance / Math.max(d.startBalance, d.balance)) * 100)) : 0;
@@ -4661,8 +5342,8 @@ function renderDebts() {
         <div class="debt-bal">${money(d.paid ? 0 : d.balance)}</div>
       </div>
       <div class="chips">
-        <span class="chip ${!(d.apr > 0) && !d.paid ? 'bad' : ''}">${toNum(d.apr).toFixed(2)}% APR</span>
-        <span class="chip ${!(d.minPayment > 0) && !d.paid ? 'bad' : ''}">min ${money(d.minPayment)}</span>
+        <span class="chip ${mi && mi.apr ? 'bad' : ''}">${toNum(d.apr).toFixed(2)}% APR</span>
+        <span class="chip ${mi && mi.min ? 'bad' : ''}">min ${money(d.minPayment)}</span>
         ${d.dueDay ? `<span class="chip">due on the ${ordinal(d.dueDay)}</span>` : ''}
         ${d.type !== 'loan' && d.closingDay ? `<span class="chip">closes on the ${ordinal(d.closingDay)}</span>` : ''}
         ${d.type !== 'loan' && d.cardKind === 'charge' ? `<span class="chip">charge card${d.utilInclude === false ? ' · not in utilization' : ''}</span>` : ''}
@@ -4671,6 +5352,7 @@ function renderDebts() {
         ${!d.paid && po ? `<span class="chip ok">#${po.order} · done ${esc(fmtMonth(po.date))}</span>` : ''}
         ${d.paid && d.paidAt ? `<span class="chip ok">paid ${esc(fmtDate(d.paidAt.slice(0, 10)))}</span>` : ''}
         ${driftChip(d)}
+        ${hasStmt ? `<button type="button" class="chip chip-btn" data-act="stmt-history" data-id="${esc(d.id)}">${icon('receipt', 'sm')} statement ${esc(shortDate(latestStatementForDebt(S.data, d).closingDate))}</button>` : ''}
         ${urgent ? `<span class="chip bad">⚠ URGENT · ${money(u.over)} over buffer${restoredOn ? ` · fixed by ${esc(fmtDate(restoredOn, { month: 'short', day: 'numeric' }))}` : ''}</span>` : ''}
       </div>
       ${u ? `<div class="util-line"><span>${u.pct.toFixed(1)}% of ${money0(u.limit)} used</span><span>${d.keepOpen > 0 ? `keep ${money0(d.keepOpen)} open` : `${money0(u.available)} available`}</span></div>
@@ -4682,18 +5364,19 @@ function renderDebts() {
           ? `<button class="btn sm" data-act="unpay" data-id="${esc(d.id)}">Undo paid</button><button class="btn sm" data-act="edit-debt" data-id="${esc(d.id)}">Edit</button><button class="btn sm danger" data-act="delete-debt" data-id="${esc(d.id)}">Delete</button>`
           : `<button class="btn sm" data-act="log-payment" data-id="${esc(d.id)}">+ Payment</button><button class="btn sm" data-act="update-balance" data-id="${esc(d.id)}">Set balance</button><button class="btn sm primary" data-act="mark-paid" data-id="${esc(d.id)}">Mark PAID</button>`}
       </div>
-      ${d.paid ? '' : `<div class="row" style="margin-top:8px;gap:8px"><button class="btn sm ghost" style="flex:1" data-act="edit-debt" data-id="${esc(d.id)}">Edit</button><button class="btn sm ghost" style="flex:1;color:var(--debt)" data-act="delete-debt" data-id="${esc(d.id)}">Delete</button></div>`}
+      ${d.paid ? '' : `<div class="row" style="margin-top:8px;gap:8px">${d.type !== 'loan' ? `<button class="btn sm ghost" style="flex:1" data-act="snap" data-id="${esc(d.id)}">${icon('receipt', 'sm')} Statement</button>` : ''}<button class="btn sm ghost" style="flex:1" data-act="edit-debt" data-id="${esc(d.id)}">Edit</button><button class="btn sm ghost" style="flex:1;color:var(--debt)" data-act="delete-debt" data-id="${esc(d.id)}">Delete</button></div>`}
     </div>`;
   };
   const t = totals();
   const util = overallUtilization();
   el.innerHTML = `
-    <div class="row between"><h2 class="section-title">Your <em>debts</em></h2><button class="btn primary sm" data-act="add-debt">+ Add</button></div>
+    <div class="row between"><h2 class="section-title">Your <em>debts</em></h2><div class="row" style="gap:8px;white-space:nowrap"><button class="btn sm" data-act="snap" title="Snap a statement">${icon('receipt', 'sm')} Snap<span class="sr-only"> a statement</span></button><button class="btn primary sm" data-act="add-debt">+ Add</button></div></div>
     ${S.data.debts.length ? `<div class="grid-2" style="margin-bottom:14px">
       <div class="stat"><div class="k">Remaining</div><div class="v" style="color:var(--debt)">${money(t.current)}</div></div>
       <div class="stat"><div class="k">Paid so far</div><div class="v" style="color:var(--accent)">${money(t.paid)}</div></div>
       ${util ? `<button class="stat tap" data-act="goto" data-tab="credit" style="grid-column:1/-1;border:0;text-align:left;color:inherit;font:inherit;cursor:pointer"><div class="row between"><div class="k">Overall utilization · ${money0(util.bal)} of ${money0(util.limit)}</div><span class="small" style="color:var(--accent);font-weight:700">Credit plan ${icon('chev', 'sm')}</span></div><div class="v" style="color:${bandColor(util.pct)}">${util.pct.toFixed(1)}%</div>
         ${utilMeter(util.pct)}</button>` : ''}
+      ${statementDayLinkHTML()}
     </div>` : emptyState()}
     ${nudgesHTML()}
     ${active.map(card).join('')}
@@ -5027,9 +5710,10 @@ function creditFlagsHTML(cx) {
   if (missing.length) {
     const est = missing.filter((a) => a.closeEst);
     h += `<div class="alert">${icon('info', 'sm')} ${missing.length === 1 ? `${esc(missing[0].name)} has` : `${missing.length} cards have`} no statement closing day${missing.length > 1 ? ` (${missing.map((a) => esc(a.name)).join(', ')})` : ''}. ${est.length ? `Until you add ${est.length === missing.length ? (missing.length === 1 ? 'it' : 'them') : 'them'}, Money HQ estimates it from the due day. ` : ''}It's on your statement as the "closing date".
-      <div><button class="btn sm" data-act="edit-acct" data-id="${esc(missing[0].id)}">Add it to ${esc(missing[0].name)}</button></div></div>`;
+      <div class="row wrap" style="gap:8px"><button class="btn sm" data-act="edit-acct" data-id="${esc(missing[0].id)}">Add it to ${esc(missing[0].name)}</button><button class="btn sm" data-act="snap" data-id="${esc(missing[0].id)}">${icon('receipt', 'sm')} Snap its statement</button></div></div>`;
   }
-  const noLim = cx.util.noLimit;
+  // a charge card whose statement says "no preset spending limit" can't have one: don't ask for it
+  const noLim = cx.util.noLimit.filter((r) => { const l = statementsFor(S.data, r); return !(l.length && l[l.length - 1].noPresetLimit); });
   if (noLim.length) h += `<div class="alert">${icon('info', 'sm')} Add a credit limit to ${noLim.map((r) => esc(r.name)).join(', ')} to include ${noLim.length === 1 ? 'it' : 'them'} in utilization. <div><button class="btn sm" data-act="edit-acct" data-id="${esc(noLim[0].id)}">Edit ${esc(noLim[0].name)}</button></div></div>`;
   return h;
 }
@@ -5232,7 +5916,7 @@ function renderCredit() {
       `<button class="btn primary block" data-act="add-debt">${icon('plus')} Add a card you owe on</button><button class="btn block" data-act="goto" data-tab="cards">Add a card from your wallet</button>`) + scoresHTML() + inquiriesHTML() + mortgageTimingHTML(cx);
     return;
   }
-  el.innerHTML = `${head}${creditHeroHTML(cx)}${creditFlagsHTML(cx)}${plannerHTML(cx)}${cardUtilHTML(cx)}${utilProjectionHTML(cx)}${scoresHTML()}${factorsHTML(cx)}${inquiriesHTML()}${mortgageTimingHTML(cx)}
+  el.innerHTML = `${head}${creditHeroHTML(cx)}${creditFlagsHTML(cx)}${statementDayHTML()}${plannerHTML(cx)}${cardUtilHTML(cx)}${utilProjectionHTML(cx)}${scoresHTML()}${factorsHTML(cx)}${inquiriesHTML()}${mortgageTimingHTML(cx)}
     <p class="disclaimer">Educational estimates, not credit or lending advice. Credit scores come from models Money HQ can't see; this screen shows the direction your data points, never a predicted score.</p>`;
   const pl = $('#planner details');
   if (pl) { pl.open = !!S.plannerOpen; pl.addEventListener('toggle', () => { S.plannerOpen = pl.open; }); }
@@ -5326,6 +6010,532 @@ function rateTiersHTML() {
   </div>`;
 }
 
+/* =====================================================================
+   STATEMENT SNAP · reads statements on this device; only the numbers you confirm are saved
+   ===================================================================== */
+// Loaded from the CDN only when you snap a statement. The libraries run here; statement files are never sent anywhere.
+const SNAP_CDN = {
+  pdf: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js',
+  pdfWorker: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js',
+  ocr: 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js',
+  ocrWorker: 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/worker.min.js',
+  ocrCore: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@5.1.1',
+  ocrLang: 'https://cdn.jsdelivr.net/npm/@tesseract.js-data/eng@1.0.0/4.0.0_best_int'
+};
+const scriptLoads = {};
+function loadScript(src) {
+  if (!scriptLoads[src]) scriptLoads[src] = new Promise((resolve, reject) => {
+    const el = document.createElement('script');
+    el.src = src; el.async = true; el.crossOrigin = 'anonymous';
+    el.onload = () => resolve();
+    el.onerror = () => { delete scriptLoads[src]; el.remove(); reject(new Error(navigator.onLine ? 'Could not load the statement reader. Try again in a moment.' : 'You\'re offline. The statement reader needs a connection the first time.')); };
+    document.head.appendChild(el);
+  });
+  return scriptLoads[src];
+}
+/** PDF text items → lines (items on the same baseline joined left to right). */
+function pdfPageText(items) {
+  const rows = [];
+  items.filter((it) => it.str && it.str.trim()).forEach((it) => {
+    const x = it.transform[4], y = it.transform[5], h = Math.abs(it.transform[3]) || it.height || 10;
+    let r = rows.find((q) => Math.abs(q.y - y) <= Math.max(2, h * 0.4));
+    if (!r) { r = { y, items: [] }; rows.push(r); }
+    r.items.push({ x, w: it.width || 0, s: it.str, h });
+  });
+  return rows.sort((a, b) => b.y - a.y).map((r) => {
+    let line = '', end = null;
+    r.items.sort((a, b) => a.x - b.x).forEach((it) => {
+      if (end != null && it.x - end > it.h * 0.15 && !/\s$/.test(line) && !/^\s/.test(it.s)) line += ' ';
+      line += it.s; end = it.x + it.w;
+    });
+    return line;
+  }).join('\n');
+}
+async function ocrWorker(onLog) {
+  await loadScript(SNAP_CDN.ocr);
+  return window.Tesseract.createWorker('eng', 1, { workerPath: SNAP_CDN.ocrWorker, corePath: SNAP_CDN.ocrCore, langPath: SNAP_CDN.ocrLang, logger: onLog });
+}
+const OCR_STAGES = { 'loading tesseract core': 'Loading the reader', 'initializing tesseract': 'Starting the reader', 'loading language traineddata': 'Loading English', 'initializing api': 'Starting the reader', 'recognizing text': 'Reading text' };
+const ocrLog = (onP, share = 1, base = 0) => (m) => onP(m.status === 'recognizing text' ? base + m.progress * share : null, OCR_STAGES[m.status] || null);
+async function readPdf(file, onP) {
+  onP(0.02, 'Loading the PDF reader');
+  await loadScript(SNAP_CDN.pdf);
+  const lib = window.pdfjsLib;
+  lib.GlobalWorkerOptions.workerSrc = SNAP_CDN.pdfWorker;
+  const doc = await lib.getDocument({ data: new Uint8Array(await file.arrayBuffer()), isEvalSupported: false, disableFontFace: true }).promise;
+  try {
+    const n = Math.min(doc.numPages, 12), pages = [];
+    for (let p = 1; p <= n; p++) {
+      const page = await doc.getPage(p);
+      pages.push(pdfPageText((await page.getTextContent()).items));
+      page.cleanup();
+      onP(p / n, `Reading page ${p} of ${n}`);
+    }
+    const text = pages.join('\n');
+    if (text.replace(/\s/g, '').length >= 80) return { text, source: 'pdf' };
+    // a scanned statement (pictures of pages): read the first pages with OCR
+    const m = Math.min(n, 4);
+    let out = '', k = 0;
+    const worker = await ocrWorker((x) => ocrLog(onP, 1 / m, k / m)(x));
+    try {
+      for (let p = 1; p <= m; p++) {
+        k = p - 1;
+        const page = await doc.getPage(p), vp = page.getViewport({ scale: 2 });
+        const c = document.createElement('canvas');
+        c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+        await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+        out += (await worker.recognize(c)).data.text + '\n';
+        c.width = c.height = 0;
+      }
+    } finally { await worker.terminate(); }
+    return { text: out, source: 'ocr' };
+  } finally { doc.destroy(); }
+}
+async function imageCanvas(file) {
+  let bmp;
+  try { bmp = await createImageBitmap(file); } catch (e) { throw new Error('This image format can\'t be read here. Take a screenshot, or save the photo as JPG or PNG.'); }
+  const long = Math.max(bmp.width, bmp.height);
+  const scale = long > 3200 ? 3200 / long : long < 1400 ? Math.min(2, 1400 / long) : 1;   // small screenshots read better enlarged
+  const c = document.createElement('canvas');
+  c.width = Math.round(bmp.width * scale); c.height = Math.round(bmp.height * scale);
+  const g = c.getContext('2d');
+  g.imageSmoothingQuality = 'high';
+  g.drawImage(bmp, 0, 0, c.width, c.height);
+  if (bmp.close) bmp.close();
+  return c;
+}
+async function readImage(file, onP) {
+  onP(0.02, 'Loading the reader');
+  const canvas = await imageCanvas(file);
+  const worker = await ocrWorker(ocrLog(onP));
+  try { return { text: (await worker.recognize(canvas)).data.text, source: 'ocr' }; }
+  finally { await worker.terminate(); canvas.width = canvas.height = 0; }
+}
+
+/* ----- snap flow state: S.snap lives in memory only and is dropped when the sheet closes ----- */
+const isPdfFile = (f) => /pdf$/i.test(f.type) || /\.pdf$/i.test(f.name);
+const isImageFile = (f) => /^image\//.test(f.type) || /\.(png|jpe?g|webp|gif|bmp|heic|heif)$/i.test(f.name);
+const snapItem = () => (S.snap ? S.snap.items[S.snap.i] : null);
+const fieldDef = (key) => STMT_FIELDS.find((f) => f.key === key);
+function snapOpen(acctId) {
+  S.snap = { items: [], i: 0, forAcct: acctId || null, assign: null, pick: null, textOpen: null };
+  snapRender();
+}
+function snapFiles(list, acctId) {
+  const files = [...(list || [])];
+  if (!files.length) return;
+  const ok = files.filter((f) => isPdfFile(f) || isImageFile(f)).slice(0, 12);
+  if (!ok.length) { toast('CAN\'T READ THAT', 'Choose PDF statements, or photos or screenshots of them.', 'warn'); return; }
+  const forAcct = acctId || (S.snap && !S.snap.items.length ? S.snap.forAcct : null);
+  S.snap = { items: ok.map((f) => ({ id: uid(), name: String(f.name || 'Statement').slice(0, 80), kind: isPdfFile(f) ? 'pdf' : 'image', file: f, status: 'waiting', progress: 0, stage: 'Waiting' })),
+    i: 0, forAcct, assign: null, pick: null, textOpen: null };
+  snapRender();
+  snapRun(S.snap);
+}
+function snapText(text) {
+  if (!String(text || '').trim()) { toast('NOTHING TO READ', 'Paste the statement text first.', 'warn'); return; }
+  const forAcct = S.snap ? S.snap.forAcct : null;
+  S.snap = { items: [{ id: uid(), name: 'Pasted text', kind: 'text', status: 'reading', progress: 1, stage: '' }], i: 0, forAcct, assign: null, pick: null, textOpen: null };
+  snapParse(S.snap.items[0], text, 'text');
+  snapRender();
+}
+async function snapRun(sn) {
+  for (const it of sn.items) {
+    if (S.snap !== sn) return;   // closed: stop and let everything go
+    if (it.status !== 'waiting') continue;
+    it.status = 'reading';
+    const onP = (p, stage) => { if (p != null) it.progress = Math.max(it.progress, Math.min(1, p)); if (stage) it.stage = stage; snapProgress(it); };
+    try {
+      const res = it.kind === 'pdf' ? await readPdf(it.file, onP) : await readImage(it.file, onP);
+      if (S.snap !== sn) return;
+      snapParse(it, res.text, res.source);
+    } catch (e) {
+      console.warn('statement read failed', e);
+      it.status = 'error';
+      it.error = e && e.message && !/^[A-Z]\w+Error\b/.test(e.message) ? e.message : 'This file couldn\'t be read. Try a PDF of the statement, or a clear screenshot.';
+    }
+    it.file = null;   // the file itself is let go as soon as it's been read
+    if (S.snap === sn && (sn.items[sn.i] === it || !['ready', 'error'].includes(sn.items[sn.i].status))) snapRender();
+    else snapProgress(it);
+  }
+}
+function snapParse(it, text, source) {
+  const sn = S.snap;
+  it.parsed = parseStatement(text, { source, today: todayISO() });
+  it.vals = stmtValues(it.parsed);
+  it.src = {}; it.conf = {}; it.set = {};
+  STMT_FIELDS.forEach((f) => { const x = it.parsed.fields[f.key]; if (x) { it.src[f.key] = { line: x.line, start: x.start, end: x.end }; it.conf[f.key] = x.conf; } });
+  const m = matchStatementCard(S.data, it.parsed);
+  const forced = sn.forAcct && creditAccounts(S.data).some((a) => a.id === sn.forAcct) ? sn.forAcct : null;
+  it.acctId = forced || m.acctId;
+  it.sure = forced ? true : m.sure;
+  const mine = forced && m.candidates.find((c) => c.id === forced);
+  it.mismatch = !!(mine && mine.why.includes('other-last4')) ? mine.last4 : null;
+  it.found = STMT_FIELDS.filter((f) => it.vals[f.key] != null).length;
+  it.status = it.parsed.lines.length ? 'ready' : 'error';
+  if (!it.parsed.lines.length) it.error = 'No text was found. For a photo, make sure the statement fills the frame and is in focus.';
+  it.step = 'review';
+  it.progress = 1;
+}
+function snapDrop() { S.snap = null; }   // statement text and files go with it
+function snapRender() {
+  if (!S.snap) return;
+  const html = snapHTML();
+  const root = $('#snapRoot');
+  if (root) { root.innerHTML = html; snapMounted(root); return; }
+  openSheet(`<div id="snapRoot">${html}</div>`, (bg) => { bg.querySelector('.sheet').classList.add('wide'); snapMounted(bg.querySelector('#snapRoot')); });
+}
+function snapMounted(root) {
+  const d = root.querySelector('.snap-text');
+  if (d) d.addEventListener('toggle', () => { if (S.snap) S.snap.textOpen = d.open; });
+}
+function snapProgress(it) {
+  const li = document.getElementById('snapq-' + it.id);
+  if (!li) return;
+  li.className = it.status;
+  li.querySelector('.sq-stage').textContent = snapStage(it);
+  const bar = li.querySelector('.progress > div');
+  if (bar) bar.style.width = Math.round((it.status === 'ready' ? 1 : it.progress || 0) * 100) + '%';
+  const pb = li.querySelector('[role="progressbar"]');
+  if (pb) pb.setAttribute('aria-valuenow', String(Math.round((it.progress || 0) * 100)));
+}
+function snapStage(it) {
+  if (it.status === 'ready') return `Ready · ${plural(it.found || 0, 'number')} found`;
+  if (it.status === 'error') return 'Couldn\'t read this one';
+  if (it.status === 'applied') return 'Applied';
+  if (it.status === 'skipped') return 'Skipped';
+  return it.status === 'waiting' ? 'Waiting' : `${it.stage || 'Reading'}… ${Math.round((it.progress || 0) * 100)}%`;
+}
+function snapHTML() {
+  const it = snapItem();
+  if (!it) return snapChooserHTML();
+  if (it.status === 'ready') return it.step === 'confirm' ? snapConfirmHTML(it) : snapReviewHTML(it);
+  if (it.status === 'error') return snapErrorHTML(it);
+  return snapQueueHTML();
+}
+const snapPrivacy = () => `<p class="snap-privacy">${icon('lock', 'sm')}<span>Read on this device. Only the numbers you confirm and the card's last 4 digits are saved. The file, its text, account numbers and transactions are never uploaded or stored.</span></p>`;
+function stmtDropHTML(acctId, compact) {
+  return `<label class="dropzone ${compact ? 'compact' : ''}" data-dropzone ${acctId ? `data-acct="${esc(acctId)}"` : ''}>
+    <input type="file" class="sr-only" accept="application/pdf,.pdf,image/*" multiple data-snap-files ${acctId ? `data-acct="${esc(acctId)}"` : ''}>
+    <span class="dz-ico">${icon('upload')}</span>
+    <b>${acctId ? 'Choose the statement' : 'Drop this month\'s statements'}</b>
+    <span class="small muted">PDFs, photos or screenshots${acctId ? '' : ', several at once'}. Tap to choose files.</span>
+  </label>`;
+}
+function snapChooserHTML() {
+  const sn = S.snap, a = sn.forAcct ? creditAccounts(S.data).find((x) => x.id === sn.forAcct) : null;
+  return `<div class="eyebrow">Statement Snap</div><h2 style="margin:6px 0 4px">${a ? `Snap ${esc(a.name)}` : 'Snap a statement'}</h2>
+    <p class="small muted" style="margin:0">Money HQ reads the balance, minimum, due date, APR, limit and more, then shows you each number before anything changes.</p>
+    ${stmtDropHTML(sn.forAcct)}
+    ${snapPrivacy()}
+    <details class="paste"><summary>Or paste the statement text</summary>
+      <label class="sr-only" for="snapPaste">Statement text</label>
+      <textarea class="input" id="snapPaste" rows="6" spellcheck="false" autocomplete="off" placeholder="Copy the summary from your card's website or PDF and paste it here."></textarea>
+      <button type="button" class="btn sm" data-act="snap-paste" style="margin-top:8px">Read this text</button></details>
+    <div class="sheet-actions one"><button type="button" class="btn" data-close>Cancel</button></div>`;
+}
+function snapQueueHTML() {
+  const sn = S.snap;
+  return `<div class="eyebrow">Statement Snap</div><h2 style="margin:6px 0 4px">Reading ${sn.items.length === 1 ? 'your statement' : `${sn.items.length} statements`}</h2>
+    ${snapPrivacy()}
+    <ul class="snapq">${sn.items.map((it) => `<li id="snapq-${it.id}" class="${it.status}">
+      <span class="l-ico">${icon(it.kind === 'pdf' ? 'receipt' : 'camera')}</span>
+      <div style="min-width:0"><b>${esc(it.name)}</b><span class="sq-stage" aria-live="polite">${esc(snapStage(it))}</span>
+        <div class="progress thin" role="progressbar" aria-label="Reading ${esc(it.name)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round((it.progress || 0) * 100)}"><div style="width:${Math.round((it.status === 'ready' ? 1 : it.progress || 0) * 100)}%"></div></div></div></li>`).join('')}</ul>
+    <p class="small faint" style="margin:0">Photos take a little longer: the text reader runs on your device.</p>
+    <div class="sheet-actions one"><button type="button" class="btn" data-close>Cancel</button></div>`;
+}
+function snapErrorHTML(it) {
+  const more = S.snap.items.some((x, j) => j !== S.snap.i && !['applied', 'skipped', 'error'].includes(x.status));
+  return `<div class="eyebrow">Statement Snap</div><h2 style="margin:6px 0 12px">Couldn't read ${esc(it.name)}</h2>
+    <div class="alert bad">${esc(it.error || 'Something went wrong.')}</div>
+    ${more ? '' : stmtDropHTML(S.snap.forAcct)}
+    <div class="sheet-actions"><button type="button" class="btn" data-close>Close</button><button type="button" class="btn primary" data-act="snap-skip">${more ? 'Next statement' : 'OK'}</button></div>`;
+}
+const snapLow = (it, key) => !it.set[key] && ((it.vals[key] != null && (it.conf[key] || 0) < STMT_LOW) || (it.vals[key] == null && (key === 'balance' || key === 'closingDate')));
+function snapConfPill(it, key) {
+  if (it.set[key]) return `<span class="pill helps">${it.set[key] === 'picked' ? 'From the text' : 'Edited'}</span>`;
+  if (it.vals[key] == null) return `<span class="pill ${key === 'balance' || key === 'closingDate' ? 'hurts' : ''}">Not found</span>`;
+  const c = it.conf[key] || 0, p = Math.round(c * 100);
+  return c >= 0.85 ? `<span class="pill helps">High · ${p}%</span>` : c >= STMT_LOW ? `<span class="pill watch">Check · ${p}%</span>` : `<span class="pill hurts">Low · ${p}%</span>`;
+}
+/** Long digit runs (account numbers) are shown masked; same length, so positions still line up. */
+function maskDigits(line) {
+  return line.replace(/\d(?:[\s-]?\d){7,}/g, (run) => { let keep = 4; return run.split('').reverse().map((ch) => (/\d/.test(ch) ? (keep-- > 0 ? ch : '•') : ch)).reverse().join(''); });
+}
+function snapSnippet(it, key) {
+  const s = it.src[key];
+  if (!s || !it.parsed) return '';
+  const line = maskDigits(it.parsed.lines[s.line] || '');
+  const a = Math.max(0, s.start - 44), b = Math.min(line.length, s.end + 28);
+  return `<div class="snip"><span class="faint">From:</span> ${a > 0 ? '…' : ''}${esc(line.slice(a, s.start))}<mark>${esc(line.slice(s.start, s.end))}</mark>${esc(line.slice(s.end, b))}${b < line.length ? '…' : ''}</div>`;
+}
+function snapFieldHTML(it, f) {
+  const v = it.vals[f.key], sel = S.snap.assign === f.key, id = `sfi-${f.key}`;
+  const val = v == null ? '' : esc(v);
+  const input = f.type === 'date' ? `<input class="input num" type="date" id="${id}" data-snapf="${f.key}" value="${val}">`
+    : f.type === 'pct' ? `<div class="suffix"><input class="input num" id="${id}" data-snapf="${f.key}" inputmode="decimal" autocomplete="off" value="${val}" placeholder="Not found"><b>%</b></div>`
+    : f.type === 'last4' ? `<input class="input num" id="${id}" data-snapf="${f.key}" inputmode="numeric" autocomplete="off" maxlength="4" value="${val}" placeholder="Not found">`
+    : `<div class="prefix"><b>${cur()}</b><input class="input num" id="${id}" data-snapf="${f.key}" inputmode="decimal" autocomplete="off" value="${val}" placeholder="Not found"></div>`;
+  const label = f.key === 'creditLimit' && it.vals.noPresetLimit ? 'Pay Over Time limit' : f.label;
+  return `<div class="sf ${snapLow(it, f.key) ? 'low' : ''} ${sel ? 'sel' : ''}" data-sf="${f.key}">
+    <div class="sf-top"><label for="${id}">${esc(label)}</label><span data-pill="${f.key}">${snapConfPill(it, f.key)}</span></div>
+    <div class="sf-in">${input}<button type="button" class="btn sm ${sel ? 'primary' : ''}" data-act="snap-assign" data-key="${f.key}" aria-pressed="${sel}" title="Pick from the statement text">${icon('target', 'sm')}<span class="sr-only">Pick ${esc(label)} from the statement text</span></button></div>
+    ${snapSnippet(it, f.key)}${it.parsed.fields[f.key] && it.parsed.fields[f.key].alts && !it.set[f.key] ? `<div class="snip">Also seen: ${it.parsed.fields[f.key].alts.map((x) => esc(snapFmt(f.type, x))).join(', ')}</div>` : ''}
+  </div>`;
+}
+function snapFmt(type, v) {
+  if (v == null || v === '') return '—';
+  if (type === 'money') return money(v);
+  if (type === 'pct') return `${toNum(v).toFixed(2)}%`;
+  if (type === 'date') return fmtDate(v);
+  if (type === 'day') return `the ${ordinal(v)}`;
+  if (type === 'kind') return CARD_KINDS[v] || v;
+  return String(v);
+}
+const tokKind = (t) => (t.type === 'int' ? (String(t.digits || '').length === 4 ? 'last4' : null) : t.type);
+function snapFitsTok(f, t) { return f.type === 'last4' ? String(t.digits || '').length >= 4 && (t.type === 'int' || t.type === 'money') : t.type === f.type || (f.type === 'money' && t.type === 'int'); }
+function snapTextHTML(it) {
+  const p = it.parsed, used = {};
+  Object.entries(it.src).forEach(([k, s]) => { used[`${s.line}:${s.start}`] = k; });
+  const pick = S.snap.pick;
+  const lines = p.lines.map((raw, li) => {
+    const line = maskDigits(raw);
+    let h = '', at = 0;
+    p.toks[li].forEach((t, ti) => {
+      if (!tokKind(t)) return;
+      h += esc(line.slice(at, t.index));
+      const k = used[`${li}:${t.index}`];
+      h += `<button type="button" class="tok ${k ? 'used' : ''} ${pick && pick.l === li && pick.t === ti ? 'on' : ''}" data-act="snap-tok" data-l="${li}" data-t="${ti}"${k ? ` title="${esc(fieldDef(k).label)}"` : ''}>${esc(line.slice(t.index, t.end))}</button>`;
+      at = t.end;
+    });
+    return `<div class="sl">${h}${esc(line.slice(at))}</div>`;
+  }).join('');
+  let bar;
+  if (S.snap.assign) {
+    const f = fieldDef(S.snap.assign);
+    bar = `<div class="assign-bar" role="status">Tap ${f.type === 'date' ? 'a date' : f.type === 'pct' ? 'a percentage' : f.type === 'last4' ? 'the account number' : 'an amount'} for <b>${esc(f.label)}</b><button type="button" class="link-btn small" data-act="snap-pick-x">Cancel</button></div>`;
+  } else if (pick) {
+    const t = p.toks[pick.l][pick.t];
+    const fits = STMT_FIELDS.filter((f) => snapFitsTok(f, t));
+    bar = `<div class="assign-bar" role="status"><span>Use <b class="num">${esc(maskDigits(p.lines[pick.l]).slice(t.index, t.end))}</b> for:</span>${fits.map((f) => `<button type="button" class="chip chip-btn" data-act="snap-use" data-key="${f.key}">${esc(f.label)}</button>`).join('')}<button type="button" class="link-btn small" data-act="snap-pick-x">Cancel</button></div>`;
+  } else bar = '<p class="small faint" style="margin:0 0 8px">Tap any number or date to use it for a field.</p>';
+  const open = S.snap.textOpen != null ? S.snap.textOpen : !!S.snap.assign || !!pick || matchMedia('(min-width: 900px)').matches;
+  return `<details class="snap-text" ${open || S.snap.assign || pick ? 'open' : ''}><summary><span>${icon('receipt', 'sm')} Statement text</span><span class="small faint">${plural(p.lines.length, 'line')} · on this device only</span></summary>
+    ${bar}<div class="stmt-text" id="stmtText">${lines || '<span class="faint">No text</span>'}</div></details>`;
+}
+function snapCardSelect(it) {
+  const accts = creditAccounts(S.data).filter((a) => a.kind !== 'loan');
+  const opt = (a) => { const l4 = acctLast4(S.data, a); return `<option value="${esc(a.id)}" ${a.id === it.acctId ? 'selected' : ''}>${esc(a.name)}${l4 ? ` · ${l4}` : ''}${a.paid ? ' (paid off)' : ''}</option>`; };
+  return `<label class="field" style="margin:0"><span>Card</span><select class="input" data-snap-acct>
+    ${it.acctId ? '' : '<option value="">Choose a card…</option>'}${accts.map(opt).join('')}<option value="new" ${it.acctId === 'new' ? 'selected' : ''}>+ Add as a new card</option></select></label>`;
+}
+function snapNewName(it) {
+  const p = it.parsed || {};
+  if (p.issuer === 'amex' && p.productName) return `Amex ${p.productName.replace(/ Card$/, '')}`;
+  if (p.issuer === 'capitalone' && p.productName) return `Capital One ${p.productName}`;
+  if (p.issuer === 'robinhood') return 'Robinhood Gold Card';
+  return p.productName || p.issuerName || 'New card';
+}
+function snapReviewHTML(it) {
+  const sn = S.snap, n = sn.items.length, k = sn.items.indexOf(it) + 1;
+  const low = STMT_FIELDS.filter((f) => snapLow(it, f.key)).length;
+  const more = STMT_FIELDS.filter((f) => !f.main);
+  const moreFound = more.filter((f) => it.vals[f.key] != null || it.set[f.key]);
+  const rest = more.filter((f) => !moreFound.includes(f));
+  const acct = it.acctId && it.acctId !== 'new' ? creditAccounts(S.data).find((a) => a.id === it.acctId) : null;
+  const src = { pdf: 'PDF', ocr: 'Photo', text: 'Pasted text' }[it.parsed.source];
+  const tags = [it.parsed.issuerName ? `${it.parsed.issuerName}${it.parsed.productName && it.parsed.productName !== it.parsed.issuerName ? ` · ${it.parsed.productName}` : ''}` : 'Issuer not recognized', src,
+    it.vals.noPresetLimit ? 'No preset spending limit' : '', it.vals.payOverTime && it.vals.noPresetLimit ? 'Pay Over Time' : ''].filter(Boolean);
+  return `<div class="snap-head"><div style="min-width:0"><div class="eyebrow">Statement ${n > 1 ? `${k} of ${n}` : 'Snap'} · ${esc(it.name)}</div><h2 style="margin:6px 0 0">Check the <em>numbers</em></h2></div></div>
+    <div class="chips" style="margin:10px 0">${tags.map((t) => `<span class="chip">${esc(t)}</span>`).join('')}</div>
+    ${snapCardSelect(it)}
+    ${it.acctId === 'new' ? `<p class="hint" style="margin:6px 0 0">Adds <b>${esc(snapNewName(it))}</b> to your debts when you apply. You can rename it later.</p>` : ''}
+    ${!it.sure ? `<div class="alert" style="margin-top:10px">${icon('info', 'sm')} <b>Which card is this?</b> ${acct ? `It looks like ${esc(acct.name)}, but Money HQ isn't sure.` : 'Money HQ couldn\'t tell.'} Pick it above${it.vals.last4 ? `; the last 4 (${esc(it.vals.last4)}) is remembered for next time` : ''}.</div>` : ''}
+    ${it.mismatch ? `<div class="alert bad" style="margin-top:10px">This statement ends in <b>${esc(it.vals.last4)}</b>, but ${esc(acct ? acct.name : 'this card')} ends in <b>${esc(it.mismatch)}</b>. Check it's the right card (a replaced card gets a new number).</div>` : ''}
+    ${!it.found ? '<div class="alert bad" style="margin-top:10px">No statement numbers were found. Fill them in below, or tap numbers in the statement text.</div>' : low ? `<p class="small" style="margin:10px 0 0;color:var(--warn)">${icon('alert', 'sm')} ${plural(low, 'field')} ${low === 1 ? 'needs' : 'need'} a look (highlighted).</p>` : `<p class="small" style="margin:10px 0 0;color:var(--accent)">${icon('check', 'sm')} Everything was read with good confidence. Still, give it a glance.</p>`}
+    <div class="snap-grid">
+      <div class="snap-fields">
+        ${STMT_FIELDS.filter((f) => f.main).map((f) => snapFieldHTML(it, f)).join('')}
+        ${moreFound.map((f) => snapFieldHTML(it, f)).join('')}
+        ${rest.length ? `<details class="paste"><summary>More fields (${rest.map((f) => f.label.toLowerCase()).join(', ')})</summary>${rest.map((f) => snapFieldHTML(it, f)).join('')}</details>` : ''}
+      </div>
+      <div>${snapTextHTML(it)}</div>
+    </div>
+    ${snapPrivacy()}
+    <div class="sheet-actions"><button type="button" class="btn" data-act="snap-skip">${n > 1 ? 'Skip' : 'Cancel'}</button><button type="button" class="btn primary" data-act="snap-review">Apply to card</button></div>`;
+}
+/** For "add as a new card": plan against a scratch copy with the new card in it. */
+function snapNewDebt(it, nowISO) {
+  return { id: uid(), name: snapNewName(it), type: 'card', balance: 0, startBalance: 0, apr: 0, minPayment: 0, promoEnd: '', paid: false, paidAt: null, createdAt: nowISO || new Date().toISOString(),
+    creditLimit: null, promoApr: 0, keepOpen: 0, dueDay: null, closingDay: null, cardKind: it.vals.noPresetLimit ? 'charge' : 'revolving', openDate: '', utilInclude: true, monthlySpend: null, last4: '' };
+}
+function snapPlan(it) {
+  if (it.acctId !== 'new') return statementPlan(S.data, it.acctId, it.vals);
+  const tmp = JSON.parse(JSON.stringify(S.data)), nd = snapNewDebt(it);
+  tmp.debts.push(nd);
+  const plan = statementPlan(tmp, nd.id, it.vals);
+  if (plan) plan.rows.forEach((r) => { if (r.key === 'balance') r.before = null; });
+  return plan;
+}
+function snapConfirmHTML(it) {
+  const plan = snapPlan(it);
+  if (!plan) { it.step = 'review'; return snapReviewHTML(it); }
+  const name = it.acctId === 'new' ? snapNewName(it) : plan.target.name;
+  const changed = plan.rows.filter((r) => r.changed);
+  const rows = plan.rows.map((r) => `<tr class="${r.changed ? 'hl' : 'same'}"><td>${esc(r.label)}</td><td>${esc(snapFmt(r.type, r.before))}</td><td>${r.changed ? `<b>${esc(snapFmt(r.type, r.after))}</b>` : '<span class="faint">no change</span>'}</td></tr>`).join('');
+  return `<div class="eyebrow">Before → after</div><h2 style="margin:6px 0 4px">Apply to <em>${esc(name)}</em></h2>
+    <p class="small muted" style="margin:0 0 10px">Statement closed ${esc(fmtDate(it.vals.closingDate))}${it.vals.balance != null ? ` · ${esc(money(it.vals.balance))} statement balance` : ''}</p>
+    ${!plan.latest ? `<div class="alert">${icon('info', 'sm')} You already have a newer statement for this card (closed ${esc(fmtDate(plan.newer))}). This one goes into the card's statement history only; the card keeps its current numbers.</div>` : ''}
+    ${plan.rows.length ? `<table class="mini-table ba"><colgroup><col style="width:38%"><col><col></colgroup><thead><tr><th>Field</th><th>Before</th><th>After</th></tr></thead><tbody>${rows}</tbody></table>` : ''}
+    ${plan.paidSince > 0 ? `<p class="small muted">${icon('info', 'sm')} The balance is the ${esc(money(plan.statementBalance))} statement balance minus ${esc(money(plan.paidSince))} you've paid since it closed.</p>` : ''}
+    ${plan.keptSince ? `<p class="small muted">${icon('info', 'sm')} Your balance stays as it is: you updated it on ${esc(fmtDate(plan.keptSince))}, after this statement closed.</p>` : ''}
+    ${changed.some((r) => r.key === 'balance') ? '<p class="small faint">The balance change is logged to your history, like a check-in.</p>' : ''}
+    <p class="small faint" style="margin:10px 0 0">${changed.length ? `${plural(changed.length, 'change')} to the card. ` : 'Nothing on the card changes. '}The statement's numbers are saved for its history and alerts. The file and its text are dropped.</p>
+    <div class="sheet-actions"><button type="button" class="btn" data-act="snap-back">Back</button><button type="button" class="btn primary" data-act="snap-apply">Confirm &amp; apply</button></div>`;
+}
+function snapValidate(it) {
+  const focus = (id) => setTimeout(() => { const el = document.getElementById(id) || $('[data-snap-acct]'); if (el) { el.focus(); el.scrollIntoView({ block: 'center', behavior: reducedMotion() ? 'auto' : 'smooth' }); } }, 30);
+  if (!it.acctId) { toast('WHICH CARD?', 'Pick the card this statement is for.', 'warn'); focus('x'); return false; }
+  if (!parseISO(it.vals.closingDate)) { toast('CLOSING DATE NEEDED', 'Add the statement closing date. It\'s near the top of the statement.', 'warn'); focus('sfi-closingDate'); return false; }
+  if (it.vals.last4 != null && !/^\d{4}$/.test(String(it.vals.last4))) { toast('LAST 4 DIGITS', 'Use exactly 4 digits, or leave it blank.', 'warn'); focus('sfi-last4'); return false; }
+  return true;
+}
+function snapApply() {
+  const sn = S.snap, it = snapItem();
+  if (!it || it.status !== 'ready') return;
+  const nowISO = new Date().toISOString();
+  let acctId = it.acctId;
+  if (acctId === 'new') {
+    const nd = snapNewDebt(it, nowISO);
+    S.data.debts.push(nd);
+    logHistory({ kind: 'added', debtId: nd.id, debtName: nd.name, after: 0 });
+    acctId = nd.id;
+  }
+  const res = applyStatement(S.data, acctId, it.vals, nowISO, { issuer: it.parsed.issuer, source: it.parsed.source });
+  if (!res) { toast('NOT APPLIED', 'That card is gone. Pick another one.', 'warn'); it.step = 'review'; snapRender(); return; }
+  const alerts = statementAlerts(S.data, todayISO(), money0).filter((a) => a.acctId === res.plan.target.id && (a.closing === res.stmt.closingDate));
+  // confirmed: drop the statement's text and everything read from it
+  it.parsed = null; it.vals = null; it.src = null; it.conf = null; it.set = null;
+  it.status = 'applied';
+  S.checkinDraft = null;
+  commit();
+  const name = res.plan.target.name;
+  it.result = { id: res.plan.target.id, name, alerts: alerts.length, changes: res.plan.rows.filter((r) => r.changed).length, latest: res.plan.latest };
+  if (res.paidOff) setTimeout(() => { confetti(260); toast(`${name.toUpperCase()} IS PAID!`, 'The statement shows a $0 balance.'); }, 600);
+  if (S.snap === sn) snapNext();
+  setTimeout(checkMilestones, 900);
+}
+function snapNext() {
+  const sn = S.snap;
+  const open = (x) => !['applied', 'skipped'].includes(x.status);
+  let k = sn.items.findIndex((x, j) => j > sn.i && open(x));
+  if (k < 0) k = sn.items.findIndex(open);
+  if (k < 0) { snapDrop(); closeSheet(); snapDoneToast(sn); return; }
+  sn.i = k; sn.assign = null; sn.pick = null;
+  snapRender();
+  const sh = $('#sheetRoot .sheet');
+  if (sh) sh.scrollTop = 0;
+}
+/** One toast for the whole batch (a bulk drop would otherwise stack one per statement). */
+function snapDoneToast(sn) {
+  const done = sn.items.filter((x) => x.status === 'applied' && x.result).map((x) => x.result);
+  if (!done.length) return;
+  const alerts = done.reduce((t, r) => t + r.alerts, 0);
+  const more = alerts ? ` · ${plural(alerts, 'thing')} to know about` : '';
+  if (done.length === 1) {
+    const r = done[0];
+    toast(`APPLIED TO ${r.name.toUpperCase()}`, `${r.latest ? `${plural(r.changes, 'change')} saved` : 'Saved to its statement history'}${more}`, 'info', alerts ? { label: 'See', fn: () => stmtHistorySheet(r.id) } : null);
+  } else toast(`${done.length} STATEMENTS APPLIED`, `${done.map((r) => r.name).join(', ')}${more}`, 'info', alerts ? { label: 'See', fn: () => switchTab('credit') } : null);
+}
+function snapSkip() {
+  const it = snapItem();
+  if (!it) { snapDrop(); closeSheet(); return; }
+  it.status = 'skipped'; it.parsed = null; it.vals = null; it.src = null; it.file = null;
+  snapNext();
+}
+function snapParseInput(type, raw) {
+  const s = String(raw == null ? '' : raw).trim();
+  if (!s) return null;
+  if (type === 'date') return parseISO(s) ? s.slice(0, 10) : null;
+  if (type === 'last4') { const d = s.replace(/\D/g, ''); return d.length === 4 ? d : s; }
+  const n = parseFloat(s.replace(/[^0-9.-]/g, ''));
+  return Number.isFinite(n) ? r2(n) : null;
+}
+function snapUseTok(it, key, l, ti) {
+  const t = it.parsed.toks[l] && it.parsed.toks[l][ti], f = fieldDef(key);
+  if (!t || !f) return false;
+  if (!snapFitsTok(f, t)) { toast('WRONG KIND', `${f.label} needs ${f.type === 'date' ? 'a date' : f.type === 'pct' ? 'a percentage' : f.type === 'last4' ? 'at least 4 digits' : 'an amount'}.`, 'warn'); return false; }
+  it.vals[key] = f.type === 'last4' ? String(t.digits).slice(-4) : t.value;
+  it.src[key] = { line: l, start: t.index, end: t.end };
+  it.set[key] = 'picked';
+  return true;
+}
+function snapFlash(key) {
+  setTimeout(() => {
+    const el = document.querySelector(`[data-sf="${key}"]`);
+    if (!el) return;
+    el.scrollIntoView({ block: 'nearest', behavior: reducedMotion() ? 'auto' : 'smooth' });
+    el.classList.add('flash');
+    setTimeout(() => el.classList.remove('flash'), 900);
+  }, 20);
+}
+
+/* ----- statement history, statement day ----- */
+function stmtHistorySheet(acctId) {
+  const a = creditAccounts(S.data).find((x) => x.id === acctId);
+  if (!a) return;
+  const list = statementsFor(S.data, a).slice().reverse();
+  const ser = statementSeries(S.data, a);
+  const alerts = statementAlerts(S.data, todayISO(), money0).filter((x) => x.acctId === a.id);
+  const chart = (id, label, color, key, fmt) => {
+    const pts = ser.filter((p) => p[key] != null).map((p) => ({ date: p.date, v: p[key] }));
+    return pts.length >= 2 ? `<div class="mini-chart"><div class="k">${esc(label)}</div>${lineChart(id, [{ label, color, dots: true, points: pts }], { height: 120, fmt, yMin: 0, aria: `${label} on each statement` })}</div>` : '';
+  };
+  const item = (s) => {
+    const bits = [s.minPayment != null ? `min ${money(s.minPayment)}` : '', s.apr != null ? `${toNum(s.apr).toFixed(2)}% APR` : '', s.interest != null ? `interest ${money(s.interest)}` : '',
+      s.fees ? `fees ${money(s.fees)}` : '', s.creditLimit ? `limit ${money0(s.creditLimit)}` : s.noPresetLimit ? 'no preset limit' : '', s.dueDate ? `due ${shortDate(s.dueDate)}` : ''].filter(Boolean);
+    return `<li><div><div><b>Closed ${esc(fmtDate(s.closingDate))}</b></div><div class="when num">${esc(bits.join(' · '))}</div></div>
+      <div class="row" style="gap:6px;align-items:flex-start"><span class="amt">${s.balance == null ? '—' : money(s.balance)}</span><button type="button" class="btn sm ghost icon" data-act="stmt-del" data-id="${esc(s.id)}" data-acct="${esc(a.id)}" aria-label="Remove the ${esc(fmtDate(s.closingDate))} statement">${icon('trash', 'sm')}</button></div></li>`;
+  };
+  openSheet(`<div class="eyebrow">Statement history</div><h2 style="margin:6px 0 12px">${esc(a.name)}</h2>
+    ${alerts.length ? `<ul class="warn-list" style="margin-bottom:8px">${alerts.map((al) => `<li class="${al.level === 'good' ? 'info' : al.level === 'bad' ? 'hurts' : 'warn'}">${icon(al.level === 'good' ? 'check' : 'alert', 'sm')}<span>${boldify(al.text)}</span></li>`).join('')}</ul>` : ''}
+    ${list.length ? `${list.length >= 2 ? `<div class="mini-charts">${chart('sh-bal', 'Balance', 'var(--s-debt)', 'balance')}${chart('sh-int', 'Interest charged', 'var(--warn)', 'interest')}${chart('sh-util', 'Utilization', 'var(--s-hysa)', 'util', (v) => `${Math.round(v)}%`)}</div>` : '<p class="small muted">Charts of balance, interest and utilization start with your second statement.</p>'}
+      <ul class="hist" style="margin-top:8px">${list.map(item).join('')}</ul>` : '<p class="muted small">No statements yet. Snap one to start this card\'s history.</p>'}
+    <p class="small faint">Only the numbers are kept: no statement files, text, account numbers or transactions.</p>
+    <div class="sheet-actions"><button type="button" class="btn" data-close>Close</button><button type="button" class="btn primary" data-act="snap" data-id="${esc(a.id)}">${icon('receipt', 'sm')} Snap a statement</button></div>`,
+  (bg) => wireCharts(bg));
+}
+function statementDayHTML() {
+  const today = todayISO(), sd = statementDay(S.data, today);
+  const mName = monthLabel(sd.month, { month: 'long' });
+  const alerts = statementAlerts(S.data, today, money0);
+  const row = (r) => {
+    const hist = r.last ? `<button type="button" class="btn sm ghost" data-act="stmt-history" data-id="${esc(r.id)}">History</button>` : '';
+    const snap = `<button type="button" class="btn sm ${r.status === 'due' ? 'primary' : ''}" data-act="snap" data-id="${esc(r.id)}">${icon('receipt', 'sm')} Snap</button>`;
+    const info = { in: [icon('check'), `In · ${r.stmt && r.stmt.balance != null ? `${money0(r.stmt.balance)} · ` : ''}${shortDate(r.closing)}`],
+      due: [icon('alert'), `Closed ${shortDate(r.closing)} · not snapped yet`], upcoming: [icon('clock'), `Closes ${shortDate(r.closing)}${r.est ? ' (estimated)' : ''}`],
+      nodate: [icon('info'), 'No closing day yet. Snap a statement to add it.'] }[r.status];
+    return `<li class="li sd ${r.status}"><span class="l-ico">${info[0]}</span><div class="l-main"><b>${esc(r.name)}</b><span>${esc(info[1])}</span></div>
+      <div class="l-end sd-act">${r.status === 'in' ? hist : snap}</div></li>`;
+  };
+  return `<div class="card" id="statement-day">
+    <div class="card-head"><h3>${icon('receipt')} Statement day</h3>${sd.total ? `<span class="small muted num">${sd.inCount} of ${sd.total}</span>` : ''}</div>
+    ${sd.total ? `<div class="progress" style="height:8px" role="progressbar" aria-label="Statements in for ${esc(mName)}" aria-valuemin="0" aria-valuemax="${sd.total}" aria-valuenow="${sd.inCount}"><div style="width:${(sd.inCount / sd.total) * 100}%"></div></div>
+      <p class="sd-count"><b>${sd.inCount} of ${sd.total} statements in for ${esc(mName)}</b>${sd.due.length ? ` · ${plural(sd.due.length, 'closed')} since your last snap` : sd.inCount === sd.total ? ' · all caught up' : ''}</p>
+      <ul class="list">${sd.rows.map(row).join('')}</ul>` : '<p class="small muted" style="margin:0">Add your cards to see which statements have closed.</p>'}
+    ${stmtDropHTML(null, true)}
+    ${alerts.length ? `<div class="group-label" style="margin:16px 0 4px"><span>Changes on your statements</span></div><ul class="warn-list">${alerts.slice(0, 6).map((al) => `<li class="${al.level === 'good' ? 'info' : al.level === 'bad' ? 'hurts' : 'warn'}">${icon(al.level === 'good' ? 'check' : 'alert', 'sm')}<span>${boldify(al.text)} <button type="button" class="link-btn small" data-act="stmt-history" data-id="${esc(al.acctId)}">History</button></span></li>`).join('')}</ul>` : ''}
+  </div>`;
+}
+/** A one-line statement-day link for the Debts screen. */
+function statementDayLinkHTML() {
+  const sd = statementDay(S.data, todayISO());
+  if (!sd.total) return '';
+  return `<button type="button" class="stat tap sd-link" data-act="goto" data-tab="credit"><div class="row between"><div class="k">${icon('receipt', 'sm')} Statement day</div><span class="small" style="color:var(--accent);font-weight:700">Credit ${icon('chev', 'sm')}</span></div>
+    <div class="small"><b class="num">${sd.inCount} of ${sd.total}</b> statements in for ${esc(monthLabel(sd.month, { month: 'long' }))}${sd.due.length ? ` · <span style="color:var(--warn)">${plural(sd.due.length, 'waiting')}</span>` : ''}</div></button>`;
+}
+
 /* ---------- calendar export ---------- */
 function icsEscape(s) { return String(s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n'); }
 /** Fold lines at 75 octets (RFC 5545) without splitting multi-byte characters. */
@@ -5410,6 +6620,7 @@ function downloadFile(name, text, type) {
 
 /* ---------- sheets (modals) ---------- */
 function openSheet(html, onMount) {
+  if (S.snap && !html.startsWith('<div id="snapRoot">')) snapDrop();   // another sheet replaces a snap in progress: drop its statement data
   const root = $('#sheetRoot');
   root.innerHTML = `<div class="sheet-bg"><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div></div>`;
   const bg = root.firstChild;
@@ -5419,6 +6630,7 @@ function openSheet(html, onMount) {
   if (first && matchMedia('(pointer:fine)').matches) first.focus();
 }
 function closeSheet() {
+  if (S.snap) { const sn = S.snap; snapDrop(); snapDoneToast(sn); }   // statement text and files never outlive the sheet
   $('#sheetRoot').innerHTML = '';
   if (S.ob) finishOnboarding(true);
   if (S.pendingRender) render();
@@ -5645,6 +6857,8 @@ function setPath(path, raw) {
 
 document.addEventListener('change', (e) => {
   const t = e.target;
+  if (t.matches('[data-snap-files]')) { const files = [...(t.files || [])]; t.value = ''; snapFiles(files, t.dataset.acct || null); return; }
+  if (t.matches('[data-snap-acct]')) { const it = snapItem(); if (it) { it.acctId = t.value || null; it.sure = !!t.value; it.mismatch = null; snapRender(); } return; }
   if (t.matches('[data-bind]')) { setPath(t.dataset.bind, t.value); commit(); return; }
   if (t.matches('[data-bind-check]')) { const [o, k] = t.dataset.bindCheck.split('.'); S.data[o][k] = t.checked; commit(); return; }
   if (t.matches('[data-setting]')) {
@@ -5670,6 +6884,17 @@ document.addEventListener('change', (e) => {
 });
 document.addEventListener('input', (e) => {
   const t = e.target;
+  if (t.matches('[data-snapf]')) {
+    const it = snapItem(), key = t.dataset.snapf;
+    if (!it || !it.vals) return;
+    it.vals[key] = snapParseInput(fieldDef(key).type, t.value);
+    it.set[key] = 'edited';
+    const pill = document.querySelector(`[data-pill="${key}"]`);
+    if (pill) pill.innerHTML = snapConfPill(it, key);
+    const row = t.closest('.sf');
+    if (row) row.classList.remove('low');
+    return;
+  }
   if (t.id === 'wiRange') { S.whatIf = toNum(t.value); updateWhatIf(); return; }
   if (t.id === 'wbQuery') { S.wb.query = t.value; updateWhichCard(); document.querySelectorAll('#whichCard [data-act="wb-cat"]').forEach((x) => x.classList.toggle('on', SPEND_CATEGORIES[x.dataset.v] === t.value)); return; }
   if (t.id === 'wbAmt') { S.wb.amount = t.value; updateWhichCard(); return; }
@@ -5838,6 +7063,32 @@ document.addEventListener('click', (e) => {
     case 'credit-mode': S.data.credit.mode = b.dataset.v === 'month' ? 'month' : 'next'; if (S.data.credit.mode === 'month' && !S.data.credit.preMonth) { const bm = creditCtx().best; S.data.credit.preMonth = bm ? bm.month : shiftMonth(todayISO().slice(0, 7), 1); } commit(); break;
     case 'credit-goal': S.data.credit.goal = ['card', 'overall', 'aze'].includes(b.dataset.v) ? b.dataset.v : 'card'; commit(); break;
     case 'edit-acct': openAccount(b.dataset.id); break;
+    case 'snap': snapOpen(b.dataset.id || null); break;
+    case 'snap-paste': { const ta = $('#snapPaste'); snapText(ta ? ta.value : ''); break; }
+    case 'snap-assign': { const sn = S.snap; if (!sn) break; sn.assign = sn.assign === b.dataset.key ? null : b.dataset.key; sn.pick = null; if (sn.assign) sn.textOpen = true; snapRender();
+      if (sn.assign) setTimeout(() => { const tx = $('#stmtText'); if (tx && !matchMedia('(min-width: 900px)').matches) tx.scrollIntoView({ block: 'start', behavior: reducedMotion() ? 'auto' : 'smooth' }); }, 20); break; }
+    case 'snap-tok': {
+      const sn = S.snap, it = snapItem(); if (!it || !it.parsed) break;
+      const l = +b.dataset.l, ti = +b.dataset.t;
+      if (sn.assign) { const key = sn.assign; if (snapUseTok(it, key, l, ti)) { sn.assign = null; snapRender(); snapFlash(key); } }
+      else { sn.pick = sn.pick && sn.pick.l === l && sn.pick.t === ti ? null : { l, t: ti }; snapRender(); }
+      break;
+    }
+    case 'snap-use': { const sn = S.snap, it = snapItem(); if (!it || !sn.pick) break; const key = b.dataset.key; if (snapUseTok(it, key, sn.pick.l, sn.pick.t)) { sn.pick = null; snapRender(); snapFlash(key); } break; }
+    case 'snap-pick-x': if (S.snap) { S.snap.pick = null; S.snap.assign = null; snapRender(); } break;
+    case 'snap-review': { const it = snapItem(); if (it && snapValidate(it)) { it.step = 'confirm'; S.snap.assign = null; S.snap.pick = null; snapRender(); const sh = $('#sheetRoot .sheet'); if (sh) sh.scrollTop = 0; } break; }
+    case 'snap-back': { const it = snapItem(); if (it) { it.step = 'review'; snapRender(); } break; }
+    case 'snap-apply': snapApply(); break;
+    case 'snap-skip': snapSkip(); break;
+    case 'stmt-history': stmtHistorySheet(b.dataset.id); break;
+    case 'stmt-del': {
+      const s = S.data.statements.find((x) => x.id === b.dataset.id);
+      if (!s || !confirm(`Remove the ${fmtDate(s.closingDate)} statement from this card's history? The card's numbers stay as they are.`)) break;
+      S.data.statements = S.data.statements.filter((x) => x !== s);
+      commit();
+      stmtHistorySheet(b.dataset.acct);
+      break;
+    }
     case 'toggle-charge': {
       const id = b.dataset.id, x = id.startsWith('w:') ? S.data.wallet.find((c) => 'w:' + c.id === id) : S.data.debts.find((d) => d.id === id);
       if (x) { x.utilInclude = x.utilInclude === false; commit(); toast(x.utilInclude ? 'COUNTED' : 'LEFT OUT', `${x.name} ${x.utilInclude ? 'counts toward' : 'no longer counts toward'} utilization.`, 'info'); }
@@ -5853,6 +7104,18 @@ document.addEventListener('click', (e) => {
   }
 });
 $('#sync').addEventListener('click', () => pull());
+// statements dropped on a drop zone are read on this device; files dropped anywhere else are ignored (never opened by the browser)
+const dropZone = (e) => (e.target && e.target.closest ? e.target.closest('[data-dropzone]') : null);
+const hasFiles = (e) => !!(e.dataTransfer && [...(e.dataTransfer.types || [])].includes('Files'));
+document.addEventListener('dragover', (e) => { if (!hasFiles(e)) return; e.preventDefault(); const z = dropZone(e); document.querySelectorAll('[data-dropzone].over').forEach((x) => { if (x !== z) x.classList.remove('over'); }); if (z) { z.classList.add('over'); e.dataTransfer.dropEffect = 'copy'; } else e.dataTransfer.dropEffect = 'none'; });
+document.addEventListener('dragleave', (e) => { const z = dropZone(e); if (z && !z.contains(e.relatedTarget)) z.classList.remove('over'); });
+document.addEventListener('drop', (e) => {
+  if (!hasFiles(e)) return;
+  e.preventDefault();
+  const z = dropZone(e);
+  document.querySelectorAll('[data-dropzone].over').forEach((x) => x.classList.remove('over'));
+  if (z && S.user) snapFiles(e.dataTransfer.files, z.dataset.acct || null);
+});
 
 function payChecklistItem(date, key) {
   const list = S.data.payChecklists.find((c) => c.date === date);
